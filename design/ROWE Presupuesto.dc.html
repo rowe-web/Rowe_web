@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>ROWE — Tu presupuesto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Inter+Tight:wght@300;400;500&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth}
+body{margin:0;background:#0A0A0A;color:#EDEAE4;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.rw-cursor,body.rw-cursor *{cursor:none !important}
+a{color:#EDEAE4;text-decoration:none}a:hover{color:#FFFFFF}
+::selection{background:#EDEAE4;color:#0A0A0A}
+@keyframes rec{0%,100%{opacity:1}50%{opacity:.22}}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-22px,12px)}40%{transform:translate(14px,-18px)}60%{transform:translate(-8px,24px)}80%{transform:translate(18px,6px)}100%{transform:translate(0,0)}}
+@keyframes lbTop{from{transform:scaleY(1)}to{transform:scaleY(0)}}
+@keyframes fadeOut{0%,60%{opacity:1}100%{opacity:0}}
+@keyframes clipIn{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:1}}
+@keyframes ovIn{from{clip-path:inset(50% 0 50% 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes sheetIn{from{opacity:0;transform:translateY(40px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes drawy{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+</style>
+</helmet>
+<div style="font-family:'Inter Tight',sans-serif;color:#EDEAE4;background:#0A0A0A;min-height:100vh;position:relative">
+
+  <div id="rw-nav" style="position:fixed;left:0;right:0;top:0;z-index:100;height:76px;padding:0 6vw;display:flex;align-items:center;justify-content:space-between;transition:transform .6s cubic-bezier(0.76,0,0.24,1), background-color .4s">
+    <div style="display:flex;align-items:center;gap:12px"><img src="assets/rowe-logo-blanco.png" alt="ROWE" style="height:18px;display:block"><div data-rec="1" style="width:8px;height:8px;border-radius:50%;background:#FF3B1F;animation:rec 1.6s ease-in-out infinite"></div></div>
+    <div data-tc="1" style="display:{{ tcDisplay }};font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;color:#8A8780">00:00:00:00</div>
+    <div style="display:flex;align-items:center;gap:24px">
+      <button style="all:unset;cursor:pointer;font-size:14px;min-height:44px;display:flex;align-items:center">Menú</button>
+      <button onClick="{{ openOverlay }}" data-magnet="1" style="all:unset;cursor:pointer;box-sizing:border-box;font-size:14px;border:1px solid rgba(237,234,228,0.3);border-radius:999px;padding:0 20px;height:42px;display:flex;align-items:center;transition:background .25s, color .25s" style-hover="background:#EDEAE4;color:#0A0A0A">Hablemos</button>
+    </div>
+  </div>
+
+  <section id="presupuesto" data-screen-label="Escena 09 — Presupuesto" style="position:relative;padding:150px 6vw 120px">
+    <div data-reveal="1" style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid rgba(237,234,228,0.10);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Escena 09 — Tu presupuesto</span><span>Web · Audiovisual</span><span data-tc="1">00:00:00:00</span></div>
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:40px;margin-top:9vh">
+      <h2 data-reveal="mask" style="margin:0;font-weight:300;font-size:clamp(56px,10vw,168px);line-height:0.92;letter-spacing:-0.045em">Calcula tu<br><em style="font-family:'Instrument Serif',serif;font-weight:400;font-size:1.1em;letter-spacing:-0.015em">presupuesto.</em></h2>
+      <div data-reveal="1" style="max-width:390px;display:flex;flex-direction:column;gap:18px;padding-bottom:16px">
+        <p style="margin:0;font-size:18px;line-height:1.6;color:#8A8780">Elige lo que necesitas y te damos un rango orientativo al momento. Después lo afinamos contigo y te enviamos un presupuesto cerrado.</p>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#EDEAE4">Sin compromiso · Presupuesto cerrado · Respuesta en 24 h</div>
+      </div>
+    </div>
+
+    <div id="rw-cfg" style="display:flex;flex-wrap:wrap;gap:clamp(40px,5vw,96px);align-items:flex-start;margin-top:12vh">
+      <div style="flex:1 1 560px;min-width:0;display:flex;flex-direction:column">
+
+        <div data-reveal="1" style="border-top:1px solid rgba(237,234,228,0.10);padding:34px 0 46px;display:flex;flex-direction:column;gap:26px">
+          <div style="display:flex;align-items:baseline;gap:20px;flex-wrap:wrap"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Toma 01</span><span style="font-size:clamp(24px,2.2vw,30px);letter-spacing:-0.01em">¿Qué necesitas?</span></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+            <sc-for list="{{ types }}" as="t" hint-placeholder-count="3">
+              <button onClick="{{ t.on }}" style="all:unset;box-sizing:border-box;cursor:pointer;position:relative;min-height:230px;padding:22px;display:flex;flex-direction:column;justify-content:space-between;gap:24px;background:{{ t.bg }};color:{{ t.fg }};border:1px solid {{ t.bd }};transition:background .5s cubic-bezier(0.76,0,0.24,1), color .5s, border-color .25s, transform .2s cubic-bezier(0.22,1,0.36,1)" style-hover="border-color:#EDEAE4" style-active="transform:scale(0.98)" style-focus="outline:2px solid #EDEAE4;outline-offset:4px">
+                <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:{{ t.sub }}"><span>{{ t.key }}</span><span>{{ t.from }}</span></div>
+                <div style="display:flex;flex-direction:column;gap:10px"><div style="font-family:'Instrument Serif',serif;font-size:40px;line-height:0.95">{{ t.title }}</div><div style="font-size:14px;line-height:1.5;color:{{ t.sub }}">{{ t.desc }}</div></div>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div data-reveal="1" style="border-top:1px solid rgba(237,234,228,0.10);padding:34px 0 46px;display:flex;flex-direction:column;gap:26px">
+          <div style="display:flex;align-items:baseline;gap:20px;flex-wrap:wrap"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Toma 02</span><span style="font-size:clamp(24px,2.2vw,30px);letter-spacing:-0.01em">Tamaño de la web</span></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));border:1px solid rgba(237,234,228,0.10)">
+            <sc-for list="{{ pages }}" as="p" hint-placeholder-count="4">
+              <button onClick="{{ p.on }}" style="all:unset;box-sizing:border-box;cursor:pointer;min-height:84px;padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between;gap:8px;border-right:1px solid rgba(237,234,228,0.10);background:{{ p.bg }};color:{{ p.fg }};transition:background .45s cubic-bezier(0.76,0,0.24,1), color .45s" style-focus="outline:2px solid #EDEAE4;outline-offset:-2px"><span style="font-size:16px">{{ p.label }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:{{ p.sub }}">{{ p.delta }}</span></button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div data-reveal="1" style="border-top:1px solid rgba(237,234,228,0.10);padding:34px 0 46px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:baseline;gap:20px;flex-wrap:wrap;padding-bottom:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Toma 03</span><span style="font-size:clamp(24px,2.2vw,30px);letter-spacing:-0.01em">Funciones</span></div>
+          <div style="display:flex;flex-direction:column;border-top:1px solid rgba(237,234,228,0.10)">
+            <sc-for list="{{ feats }}" as="f" hint-placeholder-count="4">
+              <div onClick="{{ f.row }}" style="display:flex;align-items:center;gap:20px;padding:18px 4px;border-bottom:1px solid rgba(237,234,228,0.10);cursor:{{ f.rowCursor }};background:{{ f.rowBg }};transition:padding .35s cubic-bezier(0.22,1,0.36,1), background .4s" style-hover="padding-left:14px">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px"><div style="font-size:18px">{{ f.name }}</div><div style="font-size:14px;line-height:1.45;color:#8A8780">{{ f.desc }}</div></div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.06em;white-space:nowrap;color:{{ f.priceColor }};transition:color .3s">{{ f.price }}</div>
+                <sc-if value="{{ f.toggle }}"><span style="flex:none;width:48px;height:28px;border-radius:999px;position:relative;box-sizing:border-box;border:1px solid {{ f.swBd }};background:{{ f.swBg }};transition:background .35s cubic-bezier(0.76,0,0.24,1), border-color .35s"><span style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:{{ f.knob }};transform:translateX({{ f.knobX }});transition:transform .35s cubic-bezier(0.76,0,0.24,1), background .35s"></span></span></sc-if>
+                <sc-if value="{{ f.stepper }}"><div style="flex:none;display:flex;align-items:center;border:1px solid rgba(237,234,228,0.18)"><button onClick="{{ f.dec }}" style="all:unset;cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:18px" style-hover="background:#1A1A1A">−</button><span style="min-width:28px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:13px">{{ f.val }}</span><button onClick="{{ f.inc }}" style="all:unset;cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:18px" style-hover="background:#1A1A1A">+</button></div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div data-reveal="1" style="border-top:1px solid rgba(237,234,228,0.10);padding:34px 0 46px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:baseline;gap:20px;flex-wrap:wrap;padding-bottom:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Toma 04</span><span style="font-size:clamp(24px,2.2vw,30px);letter-spacing:-0.01em">Contenido audiovisual</span></div>
+          <sc-if value="{{ avLocked }}" hint-placeholder-val="{{ true }}">
+            <div style="border:1px dashed rgba(237,234,228,0.25);padding:24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px">
+              <div style="display:flex;flex-direction:column;gap:8px;max-width:440px"><div style="font-family:'Instrument Serif',serif;font-size:30px;line-height:1">El vídeo atrae. <em>La web convierte.</em></div><div style="font-size:14px;line-height:1.55;color:#8A8780">Añade contenido y trabajamos las dos patas con el mismo equipo y la misma estética.</div></div>
+              <button onClick="{{ addContent }}" style="all:unset;cursor:pointer;box-sizing:border-box;height:46px;padding:0 22px;border-radius:999px;border:1px solid rgba(237,234,228,0.4);font-size:14px;display:flex;align-items:center;gap:10px;transition:background .25s, color .25s" style-hover="background:#EDEAE4;color:#0A0A0A">Añadir contenido <span>→</span></button>
+            </div>
+          </sc-if>
+          <div style="display:flex;flex-direction:column;border-top:1px solid rgba(237,234,228,0.10);opacity:{{ avOpacity }};pointer-events:{{ avPE }};transition:opacity .5s">
+            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:20px;padding:18px 4px;border-bottom:1px solid rgba(237,234,228,0.10)">
+              <div style="flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:4px"><div style="font-size:18px">Reels al mes</div><div style="font-size:14px;color:#8A8780">Rodaje y edición de piezas cortas para redes. Cuota mensual.</div></div>
+              <div style="display:flex;border:1px solid rgba(237,234,228,0.18)">
+                <sc-for list="{{ reels }}" as="r" hint-placeholder-count="4">
+                  <button onClick="{{ r.on }}" style="all:unset;cursor:pointer;box-sizing:border-box;min-width:56px;height:44px;padding:0 12px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;background:{{ r.bg }};color:{{ r.fg }};transition:background .4s cubic-bezier(0.76,0,0.24,1), color .4s">{{ r.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+            <sc-for list="{{ avs }}" as="f" hint-placeholder-count="2">
+              <div onClick="{{ f.row }}" style="display:flex;align-items:center;gap:20px;padding:18px 4px;border-bottom:1px solid rgba(237,234,228,0.10);cursor:pointer;background:{{ f.rowBg }};transition:padding .35s cubic-bezier(0.22,1,0.36,1), background .4s" style-hover="padding-left:14px">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px"><div style="font-size:18px">{{ f.name }}</div><div style="font-size:14px;line-height:1.45;color:#8A8780">{{ f.desc }}</div></div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.06em;white-space:nowrap;color:{{ f.priceColor }}">{{ f.price }}</div>
+                <span style="flex:none;width:48px;height:28px;border-radius:999px;position:relative;box-sizing:border-box;border:1px solid {{ f.swBd }};background:{{ f.swBg }};transition:background .35s cubic-bezier(0.76,0,0.24,1)"><span style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:{{ f.knob }};transform:translateX({{ f.knobX }});transition:transform .35s cubic-bezier(0.76,0,0.24,1)"></span></span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div data-reveal="1" style="border-top:1px solid rgba(237,234,228,0.10);padding:34px 0 20px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:baseline;gap:20px;flex-wrap:wrap;padding-bottom:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Toma 05</span><span style="font-size:clamp(24px,2.2vw,30px);letter-spacing:-0.01em">Después del estreno</span></div>
+          <div style="display:flex;flex-direction:column;border-top:1px solid rgba(237,234,228,0.10)">
+            <sc-for list="{{ posts }}" as="f" hint-placeholder-count="2">
+              <div onClick="{{ f.row }}" style="display:flex;align-items:center;gap:20px;padding:18px 4px;border-bottom:1px solid rgba(237,234,228,0.10);cursor:pointer;background:{{ f.rowBg }};transition:padding .35s cubic-bezier(0.22,1,0.36,1), background .4s" style-hover="padding-left:14px">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px"><div style="font-size:18px">{{ f.name }}</div><div style="font-size:14px;line-height:1.45;color:#8A8780">{{ f.desc }}</div></div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.06em;white-space:nowrap;color:{{ f.priceColor }}">{{ f.price }}</div>
+                <span style="flex:none;width:48px;height:28px;border-radius:999px;position:relative;box-sizing:border-box;border:1px solid {{ f.swBd }};background:{{ f.swBg }};transition:background .35s cubic-bezier(0.76,0,0.24,1)"><span style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:{{ f.knob }};transform:translateX({{ f.knobX }});transition:transform .35s cubic-bezier(0.76,0,0.24,1)"></span></span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div id="rw-monitor" style="flex:1 1 380px;min-width:0;position:{{ monPos }};top:100px">
+        <div style="position:relative;border:1px solid rgba(237,234,228,0.10);background:#0E0E0E;padding:clamp(22px,2.4vw,32px);display:flex;flex-direction:column;gap:26px">
+          <div style="position:absolute;left:-1px;top:-1px;width:18px;height:18px;border-left:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div>
+          <div style="position:absolute;right:-1px;top:-1px;width:18px;height:18px;border-right:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div>
+          <div style="position:absolute;left:-1px;bottom:-1px;width:18px;height:18px;border-left:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div>
+          <div style="position:absolute;right:-1px;bottom:-1px;width:18px;height:18px;border-right:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase"><span style="color:#8A8780">Presupuesto orientativo</span><span style="display:flex;align-items:center;gap:8px;color:{{ recColor }}"><span style="width:8px;height:8px;border-radius:50%;background:{{ recDot }};animation:rec 1.6s ease-in-out infinite"></span>{{ recLabel }}</span></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font-family:'Instrument Serif',serif;font-size:clamp(46px,4.4vw,76px);line-height:0.95;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;white-space:nowrap">{{ rangeText }}</div>
+            <div style="font-size:16px;color:#8A8780;min-height:22px">{{ monthlyText }}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:3px;height:16px"><sc-for list="{{ vu }}" as="v" hint-placeholder-count="28"><div style="flex:1;background:{{ v.bg }};transition:background .5s cubic-bezier(0.76,0,0.24,1)"></div></sc-for></div>
+            <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Nivel de proyecto</span><span style="color:#EDEAE4">{{ level }}</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:12px"><div style="width:30px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em">WE</div>
+              <div style="flex:1;min-width:0;height:40px;border:1px solid rgba(237,234,228,0.08);display:flex;gap:3px;padding:3px;box-sizing:border-box;overflow:hidden">
+                <sc-for list="{{ weClips }}" as="c" hint-placeholder-count="0"><div style="flex-grow:{{ c.g }};flex-basis:0;min-width:0;height:100%;box-sizing:border-box;border:1px solid rgba(237,234,228,0.35);padding:0 8px;display:flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transform-origin:left;animation:clipIn .6s cubic-bezier(0.76,0,0.24,1) both">{{ c.label }}</div></sc-for>
+                <div style="flex-grow:{{ weFill }};flex-basis:0;display:flex;align-items:center;padding-left:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#4A4844;white-space:nowrap;overflow:hidden">{{ weEmpty }}</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px"><div style="width:30px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em">RO</div>
+              <div style="flex:1;min-width:0;height:40px;border:1px solid rgba(237,234,228,0.08);display:flex;gap:3px;padding:3px;box-sizing:border-box;overflow:hidden">
+                <sc-for list="{{ roClips }}" as="c" hint-placeholder-count="0"><div style="flex-grow:{{ c.g }};flex-basis:0;min-width:0;height:100%;box-sizing:border-box;background-color:#1F1E1C;background-image:repeating-linear-gradient(135deg, rgba(237,234,228,0.06) 0px, rgba(237,234,228,0.06) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 6px);border:1px solid rgba(237,234,228,0.14);padding:0 8px;display:flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transform-origin:left;animation:clipIn .6s cubic-bezier(0.76,0,0.24,1) both">{{ c.label }}</div></sc-for>
+                <div style="flex-grow:{{ roFill }};flex-basis:0;display:flex;align-items:center;padding-left:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#4A4844;white-space:nowrap;overflow:hidden">{{ roEmpty }}</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;border-top:1px solid rgba(237,234,228,0.10)">
+            <div style="display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid rgba(237,234,228,0.10)"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Plazo estimado</span><span style="font-size:15px">{{ weeksText }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid rgba(237,234,228,0.10)"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780;flex:none">Incluye siempre</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;line-height:1.7;text-align:right">Diseño a medida · Responsive · Formulario · Panel para editar · Velocidad · SEO básico</span></div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:12px">
+            <button onClick="{{ sendCfg }}" data-magnet="1" style="all:unset;cursor:pointer;box-sizing:border-box;flex:1 1 200px;height:54px;padding:0 24px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:10px;opacity:{{ ctaOpacity }};transition:background .25s, opacity .3s, transform .15s" style-hover="background:#FFFFFF" style-active="transform:scale(0.97)" style-focus="outline:2px solid #EDEAE4;outline-offset:4px">Enviar y hablemos <span>→</span></button>
+            <button onClick="{{ openPdf }}" style="all:unset;cursor:pointer;box-sizing:border-box;flex:1 1 160px;height:54px;padding:0 22px;border-radius:999px;border:1px solid rgba(237,234,228,0.3);font-size:15px;display:flex;align-items:center;justify-content:center;gap:10px;opacity:{{ ctaOpacity }};transition:border-color .25s" style-hover="border-color:#EDEAE4" style-focus="outline:2px solid #EDEAE4;outline-offset:4px">Descargar PDF <span>↓</span></button>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;line-height:1.7;color:#8A8780">Precios orientativos de ejemplo · sustituir por tarifas ROWE. IVA no incluido.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div data-reveal="wipe" style="position:relative;height:42vh;min-height:260px;display:flex;align-items:center;justify-content:center;border-top:1px solid rgba(237,234,228,0.10);border-bottom:1px solid rgba(237,234,228,0.10);background:#050505;overflow:hidden">
+    <div style="position:absolute;left:0;right:0;top:0;height:10%;background:#000000"></div>
+    <div style="position:absolute;left:0;right:0;bottom:0;height:10%;background:#000000"></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:0 6vw;text-align:center">
+      <div data-tc="1" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;color:#8A8780">00:00:00:00</div>
+      <div style="font-family:'Instrument Serif',serif;font-size:clamp(40px,6vw,96px);line-height:1">Escena 10 — <em>Hablemos</em></div>
+    </div>
+  </div>
+
+  <section id="hablemos" data-screen-label="Escena 10 — Hablemos" style="position:relative;padding:16vh 6vw 14vh">
+    <div data-reveal="1" style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid rgba(237,234,228,0.10);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Escena 10 — Hablemos</span><span data-tc="1">00:00:00:00</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:clamp(40px,6vw,110px);margin-top:9vh;align-items:flex-start">
+      <div style="flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:34px">
+        <div data-rec="1" style="width:clamp(44px,5vw,72px);height:clamp(44px,5vw,72px);border-radius:50%;background:#FF3B1F;animation:rec 1.6s ease-in-out infinite"></div>
+        <h2 data-reveal="mask" style="margin:0;font-family:'Instrument Serif',serif;font-weight:400;font-size:clamp(56px,7.5vw,128px);line-height:0.92;letter-spacing:-0.015em">¿Grabamos tu próxima <em>escena?</em></h2>
+        <p data-reveal="1" style="margin:0;font-size:19px;line-height:1.6;color:#8A8780;max-width:40ch">Cuéntanos qué necesitas. Te respondemos en menos de 24 h.</p>
+        <div data-reveal="1" style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase">Sin compromiso · Presupuesto cerrado · Respuesta en 24 h</div>
+        <sc-if value="{{ hasPrefill }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid rgba(237,234,228,0.14);padding:20px 22px;display:flex;flex-direction:column;gap:12px;animation:fadeIn .6s both">
+            <div style="display:flex;justify-content:space-between;gap:12px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Viene del configurador</span><a href="#presupuesto" style="color:#EDEAE4;border-bottom:1px solid rgba(237,234,228,0.3)">Editar ↑</a></div>
+            <div style="font-family:'Instrument Serif',serif;font-size:36px;line-height:1">{{ prefillRange }}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;line-height:1.8;color:#8A8780">{{ prefillItems }}</div>
+          </div>
+        </sc-if>
+      </div>
+      <div style="flex:1.25 1 520px;min-width:0"><dc-import name="HablemosForm" prefill="{{ prefill }}" variant="section" simulate-error="{{ simErr }}" hint-size="100%,640px"></dc-import></div>
+    </div>
+  </section>
+
+  <footer style="padding:10vh 6vw 6vh;border-top:1px solid rgba(237,234,228,0.10);display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">
+    <div>Dirección: ROWE · Web: ROWE · Audiovisual: ROWE</div>
+    <div>© 2026 ROWE · rowe-web.es</div>
+  </footer>
+
+  <sc-if value="{{ showMobileBar }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:0;right:0;bottom:0;z-index:90;background:rgba(10,10,10,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(237,234,228,0.10);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;animation:fadeIn .4s both">
+      <div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Orientativo</span><span style="font-family:'Instrument Serif',serif;font-size:26px;line-height:1;white-space:nowrap">{{ rangeText }}</span></div>
+      <button onClick="{{ toMonitor }}" style="all:unset;cursor:pointer;box-sizing:border-box;height:46px;padding:0 18px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:14px;font-weight:500;display:flex;align-items:center" style-active="transform:scale(0.97)">Resumen ↓</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ overlay }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:200;background:#0A0A0A;overflow-y:auto;animation:ovIn .8s cubic-bezier(0.76,0,0.24,1) both">
+      <div style="position:sticky;top:0;z-index:2;height:76px;padding:0 6vw;display:flex;align-items:center;justify-content:space-between;background:#0A0A0A;border-bottom:1px solid rgba(237,234,228,0.08)">
+        <div style="display:flex;align-items:center;gap:12px"><img src="assets/rowe-logo-blanco.png" alt="ROWE" style="height:18px;display:block"><div style="width:8px;height:8px;border-radius:50%;background:#FF3B1F;animation:rec 1.6s ease-in-out infinite"></div></div>
+        <div style="display:{{ tcDisplay }};font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Escena 10 — Hablemos</div>
+        <button onClick="{{ closeOverlay }}" style="all:unset;cursor:pointer;min-height:44px;display:flex;align-items:center;gap:10px;font-size:14px" style-hover="color:#FFFFFF">Cerrar <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8A8780">ESC</span></button>
+      </div>
+      <div style="padding:7vh 6vw 8vh;display:flex;flex-wrap:wrap;gap:clamp(32px,5vw,96px);align-items:flex-start">
+        <div style="flex:1 1 340px;min-width:0;display:flex;flex-direction:column;gap:24px">
+          <div style="font-family:'Instrument Serif',serif;font-size:clamp(64px,8vw,128px);line-height:0.9;letter-spacing:-0.015em"><em>Hablemos.</em></div>
+          <p style="margin:0;font-size:18px;line-height:1.6;color:#8A8780;max-width:36ch">Cinco tomas cortas. La primera es de un clic. Te respondemos en menos de 24 h.</p>
+          <sc-if value="{{ hasPrefill }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px solid rgba(237,234,228,0.14);padding:20px 22px;display:flex;flex-direction:column;gap:12px">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Tu configuración</div>
+              <div style="font-family:'Instrument Serif',serif;font-size:34px;line-height:1">{{ prefillRange }}</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;line-height:1.8;color:#8A8780">{{ prefillItems }}</div>
+            </div>
+          </sc-if>
+        </div>
+        <div style="flex:1.4 1 520px;min-width:0"><dc-import name="HablemosForm" prefill="{{ prefill }}" variant="overlay" simulate-error="{{ simErr }}" hint-size="100%,600px"></dc-import></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ pdf }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closePdf }}" style="position:fixed;inset:0;z-index:250;background:rgba(10,10,10,0.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);overflow-y:auto;padding:32px 20px 60px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:18px;animation:fadeIn .4s both">
+      <div onClick="{{ stop }}" style="width:min(680px,100%);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Vista previa · Presupuesto_ROWE.pdf</span>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ downloadPdf }}" style="all:unset;cursor:pointer;height:42px;padding:0 20px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:14px;font-weight:500;display:flex;align-items:center" style-hover="background:#FFFFFF">Descargar ↓</button>
+          <button onClick="{{ closePdf }}" style="all:unset;cursor:pointer;height:42px;padding:0 18px;border-radius:999px;border:1px solid rgba(237,234,228,0.3);font-size:14px;display:flex;align-items:center">Cerrar</button>
+        </div>
+      </div>
+      <div onClick="{{ stop }}" style="width:min(680px,100%);aspect-ratio:1/1.414;box-sizing:border-box;background:#EDEAE4;color:#0A0A0A;padding:clamp(26px,5vw,56px);display:flex;flex-direction:column;gap:26px;animation:sheetIn .7s cubic-bezier(0.76,0,0.24,1) both">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px"><img src="assets/rowe-logo-negro.png" alt="ROWE" style="height:24px;display:block"><div style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;line-height:1.8;color:#4A4844">Presupuesto orientativo<br>Nº ROWE-2026-0142<br>15.10.2026</div></div>
+        <div style="font-family:'Instrument Serif',serif;font-size:clamp(34px,4.5vw,52px);line-height:0.95">Tu proyecto, <em>en cifras.</em></div>
+        <div style="display:flex;flex-direction:column;border-top:1px solid rgba(10,10,10,0.2)">
+          <sc-for list="{{ pdfRows }}" as="r" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid rgba(10,10,10,0.12);font-size:13px"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;width:24px;color:#4A4844">{{ r.track }}</span><span style="flex:1">{{ r.label }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap">{{ r.range }}</span></div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:auto">
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#4A4844">Pago único</span><span style="font-family:'Instrument Serif',serif;font-size:clamp(20px,2.6vw,30px);line-height:1">{{ rangeFinal }}</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#4A4844">Mensual</span><span style="font-family:'Instrument Serif',serif;font-size:clamp(20px,2.6vw,30px);line-height:1">{{ monthlyFinal }}</span></div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#4A4844">Plazo</span><span style="font-family:'Instrument Serif',serif;font-size:clamp(20px,2.6vw,30px);line-height:1">{{ weeksText }}</span></div>
+        </div>
+        <div style="font-size:11px;line-height:1.6;color:#4A4844;border-top:1px solid rgba(10,10,10,0.2);padding-top:14px">Rango orientativo, IVA no incluido. Tras el briefing te enviamos un presupuesto cerrado. Validez: 30 días.</div>
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#4A4844"><span>rowe.web.contacto@gmail.com</span><span>rowe-web.es</span><span>[+34 600 000 000]</span></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:50%;bottom:28px;z-index:320;background:#EDEAE4;color:#0A0A0A;padding:14px 20px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;white-space:nowrap;animation:toastIn .5s cubic-bezier(0.22,1,0.36,1) both">{{ toast }}</div>
+  </sc-if>
+
+  <div style="position:fixed;left:0;right:0;top:0;height:50vh;background:#000000;z-index:300;pointer-events:none;transform-origin:top;animation:lbTop 1.1s cubic-bezier(0.76,0,0.24,1) .35s both"></div>
+  <div style="position:fixed;left:0;right:0;bottom:0;height:50vh;background:#000000;z-index:300;pointer-events:none;transform-origin:bottom;animation:lbTop 1.1s cubic-bezier(0.76,0,0.24,1) .35s both"></div>
+  <div style="position:fixed;left:0;right:0;top:50%;z-index:301;pointer-events:none;text-align:center;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780;animation:fadeOut .6s linear both">Escena 09 — Tu presupuesto</div>
+
+  <div style="position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:350"><div data-grain="1" style="position:absolute;inset:-60px;opacity:0.06;animation:grain 1s steps(5) infinite"></div></div>
+  <div id="rw-cur" style="position:fixed;left:0;top:0;z-index:400;pointer-events:none;mix-blend-mode:difference;display:none">
+    <div id="rw-cur-ring" style="position:fixed;left:0;top:0;width:32px;height:32px;box-sizing:border-box;border:1px solid #EDEAE4;border-radius:999px;transform:translate(-50%,-50%);transition:width .25s cubic-bezier(0.22,1,0.36,1), height .25s cubic-bezier(0.22,1,0.36,1), background .25s, border-radius .25s;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#0A0A0A;white-space:nowrap;overflow:hidden"></div>
+    <div id="rw-cur-dot" style="position:fixed;left:0;top:0;width:8px;height:8px;border-radius:50%;background:#EDEAE4;transform:translate(-50%,-50%);transition:opacity .2s, background .2s"></div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;grain&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Película&quot;},&quot;liveTimecode&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Película&quot;},&quot;simulateError&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Formulario&quot;}}">
+const PR = {
+  type: {
+    nueva: { key: 'A', title: 'Web nueva', desc: 'Empezamos de cero, con tu marca y tus objetivos.', r: [900, 1400], w: [3, 4] },
+    rediseno: { key: 'B', title: 'Rediseño', desc: 'Tu web actual, a la altura de tu negocio actual.', r: [700, 1100], w: [2, 3] },
+    contenido: { key: 'C', title: 'Web + contenido', desc: 'Web y vídeo con el mismo equipo y la misma estética.', r: [1250, 1900], w: [4, 5] }
+  },
+  pages: { '1': { l: 'Landing · 1 página', r: [-300, -450], w: -1 }, '5': { l: 'Hasta 5 páginas', r: [0, 0], w: 0 }, '10': { l: 'Hasta 10 páginas', r: [400, 600], w: 1 }, '10+': { l: 'Más de 10', r: [900, 1400], w: 2 } },
+  reservas: [300, 500], tienda: [900, 1500], seo: [250, 400], idioma: [200, 300],
+  fotos: [250, 400], video: [600, 1100], reels: { 0: [0, 0], 4: [260, 360], 8: [480, 640], 12: [680, 900] }, mant: [35, 60]
+};
+const th = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+const eur = n => th(n) + ' €';
+const rng = r => `${th(r[0])} – ${th(r[1])} €`;
+const r50 = n => Math.round(n / 50) * 50;
+const p2 = n => String(n).padStart(2, '0');
+
+class Component extends DCLogic {
+  state = { type: null, pages: '5', reservas: false, tienda: false, seo: false, idiomas: 1, reels: 0, fotos: false, video: false, mant: false, urgente: false,
+    disp: [0, 0, 0, 0], overlay: false, pdf: false, prefill: null, toast: '', narrow: false, cfgInView: false };
+
+  compute(s) {
+    if (!s.type) return null;
+    const items = [], T = PR.type[s.type], pg = PR.pages[s.pages];
+    if (s.type === 'contenido') {
+      items.push({ t: 'WE', l: 'Web a medida' + (s.pages === '1' ? ' · landing' : ''), r: [900 + (s.pages === '1' ? pg.r[0] : 0), 1400 + (s.pages === '1' ? pg.r[1] : 0)] });
+      items.push({ t: 'RO', l: 'Jornada de rodaje', r: [350, 500] });
+    } else items.push({ t: 'WE', l: T.title + (s.pages === '1' ? ' · landing' : ''), r: [T.r[0] + (s.pages === '1' ? pg.r[0] : 0), T.r[1] + (s.pages === '1' ? pg.r[1] : 0)] });
+    if (s.pages === '10' || s.pages === '10+') items.push({ t: 'WE', l: pg.l, r: pg.r });
+    if (s.reservas) items.push({ t: 'WE', l: 'Reservas / citas', r: PR.reservas });
+    if (s.tienda) items.push({ t: 'WE', l: 'Tienda online', r: PR.tienda });
+    if (s.seo) items.push({ t: 'WE', l: 'SEO local', r: PR.seo });
+    if (s.idiomas > 1) items.push({ t: 'WE', l: `Idiomas ×${s.idiomas - 1}`, r: PR.idioma.map(v => v * (s.idiomas - 1)) });
+    if (s.type === 'contenido') {
+      if (s.fotos) items.push({ t: 'RO', l: 'Sesión de fotos', r: PR.fotos });
+      if (s.video) items.push({ t: 'RO', l: 'Vídeo corporativo', r: PR.video });
+      if (s.reels) items.push({ t: 'RO', l: `${s.reels} reels/mes`, r: PR.reels[s.reels], m: true });
+    }
+    if (s.mant) items.push({ t: 'WE', l: 'Mantenimiento', r: PR.mant, m: true });
+    let one = [0, 0], mon = [0, 0];
+    items.forEach(i => { const tgt = i.m ? mon : one; tgt[0] += i.r[0]; tgt[1] += i.r[1]; });
+    if (s.urgente) { const u = [one[0] * 0.2, one[1] * 0.2]; items.push({ t: 'WE', l: 'Entrega urgente', r: u }); one = [one[0] + u[0], one[1] + u[1]]; }
+    one = one.map(r50); mon = mon.map(v => Math.round(v / 10) * 10);
+    let w = [T.w[0] + pg.w, T.w[1] + pg.w];
+    if (s.tienda) w = [w[0] + 2, w[1] + 2];
+    if (s.reservas) w = [w[0], w[1] + 1];
+    if (s.video) w = [w[0], w[1] + 1];
+    w = w.map(v => Math.max(1, v));
+    if (s.urgente) w = w.map(v => Math.max(1, Math.ceil(v * 0.6)));
+    return { items, one, mon, w };
+  }
+
+  componentDidMount() {
+    const p = this.props;
+    this.onResize = () => this.setState({ narrow: window.innerWidth < 900 });
+    this.onResize();
+    window.addEventListener('resize', this.onResize);
+    let last = window.scrollY;
+    const nav = document.getElementById('rw-nav');
+    this.onScroll = () => {
+      const y = window.scrollY;
+      if (nav) {
+        nav.style.transform = y > last + 4 && y > 140 ? 'translateY(-100%)' : (y < last - 4 || y < 140 ? 'translateY(0)' : nav.style.transform);
+        nav.style.backgroundColor = y > 40 ? 'rgba(10,10,10,0.72)' : 'transparent';
+        nav.style.backdropFilter = nav.style.webkitBackdropFilter = y > 40 ? 'blur(14px)' : 'none';
+      }
+      last = y;
+      if ((this.props.liveTimecode ?? true)) {
+        const f = Math.round(y / 3);
+        const tc = `${p2(Math.floor(f / 90000))}:${p2(Math.floor(f / 1500) % 60)}:${p2(Math.floor(f / 25) % 60)}:${p2(f % 25)}`;
+        document.querySelectorAll('[data-tc]').forEach(el => { el.textContent = tc; });
+      }
+      const cfg = document.getElementById('rw-cfg');
+      if (cfg) { const b = cfg.getBoundingClientRect(); const inV = b.top < window.innerHeight * 0.6 && b.bottom > window.innerHeight * 0.4; if (inV !== this.state.cfgInView) this.setState({ cfgInView: inV }); }
+    };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    this.onScroll();
+    this.initReveal();
+    this.initCursor();
+    this.origTitle = document.title;
+    this.onVis = () => { document.title = document.hidden ? '● REC en pausa — vuelve pronto' : this.origTitle; };
+    document.addEventListener('visibilitychange', this.onVis);
+    this.onKey = e => {
+      if (e.key === 'Escape') this.setState({ overlay: false, pdf: false });
+      const tag = (e.target.tagName || '').toLowerCase();
+      if ((e.key === 'r' || e.key === 'R') && tag !== 'input' && tag !== 'textarea') { this.amb = !this.amb; this.showToast(this.amb ? 'Sonido ambiente · On' : 'Sonido ambiente · Off'); }
+    };
+    window.addEventListener('keydown', this.onKey);
+    this.applyFx();
+  }
+  componentDidUpdate() {
+    this.applyFx();
+    this.initReveal();
+    const c = this.compute(this.state), target = c ? [c.one[0], c.one[1], c.mon[0], c.mon[1]] : [0, 0, 0, 0];
+    if (target.join() !== (this.lastTarget || '')) { this.lastTarget = target.join(); this.tween(target); }
+    const lock = this.state.overlay || this.state.pdf;
+    if (lock !== this._lock) { this._lock = lock; document.body.style.overflow = lock ? 'hidden' : ''; }
+  }
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize); window.removeEventListener('scroll', this.onScroll);
+    window.removeEventListener('keydown', this.onKey); window.removeEventListener('scroll', this.rvScroll); document.removeEventListener('visibilitychange', this.onVis);
+    cancelAnimationFrame(this.raf); cancelAnimationFrame(this.craf); if (this.io) this.io.disconnect();
+    document.body.classList.remove('rw-cursor'); document.body.style.overflow = '';
+  }
+  tween(to) {
+    cancelAnimationFrame(this.raf);
+    const from = this.state.disp.slice(), t0 = performance.now(), D = 800;
+    const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const step = now => {
+      const k = Math.min(1, (now - t0) / D), e = ease(k);
+      this.setState({ disp: from.map((v, i) => v + (to[i] - v) * e) });
+      if (k < 1) this.raf = requestAnimationFrame(step);
+    };
+    this.raf = requestAnimationFrame(step);
+  }
+  applyFx() {
+    const noise = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
+    const g = this.props.grain ?? true;
+    document.querySelectorAll('[data-grain]').forEach(el => { el.style.backgroundImage = noise; el.style.display = g ? 'block' : 'none'; });
+  }
+  initReveal() {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!this.io) this.io = new IntersectionObserver(es => es.forEach(en => {
+      if (!en.isIntersecting) return;
+      const el = en.target; el.style.opacity = '1'; el.style.transform = 'none'; el.style.clipPath = 'inset(0 0 0 0)'; this.io.unobserve(el);
+    }), { rootMargin: '0px 0px -8% 0px', threshold: 0 });
+    document.querySelectorAll('[data-reveal]:not([data-rv])').forEach(el => {
+      el.setAttribute('data-rv', '1');
+      const kind = el.getAttribute('data-reveal');
+      const ez = 'cubic-bezier(0.76,0,0.24,1)';
+      el.style.transition = `opacity ${reduce ? '.5s' : '.9s'} ${ez}, transform 1s ${ez}, clip-path 1.1s ${ez}`;
+      el.style.opacity = '0';
+      if (!reduce) {
+        if (kind === 'mask') { el.style.transform = 'translateY(18%)'; el.style.clipPath = 'inset(0 0 100% 0)'; }
+        else if (kind === 'wipe') { el.style.clipPath = 'inset(0 50% 0 50%)'; }
+        else el.style.transform = 'translateY(36px)';
+      }
+      this.io.observe(el);
+    });
+    if (!this.rvScroll) {
+      this.rvScroll = () => document.querySelectorAll('[data-reveal][data-rv]').forEach(el => {
+        if (el.style.opacity === '1') return;
+        const b = el.getBoundingClientRect();
+        if (b.top < window.innerHeight * 0.92 && b.bottom > 0) { el.style.opacity = '1'; el.style.transform = 'none'; el.style.clipPath = 'inset(0 0 0 0)'; }
+      });
+      window.addEventListener('scroll', this.rvScroll, { passive: true });
+      setTimeout(this.rvScroll, 120);
+    }
+  }
+  initCursor() {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    const wrap = document.getElementById('rw-cur'), ring = document.getElementById('rw-cur-ring'), dot = document.getElementById('rw-cur-dot');
+    if (!wrap) return;
+    wrap.style.display = 'block'; document.body.classList.add('rw-cursor');
+    let mx = -100, my = -100, rx = -100, ry = -100, mode = '';
+    const setMode = (m, label) => {
+      const key = m + (label || ''); if (key === mode) return; mode = key;
+      ring.textContent = label || '';
+      Object.assign(ring.style, m === 'label' ? { width: 'auto', height: '30px', padding: '0 14px', background: '#EDEAE4', border: 'none', borderRadius: '999px' }
+        : m === 'link' ? { width: '58px', height: '58px', padding: '0', background: 'transparent', border: '1px solid #EDEAE4', borderRadius: '999px' }
+        : m === 'text' ? { width: '2px', height: '28px', padding: '0', background: '#EDEAE4', border: 'none', borderRadius: '0' }
+        : { width: '32px', height: '32px', padding: '0', background: 'transparent', border: '1px solid #EDEAE4', borderRadius: '999px' });
+      dot.style.opacity = m === '' ? '1' : '0';
+    };
+    this.onMove = e => {
+      mx = e.clientX; my = e.clientY;
+      const t = e.target;
+      const lab = t.closest && t.closest('[data-cursor]');
+      if (lab) setMode('label', lab.getAttribute('data-cursor'));
+      else if (t.closest && t.closest('button,a,[role=button]')) setMode('link');
+      else if (t.closest && t.closest('input,textarea')) setMode('text');
+      else setMode('');
+      dot.style.background = t.closest && t.closest('#hablemos') ? '#FF3B1F' : '#EDEAE4';
+      document.querySelectorAll('[data-magnet]').forEach(m => {
+        const b = m.getBoundingClientRect(), cx = b.left + b.width / 2, cy = b.top + b.height / 2, dx = mx - cx, dy = my - cy, d = Math.hypot(dx, dy);
+        m.style.translate = d < Math.max(b.width, 90) ? `${dx * 0.15}px ${dy * 0.25}px` : '0 0';
+      });
+    };
+    this.onDown = () => { ring.animate([{ transform: 'translate(-50%,-50%) scale(1)' }, { transform: 'translate(-50%,-50%) scale(0.75)' }, { transform: 'translate(-50%,-50%) scale(1)' }], { duration: 320, easing: 'cubic-bezier(0.22,1,0.36,1)' }); };
+    window.addEventListener('mousemove', this.onMove); window.addEventListener('mousedown', this.onDown);
+    const loop = () => { rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; dot.style.left = mx + 'px'; dot.style.top = my + 'px'; this.craf = requestAnimationFrame(loop); };
+    loop();
+  }
+  showToast(t) { this.setState({ toast: t }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: '' }), 2400); }
+  set(k, v) { this.setState({ [k]: v }); }
+
+  renderVals() {
+    const s = this.state, c = this.compute(s), active = !!c;
+    const inv = sel => ({ bg: sel ? '#EDEAE4' : 'transparent', fg: sel ? '#0A0A0A' : '#EDEAE4', sub: sel ? 'rgba(10,10,10,0.62)' : '#8A8780', bd: sel ? '#EDEAE4' : 'rgba(237,234,228,0.14)' });
+    const sw = on => ({ swBg: on ? '#EDEAE4' : 'transparent', swBd: on ? '#EDEAE4' : 'rgba(237,234,228,0.3)', knob: on ? '#0A0A0A' : '#8A8780', knobX: on ? '20px' : '0px', priceColor: on ? '#EDEAE4' : '#8A8780', rowBg: on ? 'rgba(237,234,228,0.03)' : 'transparent' });
+    const tog = (k, name, desc, price) => ({ name, desc, price, toggle: true, stepper: false, rowCursor: 'pointer', row: () => this.set(k, !s[k]), ...sw(s[k]) });
+    const d = s.disp;
+    const total = c ? c.items.reduce((a, i) => a + Math.max(0, (i.r[0] + i.r[1]) / 2) * (i.m ? 6 : 1), 0) : 1;
+    const clips = tr => c ? c.items.filter(i => i.t === tr).map(i => ({ label: i.l, g: Math.max(total * 0.07, (i.r[0] + i.r[1]) / 2 * (i.m ? 6 : 1)) })) : [];
+    const we = clips('WE'), ro = clips('RO');
+    const sum = a => a.reduce((x, y) => x + y.g, 0);
+    const scale = Math.max(sum(we), sum(ro), 1);
+    const lit = c ? Math.max(1, Math.round(Math.min(1, d[1] / 5600) * 28)) : 0;
+    const prefill = s.prefill;
+    return {
+      tcDisplay: s.narrow ? 'none' : 'block', monPos: s.narrow ? 'relative' : 'sticky',
+      types: Object.entries(PR.type).map(([k, t]) => ({ key: t.key, title: t.title, desc: t.desc, from: 'desde ' + eur(t.r[0]), ...inv(s.type === k), on: () => this.set('type', k) })),
+      pages: Object.entries(PR.pages).map(([k, p]) => { const o = inv(s.pages === k); return { label: p.l, delta: p.r[0] === 0 ? 'Incluido' : (p.r[0] > 0 ? '+' : '−') + rng(p.r.map(Math.abs)), ...o, on: () => this.set('pages', k) }; }),
+      feats: [
+        tog('reservas', 'Reservas / citas', 'Agenda online para clínicas, restaurantes y servicios.', '+' + rng(PR.reservas)),
+        tog('tienda', 'Tienda online', 'Catálogo, carrito y pagos seguros.', '+' + rng(PR.tienda)),
+        tog('seo', 'SEO local', 'Que te encuentren en Google en tu zona.', '+' + rng(PR.seo)),
+        { name: 'Idiomas', desc: 'El primero va incluido. Cada idioma extra suma.', price: s.idiomas > 1 ? '+' + rng(PR.idioma.map(v => v * (s.idiomas - 1))) : 'Incluido', toggle: false, stepper: true, rowCursor: 'default', row: null, val: s.idiomas, priceColor: s.idiomas > 1 ? '#EDEAE4' : '#8A8780', rowBg: 'transparent',
+          dec: () => this.set('idiomas', Math.max(1, s.idiomas - 1)), inc: () => this.set('idiomas', Math.min(4, s.idiomas + 1)) }
+      ],
+      avLocked: s.type !== 'contenido', avOpacity: s.type === 'contenido' ? 1 : 0.3, avPE: s.type === 'contenido' ? 'auto' : 'none',
+      addContent: () => this.set('type', 'contenido'),
+      reels: [0, 4, 8, 12].map(n => { const sel = s.reels === n; return { label: n === 0 ? 'No' : n, bg: sel ? '#EDEAE4' : 'transparent', fg: sel ? '#0A0A0A' : '#EDEAE4', on: () => this.set('reels', n) }; }),
+      avs: [tog('fotos', 'Sesión de fotografía', 'Fotos profesionales de tu negocio, equipo y producto.', '+' + rng(PR.fotos)), tog('video', 'Vídeo corporativo', 'Una pieza de 60–90 s que cuenta quién eres.', '+' + rng(PR.video))],
+      posts: [tog('mant', 'Mantenimiento mensual', 'Actualizaciones, copias de seguridad y cambios menores.', '+' + rng(PR.mant) + '/mes'), tog('urgente', 'Entrega urgente', 'Priorizamos tu proyecto. Plazo ~40 % más corto.', '+20 %')],
+      recColor: active ? '#EDEAE4' : '#4A4844', recDot: active ? '#FF3B1F' : '#4A4844', recLabel: active ? 'Rec' : 'Standby',
+      rangeText: active ? rng([d[0], d[1]]) : '— €',
+      monthlyText: !active ? 'Elige qué necesitas para empezar.' : (c.mon[1] > 0 ? `+ ${rng([d[2], d[3]])}/mes` : 'Pago único'),
+      vu: Array.from({ length: 28 }, (_, i) => ({ bg: i < lit ? (i < 10 ? '#4A4844' : i < 20 ? '#8A8780' : '#EDEAE4') : '#1A1A1A' })),
+      level: !active ? '—' : d[1] < 1800 ? 'Esencial' : d[1] < 3600 ? 'Completo' : 'A medida',
+      weClips: we, roClips: ro, weFill: scale - sum(we), roFill: scale - sum(ro),
+      weEmpty: we.length ? '' : 'Sin clips', roEmpty: ro.length ? '' : (s.type && s.type !== 'contenido' ? 'Añade contenido' : 'Sin clips'),
+      weeksText: active ? `${c.w[0]}–${c.w[1]} semanas` : '—',
+      ctaOpacity: active ? 1 : 0.35,
+      sendCfg: () => {
+        if (!c) return this.showToast('Elige primero qué necesitas');
+        const need = s.type === 'contenido' ? 'Las dos cosas' : 'Web';
+        const range = rng(c.one) + (c.mon[1] ? ` + ${rng(c.mon)}/mes` : '');
+        this.setState({ prefill: { id: Date.now(), need, range, items: c.items.map(i => i.l).join(' · ') }, overlay: true });
+      },
+      openPdf: () => c ? this.setState({ pdf: true }) : this.showToast('Elige primero qué necesitas'),
+      closePdf: () => this.setState({ pdf: false }), stop: e => e.stopPropagation(),
+      downloadPdf: () => { this.setState({ pdf: false }); this.showToast('Presupuesto_ROWE.pdf descargado'); },
+      pdfRows: c ? c.items.map(i => ({ track: i.t, label: i.l, range: rng(i.r) + (i.m ? '/mes' : '') })) : [],
+      rangeFinal: c ? rng(c.one) : '—', monthlyFinal: c && c.mon[1] ? rng(c.mon) : '—',
+      openOverlay: () => this.setState({ overlay: true }), closeOverlay: () => this.setState({ overlay: false }),
+      overlay: s.overlay, pdf: s.pdf,
+      prefill, hasPrefill: !!prefill, prefillRange: prefill ? prefill.range : '', prefillItems: prefill ? prefill.items : '',
+      simErr: !!this.props.simulateError,
+      hasToast: !!s.toast, toast: s.toast,
+      showMobileBar: s.narrow && s.cfgInView && active && !s.overlay,
+      toMonitor: () => { const m = document.getElementById('rw-monitor'); if (m) window.scrollTo({ top: m.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth' }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

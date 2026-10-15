@@ -1,0 +1,201 @@
+/* Botones ROWE · estados del diseño (1a/1c + implementación de Presupuesto)
+   default · hover (relleno circular + rodillo) · magnético · active · focus
+   loading (REC parpadeando) · disabled · dimmed (atenuado pero pulsable) */
+
+.root {
+  --fx: 50%;
+  --fy: 50%;
+  --fd: 0px;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.25s,
+    color 0.35s var(--ease-cut),
+    border-color 0.25s,
+    opacity 0.3s,
+    scale 0.15s var(--ease-out);
+}
+.root:active {
+  scale: 0.97;
+}
+
+/* Tamaños (diseño: 46 hero, 52/54 CTA, 42 cabecera) */
+.sm { height: 42px; padding: 0 20px; font-size: 14px; font-weight: 400; }
+.md { height: 46px; padding: 0 26px; font-size: 14px; }
+.lg { height: 54px; padding: 0 30px; font-size: 15px; }
+.full { width: 100%; }
+
+/* Relleno circular que nace donde entra el ratón */
+.fill {
+  position: absolute;
+  left: var(--fx);
+  top: var(--fy);
+  width: var(--fd);
+  height: var(--fd);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.6s var(--ease-cut);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Rodillo: el texto sube y entra su copia desde abajo */
+.roll {
+  position: relative;
+  display: inline-block;
+  height: 1.25em;
+  line-height: 1.25em;
+  overflow: hidden;
+}
+.rollInner {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.55s var(--ease-cut);
+}
+.rollInner > span {
+  display: block;
+  height: 1.25em;
+}
+
+.arrow {
+  display: inline-block;
+  transition: transform 0.45s var(--ease-out);
+}
+
+/* --- Primario: hueso → blanco ------------------------------------------- */
+.primary {
+  background: var(--color-bone);
+  color: var(--color-ink);
+}
+.primary .fill { background: var(--color-white); }
+
+/* --- Contorno (cabecera «Hablemos»): transparente → hueso --------------- */
+.outline {
+  background: transparent;
+  color: var(--color-bone);
+  border: 1px solid var(--color-line-cta);
+}
+.outline .fill { background: var(--color-bone); }
+
+/* --- REC: contorno con punto rojo que late al hover ---------------------- */
+.rec {
+  background: transparent;
+  color: var(--color-bone);
+  border: 1px solid var(--color-line-cta);
+  font-weight: 400;
+}
+.rec .fill { background: var(--color-surface); }
+
+/* --- Enlace secundario: «Ver proyectos →» -------------------------------- */
+.link {
+  height: auto;
+  padding: 0 0 4px;
+  border-radius: 2px;
+  overflow: visible;
+  background: transparent;
+  color: var(--color-bone);
+  font-weight: 400;
+  font-size: 15px;
+  border-bottom: 1px solid var(--color-line-cta);
+}
+.link .underline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--color-bone);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s var(--ease-cut);
+}
+
+/* --- Hover (solo dispositivos con ratón) -------------------------------- */
+@media (hover: hover) and (pointer: fine) {
+  .root:hover .fill { transform: translate(-50%, -50%) scale(1); }
+  .root:hover .rollInner { transform: translateY(-50%); }
+  .outline:hover { color: var(--color-ink); border-color: var(--color-bone); }
+  .rec:hover { border-color: var(--color-line-bright); }
+  .link:hover .underline { transform: scaleX(1); }
+  .link:hover .arrow,
+  .root:hover .arrow { transform: translateX(6px); }
+}
+
+/* --- Estados ------------------------------------------------------------ */
+.loading { cursor: progress; }
+.loading .fill { display: none; }
+
+.disabled,
+.root:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  scale: 1 !important;
+}
+.disabled .fill,
+.root:disabled .fill { display: none; }
+.disabled .rollInner,
+.root:disabled .rollInner { transform: none !important; }
+
+.dimmed { opacity: 0.35; }
+
+/* Punto REC del botón: late al hover (diseño «REC · hover, el punto late») */
+.recDot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  flex: none;
+}
+.recDot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--color-rec);
+}
+.recRing {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--color-rec);
+  opacity: 0;
+  transform: translate(-50%, -50%);
+}
+@media (hover: hover) and (pointer: fine) {
+  .rec:hover .recRing {
+    animation: ring 1.4s var(--ease-out) infinite;
+  }
+}
+@keyframes ring {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+}
+
+/* Punto de carga («Grabando…») */
+.loadDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-rec);
+  flex: none;
+  animation: blink 0.8s ease-in-out infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.22; }
+}
