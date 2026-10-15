@@ -1,0 +1,53 @@
+/* Hover «WE»: la palabra se rellena con una «web en movimiento» (bloques que suben como al hacer scroll). */
+.we {
+  transition: color 0.4s var(--ease-out);
+}
+/* Con ratón: al pasar por encima. En táctil: cuando la escena está en pantalla ([data-active], src/motion). */
+.we[data-active] {
+  color: transparent;
+  background-image: linear-gradient(
+    180deg,
+    var(--color-bone) 0 14%,
+    var(--color-ghost) 14% 18%,
+    var(--color-muted) 18% 30%,
+    var(--color-bone) 30% 44%,
+    var(--color-ghost) 44% 48%,
+    var(--color-bone) 48% 100%
+  );
+  background-size: 100% 240%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: scan 2.4s linear infinite;
+}
+@media (hover: hover) and (pointer: fine) {
+  .we:hover {
+    color: transparent;
+    background-image: linear-gradient(
+      180deg,
+      var(--color-bone) 0 14%,
+      var(--color-ghost) 14% 18%,
+      var(--color-muted) 18% 30%,
+      var(--color-bone) 30% 44%,
+      var(--color-ghost) 44% 48%,
+      var(--color-bone) 48% 100%
+    );
+    background-size: 100% 240%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: scan 2.4s linear infinite;
+  }
+}
+@keyframes scan {
+  from { background-position: 0 0; }
+  to { background-position: 0 -240%; }
+}
+
+/* Hover «RO»: vídeo dentro de las letras (texto hueso + vídeo en multiply sobre negro) */
+.roVideo {
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out);
+}
+.ro:hover .roVideo,
+.ro[data-active] .roVideo {
+  opacity: 1;
+}

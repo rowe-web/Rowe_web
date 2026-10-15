@@ -296,6 +296,36 @@ export const settings: SeedSetting[] = [
     },
   },
   {
+    key: "navigation",
+    label: "Menú y pie de página",
+    isPublic: true,
+    editorCanEdit: true,
+    value: {
+      menu_label: "Menú",
+      close_label: "Cerrar",
+      cta_label: "Hablemos",
+      cta_href: "/#hablemos",
+      menu_kicker: "Índice de escenas",
+      items: [
+        { label: "Inicio", href: "/", caption: "Fig. 00 — Showreel" },
+        { label: "Desarrollo web", href: "/web", caption: "Fig. 01 — Web en movimiento" },
+        { label: "Producción audiovisual", href: "/audiovisual", caption: "Fig. 02 — Rodaje" },
+        { label: "Proyectos", href: "/proyectos", caption: "Fig. 03 — Trabajos recientes" },
+        { label: "Presupuesto", href: "/#presupuesto", caption: "Fig. 04 — Calcula tu presupuesto" },
+        { label: "Hablemos", href: "/#hablemos", caption: "Fig. 05 — ¿Grabamos tu próxima escena?" },
+      ],
+      footer_title: "¿Grabamos tu próxima *escena?*",
+      footer_end: "Fin",
+      legal: [
+        { label: "Aviso legal", href: "/aviso-legal" },
+        { label: "Privacidad", href: "/privacidad" },
+        { label: "Cookies", href: "/cookies" },
+      ],
+      preloader_label: "Escena 00 — Hero",
+      preloader_meta: "2.39:1 · 25 fps",
+    },
+  },
+  {
     key: "notifications",
     label: "Avisos por email (interno)",
     isPublic: false,
@@ -329,6 +359,30 @@ export const scenes: SeedScene[] = [
       video_caption: "Fig. 02 — Showreel 2026 · 2.39:1",
       program_label: "PGM — Showreel_v12",
       format_label: "2.39:1 · 25 fps",
+      sequence_label: "Secuencia · Home",
+      // Pistas de la línea de tiempo bajo el showreel (1b). Cada clip es un enlace.
+      tracks: [
+        {
+          key: "RO",
+          label: "Rodaje",
+          clips: [
+            { label: "Showreel_v12", href: "#hero-reel", size: 3 },
+            { label: "Clinica_Mar", href: "/proyectos/clinica-dental-mar", size: 2.6 },
+            { label: "Brasa_reel_15s", href: "/proyectos/restaurante-brasa", size: 3.2 },
+            { label: "Opticas_Luz", href: "/proyectos/opticas-luz", size: 2.2 },
+          ],
+        },
+        {
+          key: "WE",
+          label: "Web",
+          clips: [
+            { label: "Home", href: "/", size: 2.4 },
+            { label: "Servicios", href: "/web", size: 2.8 },
+            { label: "Proyectos", href: "/proyectos", size: 3.2 },
+            { label: "Contacto", href: "/contacto", size: 2.1 },
+          ],
+        },
+      ],
     },
   },
   {
@@ -370,7 +424,16 @@ export const scenes: SeedScene[] = [
     body: "Diseñamos y desarrollamos webs a medida, rápidas y pensadas para que quien llegue sepa en segundos qué haces y cómo contactarte.",
     ctaLabel: "Ver servicio",
     ctaHref: "/web",
-    data: {},
+    data: {
+      url_label: "tu-negocio.es",
+      screen_caption: "Fig. 03 — Web en movimiento · sustituir",
+      specs: [
+        { label: "Velocidad", value: "Carga en menos de 1,5 s" },
+        { label: "Responsive", value: "Móvil · tablet · escritorio" },
+        { label: "Panel", value: "Editas tú, sin depender de nadie" },
+        { label: "SEO", value: "Básico incluido · local opcional" },
+      ],
+    },
   },
   {
     key: "audiovisual",
@@ -380,13 +443,20 @@ export const scenes: SeedScene[] = [
     body: "Rodamos y editamos contenido para redes y comunicación comercial. Piezas cortas, cuidadas y pensadas para que tu cliente se quede mirando.",
     ctaLabel: "Ver servicio",
     ctaHref: "/audiovisual",
-    data: {},
+    data: {
+      reels: [
+        { label: "Reel 01 — Cocina", duration: "00:00:15:00", sector: "Restauración" },
+        { label: "Reel 02 — Consulta", duration: "00:00:24:00", sector: "Salud" },
+        { label: "Reel 03 — Apertura", duration: "00:00:12:00", sector: "Comercio" },
+      ],
+      formats: ["4–12 reels al mes", "Vídeo corporativo 60–90 s", "Sesión de fotografía", "Jornadas de rodaje"],
+    },
   },
   {
     key: "ecosistema",
     name: "Ecosistema",
     kicker: "Escena 05 — Ecosistema",
-    title: "Uno atrae. *El otro convierte.*",
+    title: "Uno atrae.\n*El otro convierte.*",
     body: "Mismo equipo, misma estética, mismo mensaje. Así tu marca se ve igual de profesional en todas partes.",
     ctaLabel: "Quiero el pack completo",
     ctaHref: "#presupuesto",
