@@ -34,9 +34,7 @@ export async function runMigrations(db: Db, dir = MIGRATIONS_DIR, log = console.
   for (const file of files) {
     const sql = await readFile(path.join(dir, file), "utf8");
     // Normaliza saltos de línea: el checksum es el mismo en Windows (CRLF) y Linux (LF).
-    const checksum = createHash("sha256").update(sql.replace(/
-/g, "
-")).digest("hex");
+    const checksum = createHash("sha256").update(sql.replace(/\r\n/g, "\n")).digest("hex");
     const previous = done.get(file);
     if (previous) {
       if (previous !== checksum) {
