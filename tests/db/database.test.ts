@@ -249,6 +249,16 @@ describe("servidor (service_role)", () => {
     ).rejects.toThrow(/privacy_accepted_at/);
   });
 
+  it("rechaza JSON doblemente codificado (objeto guardado como texto)", async () => {
+    await expect(
+      db.query(`update public.scenes set data = to_jsonb('{"steps":[]}'::text) where key = 'hero'`),
+    ).rejects.toThrow(/scenes_data_object/);
+    const [{ bad }] = await db.query<{ bad: number }>(
+      "select count(*)::int as bad from public.site_settings where jsonb_typeof(value) <> 'object'",
+    );
+    expect(bad).toBe(0);
+  });
+
   it("limita los envíos por IP", async () => {
     const results: boolean[] = [];
     for (let i = 0; i < 4; i++) {

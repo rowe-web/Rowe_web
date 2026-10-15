@@ -28,10 +28,11 @@ export function FilosofiaScene({ scene }: SceneProps<{ points?: Point[] }>) {
           <li
             key={p.key}
             data-reveal
-            className="group/pt grid grid-cols-[36px_1fr] gap-x-4 gap-y-3 border-b border-line py-7 transition-[padding] duration-[400ms] ease-[var(--ease-out)] md:grid-cols-[110px_minmax(0,1.2fr)_minmax(0,1fr)] md:items-baseline md:gap-x-[3vw] md:py-10 md:hover:pl-4"
+            data-scroll-active
+            className="group/pt grid grid-cols-[36px_1fr] gap-x-4 gap-y-3 border-b border-line py-7 transition-[padding] duration-[400ms] ease-[var(--ease-out)] md:grid-cols-[110px_minmax(0,1.2fr)_minmax(0,1fr)] md:items-baseline md:gap-x-[3vw] md:py-10 md:hover:pl-4 data-[active]:pl-3"
           >
             <span className="flex items-center gap-3 label-mono text-muted">
-              <span aria-hidden="true" className="h-2 w-2 rounded-full bg-rec opacity-0 transition-opacity duration-300 group-hover/pt:opacity-100 max-md:hidden" />
+              <span aria-hidden="true" className="h-2 w-2 rounded-full bg-rec opacity-0 transition-opacity duration-300 group-hover/pt:opacity-100 group-data-[active]/pt:opacity-100" />
               {p.key}
             </span>
             <span className="headline text-[clamp(30px,8vw,40px)] leading-[1] md:text-[clamp(40px,4.4vw,68px)]">

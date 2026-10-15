@@ -4,6 +4,7 @@ import { SceneHeader } from "@/components/scene/SceneHeader";
 import { mediaUrl } from "@/lib/content/settings";
 import { supabaseConfig } from "@/lib/site";
 import styles from "./Estudio.module.css";
+import { SceneMotion } from "@/motion/SceneMotion";
 import { getMedia, type SceneProps } from "./types";
 
 interface EstudioData {
@@ -26,7 +27,8 @@ export function EstudioScene({ scene, site, previewLit }: SceneProps<EstudioData
   const [ro, we] = d.tracks ?? [];
 
   return (
-    <section id="estudio" data-scene="estudio" className="relative gutter-x py-[clamp(88px,13vh,140px)]">
+    <section id="estudio" data-scene="estudio" data-pin-container className="relative gutter-x py-[clamp(88px,13vh,140px)]">
+      <SceneMotion name="estudio" />
       <SceneHeader kicker={scene.kicker} meta={["RO + WE = ROWE"]} />
 
       <div className="mt-12 grid gap-14 md:mt-[9vh] lg:grid-cols-[minmax(0,1fr)_minmax(300px,29vw)] lg:gap-[5vw]">
@@ -52,7 +54,7 @@ export function EstudioScene({ scene, site, previewLit }: SceneProps<EstudioData
           <p className="pb-3.5 label-mono text-[10px] text-muted">Mezcla</p>
 
           {ro && (
-            <div data-track="ro" className={`${styles.ro} flex items-center gap-5 border-t border-line py-3 md:gap-6 md:py-4`}>
+            <div data-track="ro" data-scroll-active className={`${styles.ro} flex items-center gap-5 border-t border-line py-3 md:gap-6 md:py-4`}>
               <TrackLabel track={ro.key} label={ro.label} />
               <span className="relative inline-block px-3.5 py-1.5" data-cursor="Rodaje">
                 <span className="relative block headline-serif text-[clamp(64px,17vw,112px)] leading-[0.9] lg:text-[clamp(72px,7.8vw,112px)]">
@@ -73,7 +75,7 @@ export function EstudioScene({ scene, site, previewLit }: SceneProps<EstudioData
           )}
 
           {we && (
-            <div data-track="we" className="flex items-center gap-5 border-t border-line py-3 md:gap-6 md:py-4">
+            <div data-track="we" data-scroll-active className="group/we flex items-center gap-5 border-t border-line py-3 md:gap-6 md:py-4">
               <TrackLabel track={we.key} label={we.label} />
               <span
                 className={`${styles.we} block px-3.5 py-1.5 headline-serif text-[clamp(64px,17vw,112px)] leading-[0.9] lg:text-[clamp(72px,7.8vw,112px)]`}

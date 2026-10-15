@@ -195,6 +195,26 @@
 }
 
 /* ---------------------------------------------------------------------------
+   Estados iniciales del movimiento.
+   html.motion-ready lo pone un script en línea ANTES de pintar (sin parpadeo).
+   Si el movimiento no arranca en 4 s, el script lo quita y todo se ve igualmente.
+   --------------------------------------------------------------------------- */
+html.motion-ready [data-reveal] {
+  opacity: 0;
+}
+html.motion-ready:not(.reduced) [data-hero-title] [data-line-inner] {
+  /* debajo de la máscara de la línea (clip-path con margen para cursivas y descendentes) */
+  transform: translateY(130%);
+}
+html.motion-ready:not(.reduced) [data-manifesto] [data-word] {
+  opacity: 0.28;
+}
+html.scroll-locked,
+html.scroll-locked body {
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------------------
    Movimiento reducido: sin grano animado, parpadeos ni bucles decorativos.
    --------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
@@ -206,4 +226,115 @@
     transition-duration: 0.15s !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Cursor personalizado (src/components/chrome/Cursor.tsx)
+   --------------------------------------------------------------------------- */
+html.has-cursor,
+html.has-cursor * {
+  cursor: none !important;
+}
+.cursor-ring,
+.cursor-dot {
+  position: fixed;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  visibility: hidden;
+  will-change: transform;
+}
+.cursor-ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: -16px 0 0 -16px;
+  border: 1px solid var(--color-bone);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  transition:
+    width 0.25s var(--ease-out),
+    height 0.25s var(--ease-out),
+    margin 0.25s var(--ease-out),
+    background-color 0.25s,
+    border-radius 0.25s,
+    padding 0.25s;
+}
+.cursor-ring[data-mode="link"] {
+  width: 58px;
+  height: 58px;
+  margin: -29px 0 0 -29px;
+}
+.cursor-ring[data-mode="text"] {
+  width: 2px;
+  height: 28px;
+  margin: -14px 0 0 -1px;
+  border: 0;
+  border-radius: 0;
+  background: var(--color-bone);
+}
+.cursor-ring[data-mode="label"] {
+  width: auto;
+  height: 30px;
+  margin: -15px 0 0 0;
+  padding: 0 14px;
+  border: 0;
+  background: var(--color-bone);
+  translate: -50% 0;
+}
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--color-bone);
+  transition: background-color 0.2s, opacity 0.2s;
+}
+.cursor-ring[data-mode="link"] ~ .cursor-dot,
+.cursor-ring[data-mode="text"] ~ .cursor-dot,
+.cursor-ring[data-mode="label"] ~ .cursor-dot {
+  opacity: 0 !important;
+}
+/* Modo REC: dentro de «Hablemos» el punto es rojo (sin mezcla de diferencia para que se vea rojo) */
+.cursor-dot[data-rec="1"] {
+  background: var(--color-rec);
+}
+
+/* Halo de luz que sigue al ratón: muy sutil, solo con cursor activo */
+.cursor-halo {
+  display: none;
+}
+html.has-cursor .cursor-halo {
+  display: block;
+  background: radial-gradient(560px circle at var(--mx, 50%) var(--my, 30%), rgb(237 234 228 / 0.045), transparent 62%);
+}
+
+/* Aviso (toast) del diseño */
+.toast-in {
+  animation: toast-in 0.5s var(--ease-out) both;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Preloader: solo en la primera visita de la sesión (el script en línea marca html.intro-seen) */
+html.intro-seen .rowe-preloader,
+html.reduced .rowe-preloader {
+  display: none;
+}
+
+/* Cabecera con fondo al salir del inicio (diseño: rgba(10,10,10,.72) + desenfoque) */
+.header-solid {
+  background-color: rgb(10 10 10 / 0.72);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }

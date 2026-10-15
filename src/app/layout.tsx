@@ -56,7 +56,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${interTight.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}>
+    <html lang="es" suppressHydrationWarning className={`${interTight.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}>
       <body>{children}</body>
     </html>
   );

@@ -66,6 +66,8 @@ Protecciones adicionales en la base de datos:
 
 > Las tablas nuevas que se creen en migraciones futuras deben activar RLS y revocar privilegios a `anon` (Supabase se los concede por defecto).
 
+Los campos JSON tienen restricciones de forma (`0004_json_shapes.sql`): por ejemplo, `scenes.data` tiene que ser un objeto. La base de datos rechaza un JSON doblemente codificado (un objeto guardado como texto).
+
 ## Pruebas
 
 `npm test` levanta un Postgres real en memoria (PGlite), aplica las migraciones y el seed, y comprueba la publicación, la restauración, el historial y los permisos de cada rol (`tests/db/`).

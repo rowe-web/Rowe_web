@@ -4,6 +4,7 @@ import { RichText } from "@/components/ui/RichText";
 import { MediaFrame } from "@/components/scene/MediaFrame";
 import { SceneHeader } from "@/components/scene/SceneHeader";
 import { getSetting } from "@/lib/content/settings";
+import { SceneMotion } from "@/motion/SceneMotion";
 import { getMedia, type SceneProps } from "./types";
 
 interface ProyectosData {
@@ -24,6 +25,7 @@ export function ProyectosScene({ scene, site }: SceneProps<ProyectosData>) {
 
   return (
     <section id="proyectos" data-scene="proyectos" className="relative py-[clamp(88px,13vh,140px)]">
+      <SceneMotion name="carousel" />
       <div className="gutter-x">
         <SceneHeader kicker={scene.kicker} meta={[`${projects.length} proyectos`]} />
         <div className="mt-12 flex flex-wrap items-end justify-between gap-6 md:mt-[9vh]">
@@ -55,6 +57,7 @@ export function ProyectosScene({ scene, site }: SceneProps<ProyectosData>) {
             draggable={false}
             className="group/card flex w-[82vw] shrink-0 snap-start flex-col gap-4 md:w-[52vw]"
             data-cursor="Ver proyecto"
+            data-scroll-active
           >
             <div className="overflow-hidden">
               <MediaFrame
@@ -62,7 +65,7 @@ export function ProyectosScene({ scene, site }: SceneProps<ProyectosData>) {
                 aspect="2.39 / 1"
                 placeholder={`[ Portada 2.39:1 · ${p.title} ]`}
                 sizes="(min-width:768px) 52vw, 82vw"
-                className="transition-transform duration-700 ease-[var(--ease-cut)] group-hover/card:scale-[1.035]"
+                className="transition-transform duration-700 ease-[var(--ease-cut)] group-hover/card:scale-[1.035] group-data-[active]/card:scale-[1.035]"
               />
             </div>
             <div className="flex items-start justify-between gap-6 border-t border-line pt-4">

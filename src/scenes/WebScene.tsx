@@ -3,6 +3,7 @@ import { CornerMarks } from "@/components/ui/CornerMarks";
 import { RichText } from "@/components/ui/RichText";
 import { MediaFrame } from "@/components/scene/MediaFrame";
 import { SceneHeader } from "@/components/scene/SceneHeader";
+import { SceneMotion } from "@/motion/SceneMotion";
 import { getMedia, type SceneProps } from "./types";
 
 interface WebData {
@@ -24,6 +25,7 @@ export function WebScene({ scene, site }: SceneProps<WebData>) {
 
   return (
     <section id="web" data-scene="web" className="relative gutter-x py-[clamp(88px,13vh,140px)]">
+      <SceneMotion name="web" />
       <SceneHeader kicker={scene.kicker} meta={["Diseño · Desarrollo · SEO"]} />
 
       <div className="mt-12 grid gap-14 md:mt-[9vh] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-[5vw]">

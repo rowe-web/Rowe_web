@@ -32,6 +32,8 @@ npm install
 3. Cuando termine de crearse:
    - **Project Settings → API Keys**: copia la **Project URL**, la clave **publishable** y la clave **secret**.
    - Botón **Connect** (arriba) → pestaña **Session pooler** → copia la cadena `postgresql://…` y sustituye `[YOUR-PASSWORD]` por la contraseña de la base de datos.
+     - Usa el **Session pooler**, no la conexión directa (`db.xxx.supabase.co`): la directa solo funciona con IPv6 y muchas redes domésticas son solo IPv4.
+     - Si la contraseña tiene símbolos como `? # / @ :`, van codificados en la URL (`?` → `%3F`, `#` → `%23`, `/` → `%2F`, `@` → `%40`, `:` → `%3A`).
 4. **Authentication → Sign In / Providers**: desactiva **Allow new users to sign up**. El panel es solo por invitación; esto impide que alguien se registre por su cuenta.
 
 ### 3. Configurar las variables de entorno
@@ -73,6 +75,7 @@ Abre <http://localhost:3000>. La portada debe decir «Base de datos conectada ·
 | `npm run build` / `npm start` | Build de producción y servidor de producción |
 | `npm run check` | Lint + tipos + tests + build (antes de cada entrega) |
 | `npm test` | Tests (incluye base de datos real en memoria: permisos, publicación, historial) |
+| `npm run test:e2e` | Pruebas en navegador real del scroll y la navegación (construye y arranca la web de producción) |
 | `npm run db:migrate` | Aplica migraciones nuevas |
 | `npm run db:seed` | Carga el contenido que falte y asegura el admin |
 | `npm run db:seed -- --reset-content` | Vuelve a cargar TODO el contenido del diseño (pide confirmación; no toca mensajes ni usuarios) |

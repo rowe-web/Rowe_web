@@ -64,7 +64,8 @@ export function ServiciosScene({ scene, site }: SceneProps) {
                 {items.map((s, i) => (
                   <li
                     key={s.slug}
-                    className="group/item flex items-baseline gap-5 border-b border-line py-4 transition-[padding] duration-300 ease-[var(--ease-out)] hover:pl-3.5"
+                    data-scroll-active
+                    className="group/item flex items-baseline gap-5 border-b border-line py-4 transition-[padding] duration-300 ease-[var(--ease-out)] hover:pl-3.5 data-[active]:pl-3.5"
                   >
                     <span className="w-6 shrink-0 label-mono text-[10px] text-muted">{String(i + 1).padStart(2, "0")}</span>
                     <span className="flex min-w-0 flex-1 flex-col gap-1 md:flex-row md:items-baseline md:justify-between md:gap-6">

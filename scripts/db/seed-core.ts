@@ -35,7 +35,7 @@ export async function seedContent(db: Db, opts: SeedOptions = {}): Promise<{ pub
   for (const s of data.settings) {
     await db.query(
       `insert into public.site_settings (key, label, value, is_public, editor_can_edit)
-       values ($1, $2, $3::jsonb, $4, $5) on conflict (key) do nothing`,
+       values ($1, $2, $3::text::jsonb, $4, $5) on conflict (key) do nothing`,
       [s.key, s.label, j(s.value), s.isPublic, s.editorCanEdit],
     );
   }
@@ -43,7 +43,7 @@ export async function seedContent(db: Db, opts: SeedOptions = {}): Promise<{ pub
   for (const [i, s] of data.scenes.entries()) {
     await db.query(
       `insert into public.scenes (key, position, visible, name, kicker, title, body, cta_label, cta_href, data)
-       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb) on conflict (key) do nothing`,
+       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::text::jsonb) on conflict (key) do nothing`,
       [s.key, i * 10, s.visible ?? true, s.name, s.kicker, s.title, s.body, s.ctaLabel, s.ctaHref, j(s.data)],
     );
   }
@@ -59,7 +59,7 @@ export async function seedContent(db: Db, opts: SeedOptions = {}): Promise<{ pub
   for (const p of data.pages) {
     await db.query(
       `insert into public.pages (slug, kind, title, intro, blocks, seo_title, seo_description)
-       values ($1, $2, $3, $4, $5::jsonb, $6, $7) on conflict (slug) do nothing`,
+       values ($1, $2, $3, $4, $5::text::jsonb, $6, $7) on conflict (slug) do nothing`,
       [p.slug, p.kind, p.title, p.intro, j(p.blocks), p.seoTitle, p.seoDescription],
     );
   }
@@ -68,7 +68,7 @@ export async function seedContent(db: Db, opts: SeedOptions = {}): Promise<{ pub
     await db.query(
       `insert into public.projects (slug, title, client, sector, year, category, summary, challenge, solution, result,
          metrics, seo_title, seo_description, status, featured, is_placeholder, position)
-       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, $12, $13, $14::public.content_status, $15, true, $16)
+       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::text::jsonb, $12, $13, $14::public.content_status, $15, true, $16)
        on conflict (slug) do nothing`,
       [p.slug, p.title, p.client, p.sector, p.year, p.category, p.summary, p.challenge, p.solution, p.result,
         j(p.metrics), `${p.title} — Caso de estudio · ROWE`, p.summary, p.status, p.featured, i * 10],
@@ -79,7 +79,7 @@ export async function seedContent(db: Db, opts: SeedOptions = {}): Promise<{ pub
     await db.query(
       `insert into public.config_sections (key, position, take_label, title, description, requires,
          locked_title, locked_body, locked_cta, locked_select)
-       values ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9, $10) on conflict (key) do nothing`,
+       values ($1, $2, $3, $4, $5, $6::text::jsonb, $7, $8, $9, $10) on conflict (key) do nothing`,
       [s.key, i * 10, s.takeLabel, s.title, s.description ?? "", s.requires ? j(s.requires) : null,
         s.lockedTitle ?? "", s.lockedBody ?? "", s.lockedCta ?? "", s.lockedSelect ?? ""],
     );
@@ -90,7 +90,7 @@ export async function seedContent(db: Db, opts: SeedOptions = {}): Promise<{ pub
       `insert into public.config_options (section_key, key, position, control, set_key, set_label, set_description, badge,
          label, description, line_label, price_min, price_max, price_mode, unit_label, track, is_base, components,
          modifies_base, base_suffix, weeks_min, weeks_max, weeks_factor, stepper_min, stepper_max, stepper_included, is_default)
-       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::public.price_mode, $15, $16, $17, $18::jsonb,
+       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::public.price_mode, $15, $16, $17, $18::text::jsonb,
          $19, $20, $21, $22, $23, $24, $25, $26, $27)
        on conflict (key) do nothing`,
       [o.section, o.key, i * 10, o.control, o.setKey ?? null, o.setLabel ?? "", o.setDescription ?? "", o.badge ?? "",
@@ -107,7 +107,7 @@ export async function seedContent(db: Db, opts: SeedOptions = {}): Promise<{ pub
         `insert into public.leads (created_at, origin, need, sector, budget_label, message, name, company, email, phone,
            privacy_accepted_at, status, source)
          select now() - make_interval(hours => $1), $2::public.lead_origin, $3, $4, $5, $6, $7, $8, $9, $10,
-           now() - make_interval(hours => $1), $11::public.lead_status, $12::jsonb
+           now() - make_interval(hours => $1), $11::public.lead_status, $12::text::jsonb
          where not exists (select 1 from public.leads where email = $9)`,
         [l.hoursAgo, l.origin, l.need, l.sector, l.budgetLabel, l.message, l.name, l.company, l.email, l.phone, l.status,
           j({ demo: true, items: l.items })],

@@ -7,15 +7,17 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
     "brand": "tsx scripts/gen-brand.ts",
     "db:migrate": "tsx --env-file-if-exists=.env.local scripts/db/migrate.ts",
     "db:seed": "tsx --env-file-if-exists=.env.local scripts/db/seed.ts",
-    "db:setup": "npm run db:migrate && npm run db:seed"
+    "db:setup": "npm run db:migrate && npm run db:seed",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
     "gsap": "^3.15.0",

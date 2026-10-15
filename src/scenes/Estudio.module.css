@@ -3,7 +3,7 @@
   transition: color 0.4s var(--ease-out);
 }
 /* Con ratón: al pasar por encima. En táctil: cuando la escena está en pantalla ([data-active], src/motion). */
-.we[data-active] {
+[data-active] > .we {
   color: transparent;
   background-image: linear-gradient(
     180deg,

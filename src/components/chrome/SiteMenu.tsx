@@ -13,7 +13,10 @@ interface SiteMenuProps {
   contact: ContactSettings;
   brand: BrandSettings;
   open: boolean;
+  /** Cierre inmediato (al navegar: la cortinilla ya tapa). */
   onClose?: () => void;
+  /** Cierre animado (botón «Cerrar», Esc). */
+  onCloseAnimated?: () => void;
   /** Guía de estilo: abierto y en su sitio. */
   preview?: boolean;
 }
@@ -24,7 +27,7 @@ interface SiteMenuProps {
  * los demás y cambia la figura de la derecha. Abre con el corte desde el centro del
  * overlay del diseño (clip-path) y bloquea el scroll mientras está abierto.
  */
-export function SiteMenu({ nav, contact, brand, open, onClose, preview = false }: SiteMenuProps) {
+export function SiteMenu({ nav, contact, brand, open, onClose, onCloseAnimated, preview = false }: SiteMenuProps) {
   const [hover, setHover] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const current = hover ?? 0;
@@ -55,7 +58,7 @@ export function SiteMenu({ nav, contact, brand, open, onClose, preview = false }
       <div className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-line-soft bg-ink gutter-x md:h-[76px]">
         <Logo height={18} href={null} />
         <span className="hidden label-mono text-muted md:inline">{nav.menu_kicker}</span>
-        <button type="button" onClick={onClose} className="flex min-h-11 items-center gap-2.5 text-[15px] md:text-[14px]">
+        <button type="button" onClick={onCloseAnimated ?? onClose} className="flex min-h-11 items-center gap-2.5 text-[15px] md:text-[14px]">
           {nav.close_label} <span className="label-mono text-[10px] text-muted max-md:hidden">Esc</span>
         </button>
       </div>
@@ -67,6 +70,7 @@ export function SiteMenu({ nav, contact, brand, open, onClose, preview = false }
               <li key={item.href} data-menu-item className="overflow-hidden border-b border-line">
                 <Link
                   href={item.href}
+                  data-transition-label={item.label}
                   onClick={onClose}
                   onMouseEnter={() => setHover(i)}
                   onFocus={() => setHover(i)}

@@ -4,6 +4,7 @@ import { RichText } from "@/components/ui/RichText";
 import { MediaFrame } from "@/components/scene/MediaFrame";
 import { Timecode } from "@/components/scene/Timecode";
 import { getSetting, emptyBrand, type BrandSettings } from "@/lib/content/settings";
+import { SceneMotion } from "@/motion/SceneMotion";
 import { getMedia, type SceneProps } from "./types";
 
 interface HeroData {
@@ -37,9 +38,10 @@ export function HeroScene({ scene, site }: SceneProps<HeroData>) {
 
   return (
     <section id="hero" data-scene="hero" className="relative">
+      <SceneMotion name="hero" />
       {/* --- Plano 1 · Editorial (1c) --------------------------------------- */}
       <div data-hero-editorial className="relative flex min-h-screen-safe flex-col gutter-x pb-8 pt-[92px] md:pb-10 md:pt-[104px]">
-        <div className="flex justify-between gap-4 border-b border-line pb-3 label-mono text-[9px] text-muted md:text-[11px]">
+        <div data-hero-intro className="flex justify-between gap-4 border-b border-line pb-3 label-mono text-[9px] text-muted md:text-[11px]">
           <span>{scene.kicker}</span>
           <span>{brand.tagline}</span>
           <span className="hidden md:inline">{brand.city}</span>
@@ -49,7 +51,7 @@ export function HeroScene({ scene, site }: SceneProps<HeroData>) {
         <div className="relative mt-8 md:mt-12 md:flex-1">
           <h1 data-hero-title className="headline relative z-10 text-[clamp(44px,14.2vw,80px)] md:text-[clamp(72px,11.67vw,168px)]">
             {lines.map((line, i) => (
-              <span key={i} className={`block whitespace-nowrap ${i === 1 ? "pl-[9vw] md:pl-[18.75vw]" : ""}`} data-line>
+              <span key={i} className={`block whitespace-nowrap ${i === 1 ? "pl-[9vw] md:pl-[18.75vw]" : ""}`} style={{ clipPath: "inset(-40% -12% -0.16em -12%)" }} data-line>
                 <span className="block" data-line-inner>
                   <RichText text={line} />
                 </span>
@@ -59,14 +61,16 @@ export function HeroScene({ scene, site }: SceneProps<HeroData>) {
 
           {/* Fig. 01 — foto 4:5 (escritorio) */}
           <figure data-parallax="0.12" className="absolute right-0 top-[-8px] hidden w-[17.9vw] md:block">
-            <figcaption className="mb-2.5 text-right label-mono text-[10px] text-muted">{d.photo_caption}</figcaption>
-            <MediaFrame media={photo} aspect="4 / 5" placeholder="[ Foto 4:5 ]" sizes="18vw" priority />
+            <figcaption data-hero-intro className="mb-2.5 text-right label-mono text-[10px] text-muted">{d.photo_caption}</figcaption>
+            <div data-hero-intro>
+              <MediaFrame media={photo} aspect="4 / 5" placeholder="[ Foto 4:5 ]" sizes="18vw" priority />
+            </div>
           </figure>
         </div>
 
         <div className="mt-8 grid gap-8 md:mt-10 md:grid-cols-[minmax(0,440px)_1fr_27.4vw] md:items-end md:gap-10">
           {/* Texto + CTAs */}
-          <div className="flex flex-col gap-6">
+          <div data-hero-intro className="flex flex-col gap-6">
             <div className="flex items-start gap-4">
               <p className="max-w-[44ch] text-[14px] leading-[1.55] text-muted md:text-[17px]">{scene.body}</p>
               {/* Fig. 01 en móvil, junto al texto */}
@@ -87,7 +91,7 @@ export function HeroScene({ scene, site }: SceneProps<HeroData>) {
           </div>
 
           {/* Leyenda + Desliza */}
-          <div className="flex items-end justify-between gap-6 md:h-full md:flex-col md:items-start md:justify-between md:pl-[4vw]">
+          <div data-hero-intro className="flex items-end justify-between gap-6 md:h-full md:flex-col md:items-start md:justify-between md:pl-[4vw]">
             <p className="label-mono text-[10px] leading-[1.8] text-muted md:text-[11px]">
               {brand.legend.map((l) => (
                 <span key={l} className="block">
@@ -102,7 +106,7 @@ export function HeroScene({ scene, site }: SceneProps<HeroData>) {
           </div>
 
           {/* Fig. 02 — showreel pequeño: crecerá hasta el plano 2 */}
-          <figure className="hidden md:block">
+          <figure data-hero-intro className="hidden md:block">
             <a href="#hero-reel" data-hero-reel-source aria-label={`${d.reel_label} — ir a la proyección`} className="block">
               <MediaFrame media={video} poster={poster} aspect="2.39 / 1" marks={16} placeholder="" sizes="28vw" cursor="▶ Ver">
                 <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-bone px-4 py-2 label-mono text-[10px] text-ink">
@@ -122,7 +126,7 @@ export function HeroScene({ scene, site }: SceneProps<HeroData>) {
             <div className="absolute inset-0 bg-ink/30" aria-hidden="true" />
             <span className="absolute left-[6vw] top-[7%] label-mono text-[9px] text-bone md:text-[11px]">{d.program_label}</span>
             <span className="absolute right-[6vw] top-[7%] hidden label-mono text-[11px] text-muted md:inline">{d.format_label}</span>
-            <span className="absolute bottom-[7%] left-[6vw] label-mono text-[9px] text-muted md:text-[11px]">{d.sound_label}</span>
+            <span data-sound-label={d.sound_label} className="absolute bottom-[7%] left-[6vw] label-mono text-[9px] text-muted md:text-[11px]">{d.sound_label}</span>
             <Timecode className="absolute bottom-[7%] right-[6vw] label-mono text-[9px] text-bone md:text-[11px]" />
           </MediaFrame>
         </div>
@@ -134,7 +138,7 @@ export function HeroScene({ scene, site }: SceneProps<HeroData>) {
             <span className="hidden sm:inline">In 00:00:00:00</span>
             <span className="hidden sm:inline">Out 00:01:24:00</span>
           </div>
-          {tracks.map((track) => {
+          {tracks.map((track, ti) => {
             const total = track.clips.reduce((a, c) => a + c.size, 0);
             return (
               <div key={track.key} className="flex h-[50px] items-center gap-3 border-b border-line gutter-x md:h-[66px] md:gap-6">
@@ -142,7 +146,7 @@ export function HeroScene({ scene, site }: SceneProps<HeroData>) {
                   <span className="block text-[10px] md:text-[12px]">{track.key}</span>
                   <span className="hidden text-[9px] text-muted md:block">{track.label}</span>
                 </div>
-                <div className="flex h-8 min-w-0 flex-1 gap-1 md:h-12">
+                <div className="flex h-8 min-w-0 flex-1 gap-1 md:h-12" {...(ti === 0 ? { "data-hero-track-area": "" } : {})}>
                   {track.clips.map((clip, i) => (
                     <Link
                       key={clip.label}
