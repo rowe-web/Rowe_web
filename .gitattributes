@@ -1,0 +1,6 @@
+# Saltos de línea LF en todo el repositorio (Windows y Linux/Vercel iguales)
+* text=auto eol=lf
+*.png binary
+*.ico binary
+*.jpg binary
+*.mp4 binary
