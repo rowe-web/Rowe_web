@@ -3,10 +3,11 @@ import { AudiovisualScene } from "./AudiovisualScene";
 import { EcosistemaScene } from "./EcosistemaScene";
 import { EstudioScene } from "./EstudioScene";
 import { FilosofiaScene } from "./FilosofiaScene";
+import { HablemosScene } from "./HablemosScene";
 import { HeroScene } from "./HeroScene";
 import { ProcesoScene } from "./ProcesoScene";
+import { PresupuestoScene } from "./PresupuestoScene";
 import { ProyectosScene } from "./ProyectosScene";
-import { SceneStub } from "./SceneStub";
 import { ServiciosScene } from "./ServiciosScene";
 import { WebScene } from "./WebScene";
 import type { SceneProps } from "./types";
@@ -28,7 +29,6 @@ export const sceneRegistry: Record<string, ComponentType<SceneProps<any>>> = {
   proceso: ProcesoScene,
   proyectos: ProyectosScene,
   filosofia: FilosofiaScene,
-  // Fase 3: el configurador y el formulario sustituyen a estos marcadores
-  presupuesto: SceneStub,
-  hablemos: SceneStub,
+  presupuesto: PresupuestoScene,
+  hablemos: HablemosScene,
 };

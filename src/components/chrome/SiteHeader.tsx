@@ -3,6 +3,7 @@
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/Button";
 import { Timecode } from "@/components/scene/Timecode";
+import { hablemos } from "@/features/hablemos/store";
 import type { NavigationSettings } from "@/lib/content/settings";
 
 interface SiteHeaderProps {
@@ -38,7 +39,8 @@ export function SiteHeader({ nav, onMenu, menuOpen = false, preview = false }: S
         </button>
         {/* En móvil, como en el diseño, solo «Menú» */}
         <span className="hidden sm:inline-flex">
-          <Button variant="outline" size="sm" href={nav.cta_href}>
+          {/* Como en el diseño: abre el overlay «Hablemos» desde cualquier página */}
+          <Button variant="outline" size="sm" onClick={() => hablemos.open()}>
             {nav.cta_label}
           </Button>
         </span>

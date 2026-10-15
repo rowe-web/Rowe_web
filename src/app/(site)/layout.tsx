@@ -10,8 +10,10 @@ import {
   mediaUrl,
   type BrandSettings,
   type ContactSettings,
+  type CookieSettings,
   type NavigationSettings,
 } from "@/lib/content/settings";
+import { getHablemosSettings } from "@/features/hablemos/settings";
 import { loadSite } from "@/lib/content/site";
 import { supabaseConfig } from "@/lib/site";
 import { MotionProvider } from "@/motion/MotionProvider";
@@ -43,7 +45,14 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         Saltar al contenido
       </a>
       <MotionProvider>
-        <SiteChrome nav={nav} contact={contact} brand={brand} ambientUrl={ambientUrl} />
+        <SiteChrome
+          nav={nav}
+          contact={contact}
+          brand={brand}
+          hablemosSettings={getHablemosSettings(site)}
+          cookies={getSetting<CookieSettings>(site, "cookies", { enabled: false, text: "", accept: "Aceptar", reject: "Rechazar", configure: "Configurar" })}
+          ambientUrl={ambientUrl}
+        />
         {children}
         <div className="relative z-[1]">
           <SiteFooter site={site} />

@@ -1,0 +1,74 @@
+import "server-only";
+import nodemailer, { type Transporter } from "nodemailer";
+import { serverEnv } from "@/lib/env.server";
+
+export interface Mail {
+  to: string[];
+  subject: string;
+  html: string;
+  text: string;
+  replyTo?: string;
+  attachments?: { filename: string; path?: string; content?: Buffer; cid?: string }[];
+}
+
+export class EmailNotConfiguredError extends Error {
+  constructor() {
+    super("El envío de emails no está configurado (EMAIL_PROVIDER en .env.local)");
+  }
+}
+
+let smtp: Transporter | null = null;
+
+/**
+ * Envía un email con el proveedor configurado:
+ *  - smtp:   Gmail con contraseña de aplicación (sin dominio propio).
+ *  - resend: API de Resend (cuando haya dominio verificado).
+ * Lanza un error si falla: quien llama lo registra en la cola y lo reintenta.
+ */
+export async function sendMail(mail: Mail): Promise<{ id: string }> {
+  const env = serverEnv();
+
+  if (env.EMAIL_PROVIDER === "smtp") {
+    if (!env.SMTP_USER || !env.SMTP_PASSWORD) throw new EmailNotConfiguredError();
+    smtp ??= nodemailer.createTransport({
+      host: env.SMTP_HOST,
+      port: env.SMTP_PORT,
+      secure: env.SMTP_PORT === 465,
+      auth: { user: env.SMTP_USER, pass: env.SMTP_PASSWORD },
+    });
+    const info = await smtp.sendMail({
+      from: env.EMAIL_FROM || `ROWE <${env.SMTP_USER}>`,
+      to: mail.to,
+      replyTo: mail.replyTo,
+      subject: mail.subject,
+      html: mail.html,
+      text: mail.text,
+      attachments: mail.attachments,
+    });
+    return { id: info.messageId };
+  }
+
+  if (env.EMAIL_PROVIDER === "resend") {
+    if (!env.RESEND_API_KEY || !env.EMAIL_FROM) throw new EmailNotConfiguredError();
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, "content-type": "application/json" },
+      body: JSON.stringify({
+        from: env.EMAIL_FROM,
+        to: mail.to,
+        reply_to: mail.replyTo,
+        subject: mail.subject,
+        html: mail.html,
+        text: mail.text,
+        attachments: mail.attachments
+          ?.filter((a) => a.content)
+          .map((a) => ({ filename: a.filename, content: a.content!.toString("base64"), content_id: a.cid })),
+      }),
+    });
+    if (!res.ok) throw new Error(`Resend ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    const body = (await res.json()) as { id: string };
+    return { id: body.id };
+  }
+
+  throw new EmailNotConfiguredError();
+}

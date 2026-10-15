@@ -1,0 +1,51 @@
+/* HablemosForm.dc.html · animaciones */
+
+/* Claqueta: chasquido al cambiar de toma */
+.clap {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 14px;
+  transform-origin: 0 100%;
+  background-image: repeating-linear-gradient(-45deg, rgb(237 234 228 / 0.85) 0 10px, var(--color-ink) 10px 20px);
+  animation: clap 0.55s var(--ease-cut) both;
+}
+@keyframes clap {
+  0% { transform: rotate(-7deg); }
+  55% { transform: rotate(0); }
+  70% { transform: rotate(-1.2deg); }
+  100% { transform: rotate(0); }
+}
+
+/* Entrada de cada pregunta */
+.stepIn {
+  animation: step-in 0.7s var(--ease-cut) both;
+}
+@keyframes step-in {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* «Toma 1. Grabado.»: el REC se apaga */
+.recOff {
+  animation: rec-off 1.8s var(--ease-cut) 0.5s both;
+}
+@keyframes rec-off {
+  0% { transform: scale(1); opacity: 1; }
+  35% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(0.15); opacity: 0; }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .budget:hover {
+    padding-left: 26px;
+  }
+}
+
+/* Campo trampa para bots: fuera de pantalla, no lo ven ni los lectores de pantalla */
+.trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

@@ -25,6 +25,14 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  // react-pdf se ejecuta tal cual en Node (no se empaqueta)
+  serverExternalPackages: ["@react-pdf/renderer"],
+  // Fuentes y logo que leen del disco el PDF y los emails: se incluyen en el despliegue
+  outputFileTracingIncludes: {
+    "/api/quote/pdf": ["./src/assets/**/*"],
+    "/api/leads": ["./src/assets/brand/**/*"],
+    "/api/cron/email-retry": ["./src/assets/brand/**/*"],
+  },
   reactStrictMode: true,
   images: {
     formats: ["image/avif", "image/webp"],

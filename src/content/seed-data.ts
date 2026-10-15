@@ -274,6 +274,7 @@ export const settings: SeedSetting[] = [
         phone: "Teléfono",
         phone_placeholder: "[+34 600 000 000]",
         privacy: "He leído y acepto la política de privacidad.",
+        privacy_link: "Leer la política de privacidad",
       },
       errors: {
         name: "Necesitamos tu nombre para dirigirnos a ti.",

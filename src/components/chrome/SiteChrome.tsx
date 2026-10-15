@@ -1,7 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { BrandSettings, ContactSettings, NavigationSettings } from "@/lib/content/settings";
+import { HablemosOverlay } from "@/features/hablemos/HablemosOverlay";
+import type { HablemosSettings } from "@/features/hablemos/settings";
+import type { BrandSettings, ContactSettings, CookieSettings, NavigationSettings } from "@/lib/content/settings";
+import { Analytics } from "./Analytics";
+import { CookieBanner } from "./CookieBanner";
 import { toggleAmbient } from "@/motion/ambient";
 import { EASE, gsap } from "@/motion/gsap";
 import { prefersReducedMotion } from "@/motion/media";
@@ -17,6 +21,8 @@ interface SiteChromeProps {
   nav: NavigationSettings;
   contact: ContactSettings;
   brand: BrandSettings;
+  hablemosSettings: HablemosSettings;
+  cookies: CookieSettings;
   /** URL del audio ambiente subido en el panel (si no hay, se sintetiza). */
   ambientUrl: string | null;
 }
@@ -26,7 +32,7 @@ interface SiteChromeProps {
  * completa, cursor, cortinilla, preloader, avisos, tecla R (sonido ambiente) y el
  * título de la pestaña cuando la web pasa a segundo plano.
  */
-export function SiteChrome({ nav, contact, brand, ambientUrl }: SiteChromeProps) {
+export function SiteChrome({ nav, contact, brand, hablemosSettings, cookies, ambientUrl }: SiteChromeProps) {
   const { lock, unlock, onScroll } = useMotion();
   const [menuOpen, setMenuOpen] = useState(false);
   const animating = useRef(false);
@@ -160,9 +166,12 @@ export function SiteChrome({ nav, contact, brand, ambientUrl }: SiteChromeProps)
       <PreloaderGate label={nav.preloader_label} meta={nav.preloader_meta} />
       <SiteHeader nav={nav} menuOpen={menuOpen} onMenu={() => (menuOpen ? closeMenu() : openMenu())} />
       <SiteMenu nav={nav} contact={contact} brand={brand} open={menuOpen} onClose={() => closeMenu(true)} onCloseAnimated={() => closeMenu()} />
+      <HablemosOverlay settings={hablemosSettings} contact={contact} closeLabel={nav.close_label} />
       <Curtain />
       <Cursor />
       <Toaster />
+      <CookieBanner settings={cookies} />
+      <Analytics />
     </>
   );
 }

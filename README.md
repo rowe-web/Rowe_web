@@ -67,6 +67,22 @@ npm run dev
 
 Abre <http://localhost:3000>. La portada debe decir «Base de datos conectada · versión publicada 1 · 11 escenas…».
 
+## Email de avisos (nuevo lead)
+
+Cada solicitud se guarda **siempre** en la base de datos. Después se envía un aviso por email al equipo (ajuste «notifications»: por defecto `rowe.web.agency@gmail.com` y `rowe.web.contacto@gmail.com`). Si el envío falla, queda registrado en la cola (`email_outbox`) con el motivo y se reintenta (1 min, 5 min, 30 min, 2 h, 12 h).
+
+**Ahora (sin dominio propio): Gmail con contraseña de aplicación**
+
+1. Entra en <https://myaccount.google.com> con `rowe.web.agency@gmail.com` → **Seguridad** → activa la **Verificación en dos pasos** (obligatoria para lo siguiente).
+2. Ve a <https://myaccount.google.com/apppasswords>, crea una contraseña de aplicación llamada «ROWE web» y copia las 16 letras (sin espacios).
+3. En `.env.local`: `EMAIL_PROVIDER=smtp`, `SMTP_USER=rowe.web.agency@gmail.com` y `SMTP_PASSWORD=` esas 16 letras. Reinicia `npm run dev`.
+
+Limitaciones: unos 500 destinatarios al día, el remitente es una dirección @gmail.com y Google puede bloquear el envío si detecta un uso anómalo (el lead nunca se pierde: queda en la cola).
+
+**Con dominio propio:** `EMAIL_PROVIDER=resend`, `RESEND_API_KEY` y `EMAIL_FROM=avisos@tu-dominio` (se verifica el dominio en Resend). Sin dominio, Resend solo deja enviar a la dirección con la que te registraste.
+
+**Reintentos:** `GET /api/cron/email-retry` con `Authorization: Bearer CRON_SECRET` (la tarea programada se configura en la Fase 6).
+
 ## Comandos
 
 | Comando | Qué hace |
@@ -75,7 +91,7 @@ Abre <http://localhost:3000>. La portada debe decir «Base de datos conectada ·
 | `npm run build` / `npm start` | Build de producción y servidor de producción |
 | `npm run check` | Lint + tipos + tests + build (antes de cada entrega) |
 | `npm test` | Tests (incluye base de datos real en memoria: permisos, publicación, historial) |
-| `npm run test:e2e` | Pruebas en navegador real del scroll y la navegación (construye y arranca la web de producción) |
+| `npm run test:e2e` | Pruebas en navegador real: scroll, navegación, configurador, formulario, leads, PDF, cookies (construye y arranca la web de producción; crea y borra datos de prueba en Supabase) |
 | `npm run db:migrate` | Aplica migraciones nuevas |
 | `npm run db:seed` | Carga el contenido que falte y asegura el admin |
 | `npm run db:seed -- --reset-content` | Vuelve a cargar TODO el contenido del diseño (pide confirmación; no toca mensajes ni usuarios) |
