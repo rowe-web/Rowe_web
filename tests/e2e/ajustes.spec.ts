@@ -46,22 +46,134 @@ test("preloader: «/» y «>» del cierre separados", async ({ page }, info) => 
   expect(gap).toBeGreaterThan(2);
 });
 
-test("logo: en la home vuelve arriba con scroll suave y quita el ancla", async ({ page }) => {
+const posY = (page: Page) => page.evaluate(() => window.scrollY);
+const stopped = (page: Page) => page.evaluate(() => (window as unknown as { __rowe: { lenis: { isStopped: boolean } } }).__rowe.lenis.isStopped);
+
+test("logo: en la home, cortinilla → arriba del todo → la página vuelve a empezar", async ({ page }, info) => {
   await open(page);
   await jump(page, "#presupuesto");
   await page.evaluate(() => history.replaceState(null, "", "/#presupuesto"));
   await page.waitForTimeout(600);
-  expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(1500);
+  expect(await posY(page)).toBeGreaterThan(1500);
   await revealHeader(page);
+  // Marca en el DOM actual: si la página se vuelve a montar, desaparece
+  await page.locator("#hero").evaluate((el) => el.setAttribute("data-old", ""));
 
   await page.locator("[data-site-header] a[aria-label='ROWE — Inicio']").click();
-  // A mitad del viaje sigue bajando de forma progresiva (no es un salto)
-  await page.waitForTimeout(350);
-  const mid = await page.evaluate(() => window.scrollY);
-  expect(mid).toBeGreaterThan(0);
-  await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 5000 }).toBe(0);
+  if (info.project.name === "escritorio") {
+    // Misma cortinilla que el menú, con el destino
+    await expect(page.locator(".rowe-curtain")).toBeVisible();
+    await expect(page.locator(".rowe-curtain")).toContainText("Inicio");
+  }
+  await expect(page.locator(".rowe-curtain")).toBeHidden({ timeout: 6000 });
+  expect(await posY(page)).toBe(0);
   expect(new URL(page.url()).hash).toBe("");
+  await expect(page.locator("#hero[data-old]")).toHaveCount(0);
   await expect(page.locator("#hero")).toBeInViewport();
+  await expect(page.locator("#hero [data-hero-title] [data-line-inner]").first()).toHaveCSS("transform", /matrix\(1, 0, 0, 1, 0, 0\)|none/);
+  expect(await stopped(page)).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+test("logo: siempre clicable, también con el menú o «Hablemos» abiertos", async ({ page }, info) => {
+  await open(page);
+  // Con «Hablemos» abierto, a mitad de página (el botón de la cabecera solo existe en escritorio)
+  if (info.project.name === "escritorio") {
+    await jump(page, 4000);
+    await revealHeader(page);
+    await page.locator("[data-site-header]").getByRole("button", { name: /Hablemos/ }).click();
+    const dialog = page.getByRole("dialog", { name: "Hablemos" });
+    await expect(dialog).toBeVisible();
+    await dialog.locator("a[aria-label='ROWE — Inicio']").click();
+    await expect(dialog).toHaveCount(0, { timeout: 6000 });
+    await expect(page.locator(".rowe-curtain")).toBeHidden({ timeout: 6000 });
+    expect(await posY(page)).toBe(0);
+    expect(await stopped(page)).toBe(false);
+  }
+
+  // Con el menú abierto
+  await jump(page, 3000);
+  await revealHeader(page);
+  await page.getByRole("button", { name: "Menú" }).click();
+  const menu = page.locator("[data-site-menu]");
+  await expect(menu).toBeVisible();
+  await menu.locator("a[aria-label='ROWE — Inicio']").click();
+  await expect(menu).toBeHidden({ timeout: 6000 });
+  await expect(page.locator(".rowe-curtain")).toBeHidden({ timeout: 6000 });
+  expect(await posY(page)).toBe(0);
+  expect(await stopped(page)).toBe(false);
+
+  // Varias veces seguidas: sin ScrollTriggers acumulados
+  const count = () => page.evaluate(() => (window as unknown as { __rowe: { ScrollTrigger: { getAll: () => unknown[] } } }).__rowe.ScrollTrigger.getAll().length);
+  const before = await count();
+  for (let i = 0; i < 3; i++) {
+    await jump(page, 2000);
+    await revealHeader(page);
+    await page.locator("[data-site-header] a[aria-label='ROWE — Inicio']").click();
+    await expect(page.locator(".rowe-curtain")).toBeHidden({ timeout: 6000 });
+  }
+  expect(await count()).toBeLessThanOrEqual(before);
+  expect(errors).toEqual([]);
+});
+
+test("menú: «Presupuesto» y «Hablemos» aterrizan exactos, desde la home y desde otra página", async ({ page }, info) => {
+  test.skip(info.project.name !== "escritorio");
+  await open(page);
+  const viaMenu = async (label: string) => {
+    await page.mouse.wheel(0, -300);
+    await page.waitForTimeout(600);
+    await page.getByRole("button", { name: "Menú" }).click();
+    await page.locator("[data-menu-item] a").filter({ hasText: label }).click();
+  };
+  const landed = async (sel: string) => {
+    await expect(page.locator(".rowe-curtain")).toBeHidden({ timeout: 8000 });
+    await expect.poll(() => page.locator(sel).evaluate((el) => Math.round(el.getBoundingClientRect().top)), { timeout: 8000 }).toBe(0);
+    await page.waitForTimeout(800); // y se queda ahí
+    expect(Math.abs(await page.locator(sel).evaluate((el) => el.getBoundingClientRect().top))).toBeLessThanOrEqual(1);
+  };
+  await viaMenu("Presupuesto");
+  await landed("#presupuesto");
+  await viaMenu("Hablemos");
+  await landed("#hablemos");
+  for (const [label, sel] of [["Presupuesto", "#presupuesto"], ["Hablemos", "#hablemos"]]) {
+    await viaMenu("Proyectos");
+    await expect(page).toHaveURL(/\/proyectos$/);
+    await expect(page.locator(".rowe-curtain")).toBeHidden({ timeout: 6000 });
+    await viaMenu(label);
+    await landed(sel);
+  }
+  expect(errors).toEqual([]);
+});
+
+test("navegación repetida (ir y volver atrás): nada se queda oculto ni bloqueado", async ({ page }, info) => {
+  test.skip(info.project.name !== "escritorio");
+  test.setTimeout(150_000);
+  await open(page);
+  for (const label of ["Desarrollo web", "Proyectos", "Producción audiovisual", "Desarrollo web"]) {
+    await page.getByRole("button", { name: "Menú" }).click();
+    await page.locator("[data-menu-item] a").filter({ hasText: label }).click();
+    await expect(page.locator(".rowe-curtain")).toBeHidden({ timeout: 6000 });
+    await page.goBack();
+    await expect(page).toHaveURL(/\/$/);
+    await page.waitForTimeout(1200);
+  }
+  expect(await stopped(page)).toBe(false);
+  // Recorre la home: todo lo que entra en pantalla termina visible
+  const stuck = await page.evaluate(async () => {
+    const out: number[] = [];
+    const H = document.documentElement.scrollHeight;
+    for (let y = 0; y < H; y += 700) {
+      (window as unknown as { __rowe: RoweDebug }).__rowe.lenis.scrollTo(y, { immediate: true, force: true });
+      await new Promise((r) => setTimeout(r, 1100));
+      document.querySelectorAll<HTMLElement>("[data-page] [data-reveal]").forEach((e) => {
+        if (!e.offsetParent) return;
+        const b = e.getBoundingClientRect();
+        if (b.width && b.top < innerHeight - 100 && b.bottom > 100 && getComputedStyle(e).opacity === "0") out.push(Math.round(b.top + scrollY));
+      });
+    }
+    return out;
+  });
+  expect(stuck).toEqual([]);
   expect(errors).toEqual([]);
 });
 

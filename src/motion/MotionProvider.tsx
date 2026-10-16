@@ -6,6 +6,7 @@ import { createContext, Suspense, useCallback, useContext, useEffect, useMemo, u
 import { timecodeFromScroll } from "@/lib/timecode";
 import { gsap, ScrollTrigger } from "./gsap";
 import { prefersReducedMotion } from "./media";
+import { onReplay } from "./replay";
 
 interface MotionApi {
   /** Bloquea el scroll (preloader, menú, overlays). Se apila: hace falta un unlock por cada lock. */
@@ -45,6 +46,8 @@ export function MotionProvider({ children }: { children: ReactNode }) {
   const listeners = useRef(new Set<(y: number, d: number) => void>());
   const tcNodes = useRef<HTMLElement[]>([]);
   const lastTc = useRef("");
+  /** Scroll suave pedido con el scroll bloqueado (p. ej. un ancla desde el menú abierto). */
+  const pendingScroll = useRef<(() => void) | null>(null);
 
   // --- Arranque (una sola vez) ------------------------------------------------
   useEffect(() => {
@@ -142,14 +145,25 @@ export function MotionProvider({ children }: { children: ReactNode }) {
     if (locks.current === 0) {
       document.documentElement.classList.remove("scroll-locked");
       lenisRef.current?.start();
+      // Lenis.start() corta cualquier viaje en curso: el que esperaba sale ahora, completo
+      const run = pendingScroll.current;
+      pendingScroll.current = null;
+      run?.();
     }
   }, []);
 
-  const scrollTo = useCallback<MotionApi["scrollTo"]>((target, opts = {}) => {
+
+  const scrollTo = useCallback<MotionApi["scrollTo"]>(function scrollTo(target, opts = {}) {
     const lenis = lenisRef.current;
     const el = typeof target === "string" ? document.querySelector<HTMLElement>(target) : target;
     if (el === null) return;
     const immediate = opts.immediate || prefersReducedMotion();
+    // Con el scroll bloqueado (menú u overlay cerrándose), el viaje suave espera al desbloqueo:
+    // si empezara ya, el desbloqueo lo cortaría a medias y el ancla no quedaría exacta.
+    if (lenis && !immediate && locks.current > 0) {
+      pendingScroll.current = () => scrollTo(target, opts);
+      return;
+    }
     if (lenis) {
       const offset = opts.offset ?? 0;
       lenis.scrollTo(el as HTMLElement | number, {
@@ -196,13 +210,27 @@ export function MotionProvider({ children }: { children: ReactNode }) {
         refresh();
       }
       writeTimecode(window.scrollY);
+      // La posición cambió sin evento de scroll: la cabecera (y demás oyentes) se ponen al día,
+      // así la página nueva nunca empieza con la cabecera escondida.
+      listeners.current.forEach((cb) => cb(window.scrollY, 0));
     });
     return () => cancelAnimationFrame(id);
   }, [refresh, scrollTo]);
 
+  // --- Página vuelta a montar (logo en la propia página): timecodes nuevos ----------
+  useEffect(
+    () =>
+      onReplay(() =>
+        requestAnimationFrame(() => {
+          collectTimecodes();
+          writeTimecode(window.scrollY);
+          listeners.current.forEach((cb) => cb(window.scrollY, 0));
+        }),
+      ),
+    [],
+  );
+
   // --- Anclas internas: «#presupuesto», «/#hablemos» (estando en la home) ---------
-  // Un enlace a la propia página sin ancla (el logo, «Inicio» estando en la home) vuelve
-  // arriba con el mismo scroll suave y quita el ancla de la dirección.
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -210,15 +238,15 @@ export function MotionProvider({ children }: { children: ReactNode }) {
       if (!a || a.target === "_blank") return;
       const href = a.getAttribute("href") ?? "";
       const url = new URL(href, window.location.href);
-      if (url.origin !== window.location.origin || url.pathname !== window.location.pathname || url.search !== window.location.search) return;
-      const el = url.hash ? document.querySelector<HTMLElement>(url.hash) : 0;
-      if (el === null) return;
+      if (url.origin !== window.location.origin || url.pathname !== window.location.pathname || !url.hash) return;
+      const el = document.querySelector<HTMLElement>(url.hash);
+      if (!el) return;
       // Fase de captura: antes que <Link> (que saltaría de golpe al ancla)
       e.preventDefault();
       e.stopPropagation();
       window.dispatchEvent(new Event("rowe:navigate"));
       scrollTo(el);
-      history.replaceState(history.state, "", url.hash || url.pathname + url.search);
+      history.replaceState(history.state, "", url.hash);
     };
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);

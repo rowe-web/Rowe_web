@@ -33,9 +33,13 @@ export function HablemosOverlay({ settings, contact, closeLabel }: { settings: H
       gsap.fromTo(el, { clipPath: "inset(50% 0% 50% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.8, ease: EASE.cut });
     }
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && hablemos.close();
+    // Cortinilla de navegación (p. ej. el logo): el overlay se cierra por debajo, sin animar
+    const onCovered = () => hablemos.close();
     window.addEventListener("keydown", onKey);
+    window.addEventListener("rowe:covered", onCovered);
     return () => {
       window.removeEventListener("keydown", onKey);
+      window.removeEventListener("rowe:covered", onCovered);
       motion?.unlock();
       opener.current?.focus?.({ preventScroll: true });
     };
@@ -51,7 +55,8 @@ export function HablemosOverlay({ settings, contact, closeLabel }: { settings: H
   return (
     <div ref={root} role="dialog" aria-modal="true" aria-label="Hablemos" data-lenis-prevent data-cursor-rec className="fixed inset-0 z-[200] overflow-y-auto bg-ink">
       <div className="sticky top-0 z-[2] flex h-16 items-center justify-between border-b border-line-soft bg-ink gutter-x md:h-[76px]">
-        <Logo height={18} href={null} />
+        {/* El logo lleva al inicio también desde el overlay (la cortinilla lo cierra al tapar) */}
+        <Logo height={18} />
         <span className="hidden label-mono text-muted md:inline">{settings.kicker}</span>
         <button type="button" onClick={close} className="flex min-h-11 items-center gap-2.5 text-[14px] hover:text-white">
           {closeLabel} <span className="label-mono text-[10px] text-muted max-md:hidden">Esc</span>

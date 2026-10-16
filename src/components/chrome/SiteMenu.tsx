@@ -60,7 +60,8 @@ export function SiteMenu({ nav, contact, brand, open, onClose, onCloseAnimated, 
       }`}
     >
       <div className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-line-soft bg-ink gutter-x md:h-[76px]">
-        <Logo height={18} href={null} />
+        {/* También con el menú abierto lleva al inicio (misma cortinilla que la cabecera) */}
+        <Logo height={18} href={preview ? null : "/"} />
         <span className="hidden label-mono text-muted md:inline">{nav.menu_kicker}</span>
         <button type="button" onClick={onCloseAnimated ?? onClose} className="flex min-h-11 items-center gap-2.5 text-[15px] md:text-[14px]">
           {nav.close_label} <span className="label-mono text-[10px] text-muted max-md:hidden">Esc</span>

@@ -6,6 +6,7 @@ import { registerCurtainOpener, setCurtainPending } from "@/motion/curtain";
 import { EASE, gsap } from "@/motion/gsap";
 import { prefersReducedMotion } from "@/motion/media";
 import { useMotion } from "@/motion/MotionProvider";
+import { replayPage } from "@/motion/replay";
 
 /**
  * Cortinilla entre páginas con timecode.
@@ -13,10 +14,13 @@ import { useMotion } from "@/motion/MotionProvider";
  * (como el letterbox del diseño, al revés) mostrando el destino y el timecode; se
  * navega por debajo y la página nueva la abre al estar lista. Botón «atrás»: el
  * navegador ya ha cambiado de página, así que no hay cierre, solo la página nueva.
+ * Enlace a la propia página sin ancla (el logo estando en la home): la misma cortinilla;
+ * por debajo se sube arriba del todo, se cierran menú y overlays y la página se vuelve a
+ * montar, así que todas sus animaciones empiezan de nuevo.
  */
 export function Curtain() {
   const router = useRouter();
-  const { lock, unlock } = useMotion();
+  const { lock, unlock, scrollTo } = useMotion();
   const top = useRef<HTMLDivElement>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const info = useRef<HTMLDivElement>(null);
@@ -56,13 +60,29 @@ export function Curtain() {
       if (!href || href.startsWith("mailto:") || href.startsWith("tel:")) return;
       const url = new URL(href, window.location.href);
       if (url.origin !== window.location.origin) return;
-      // Misma página (ancla o mismo path): lo gestiona el scroll suave
-      if (url.pathname === window.location.pathname && url.search === window.location.search) return;
+      const samePage = url.pathname === window.location.pathname && url.search === window.location.search;
+      // Ancla en la misma página: la gestiona el scroll suave (MotionProvider)
+      if (samePage && url.hash) return;
       if (busy.current) {
         e.preventDefault();
+        e.stopPropagation();
         return;
       }
-      if (prefersReducedMotion()) return; // navegación normal, sin cortinilla
+      // Volver a empezar la página actual (por debajo de la cortinilla, si la hay)
+      const restart = () => {
+        window.dispatchEvent(new Event("rowe:covered"));
+        history.replaceState(history.state, "", url.pathname + url.search);
+        scrollTo(0, { immediate: true });
+        window.scrollTo(0, 0);
+        replayPage();
+      };
+      if (prefersReducedMotion()) {
+        if (!samePage) return; // navegación normal, sin cortinilla
+        e.preventDefault();
+        e.stopPropagation();
+        restart();
+        return;
+      }
       // Fase de captura: actuamos antes que el onClick de <Link> y lo detenemos
       e.preventDefault();
       e.stopPropagation();
@@ -77,8 +97,10 @@ export function Curtain() {
       gsap
         .timeline({
           onComplete: () => {
-            router.push(url.pathname + url.search + url.hash, { scroll: false });
-            // Si la navegación fallara, no dejamos la web tapada
+            // La página vuelta a montar (o la nueva) abre la cortinilla al estar lista
+            if (samePage) restart();
+            else router.push(url.pathname + url.search + url.hash, { scroll: false });
+            // Si algo fallara, no dejamos la web tapada
             failsafe = window.setTimeout(open, 8000);
           },
         })
@@ -91,7 +113,7 @@ export function Curtain() {
       registerCurtainOpener(null);
       window.clearTimeout(failsafe);
     };
-  }, [router, lock, unlock]);
+  }, [router, lock, unlock, scrollTo]);
 
   return (
     <div aria-hidden="true" className="rowe-curtain pointer-events-none invisible fixed inset-0 z-[450] opacity-0">

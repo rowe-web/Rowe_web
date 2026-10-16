@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { Fragment, useEffect, useRef, type ReactNode } from "react";
 import { EASE, gsap, MQ, ScrollTrigger } from "./gsap";
 import { canHover, prefersReducedMotion } from "./media";
 import { openCurtainIfPending } from "./curtain";
 import { whenReady } from "./ready";
 import { useMotion } from "./MotionProvider";
+import { useReplayKey } from "./replay";
 
 /**
  * Movimiento común de cada página (se monta en template.tsx: se recrea al navegar
@@ -17,6 +18,7 @@ import { useMotion } from "./MotionProvider";
 export function PageMotion({ children }: { children: ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
   const { refresh } = useMotion();
+  const replayKey = useReplayKey();
 
   useEffect(() => {
     const el = root.current;
@@ -33,6 +35,9 @@ export function PageMotion({ children }: { children: ReactNode }) {
       ctx = gsap.context(() => {
         // --- Revelados por lotes (una sola pasada por elemento) ---
         const items = gsap.utils.toArray<HTMLElement>("[data-reveal]", el);
+        // Next conserva las páginas visitadas (ocultas) y las vuelve a mostrar con «atrás»:
+        // la marca de «ya revelado» de la visita anterior no puede dejar nada oculto.
+        items.forEach((item) => delete item.dataset.revealed);
         items.forEach((item) => {
           const kind = item.dataset.reveal || "fade";
           if (reduced) gsap.set(item, { opacity: 0 });
@@ -145,17 +150,18 @@ export function PageMotion({ children }: { children: ReactNode }) {
     });
 
     return () => {
+      el.querySelectorAll<HTMLElement>("[data-revealed]").forEach((item) => delete item.dataset.revealed);
       cancel();
       listeners.abort();
       io?.disconnect();
       mm?.revert();
       ctx?.revert();
     };
-  }, [refresh]);
+  }, [refresh, replayKey]);
 
   return (
     <div ref={root} data-page className="relative z-[1]">
-      {children}
+      <Fragment key={replayKey}>{children}</Fragment>
     </div>
   );
 }

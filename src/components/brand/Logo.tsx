@@ -62,7 +62,7 @@ export function Logo({ height = 18, tone = "light", href = "/", interactive = tr
     );
   }
   return (
-    <Link href={href} aria-label="ROWE — Inicio" className={styles.link}>
+    <Link href={href} aria-label="ROWE — Inicio" data-transition-label="Inicio" className={styles.link}>
       {art}
     </Link>
   );
