@@ -247,6 +247,15 @@ test("tiempo real: avisos abajo a la derecha (mensaje nuevo y respuesta por emai
   await db.from("lead_replies").insert({ lead_id: lead.id, to_email: email("hilo"), from_email: process.env.SMTP_USER, sent_by_name: "QA", subject: "Tu proyecto con ROWE", body: "Respuesta de ROWE E2E", status: "sent", message_id: `<e2e-${run}@gmail.com>` });
   await login(page, "admin", `/admin/mensajes?lead=${lead.id}`);
   await expect(page.locator("[data-thread='form']")).toContainText("Mensaje inicial E2E");
+  // Contacto arriba: antes de la conversación, con email, WhatsApp y fecha de envío
+  const contact = page.locator("[data-lead-contact]");
+  await expect(contact).toContainText(email("hilo"));
+  await expect(contact).toContainText("Enviado");
+  expect(await page.evaluate(() => {
+    const c = document.querySelector("[data-lead-contact]")!;
+    const t = document.querySelector("[data-thread='form']")!;
+    return Boolean(c.compareDocumentPosition(t) & Node.DOCUMENT_POSITION_FOLLOWING);
+  })).toBe(true);
   await expect(page.locator("[data-thread='rowe']")).toContainText("Respuesta de ROWE");
   // Que la suscripción esté lista antes de crear filas
   await page.waitForTimeout(2500);

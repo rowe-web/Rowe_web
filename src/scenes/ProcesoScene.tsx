@@ -80,17 +80,23 @@ export function ProcesoScene({ scene, previewHead }: SceneProps<{ steps?: Proces
         </div>
       </div>
 
-      {/* Móvil: línea de tiempo vertical */}
-      <ol className="relative mt-12 flex flex-col gap-10 border-l border-line pl-6 md:hidden">
+      {/* Móvil: línea de tiempo vertical. La línea se dibuja con el scroll y cada hito se
+          enciende cuando la alcanza (src/motion/scenes/proceso). Sin JavaScript: todo encendido. */}
+      <ol data-proceso-vline-list className="relative mt-12 flex flex-col gap-10 border-l border-line pl-6 md:hidden">
+        <span aria-hidden="true" data-proceso-vline className="pointer-events-none absolute -left-px top-0 h-full w-px origin-top bg-bone" />
         {steps.map((s) => (
-          <li key={s.key} data-reveal className="relative flex flex-col gap-2">
-            <span aria-hidden="true" className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 bg-bone" />
+          <li key={s.key} data-reveal data-proceso-vitem className="group/v relative flex flex-col gap-2 transition-colors duration-500 data-[off]:text-ghost">
+            <span
+              aria-hidden="true"
+              data-proceso-vnode
+              className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 border border-bone bg-bone transition-[background-color,border-color,box-shadow] duration-500 group-data-[off]/v:border-line-cta group-data-[off]/v:bg-ink group-data-[on]/v:shadow-[0_0_0_4px_rgb(237_234_228/0.12)]"
+            />
             <span className="flex items-baseline justify-between gap-4">
               <span className="font-mono text-[24px] leading-none">{s.key}</span>
-              <span className="label-mono text-[9px] text-muted">{s.duration}</span>
+              <span className="label-mono text-[9px] text-muted transition-colors duration-500 group-data-[off]/v:text-ghost">{s.duration}</span>
             </span>
             <span className="text-[20px]">{s.title}</span>
-            <span className="text-[15px] leading-relaxed text-muted">{s.body}</span>
+            <span className="text-[15px] leading-relaxed text-muted transition-colors duration-500 group-data-[off]/v:text-ghost">{s.body}</span>
           </li>
         ))}
       </ol>

@@ -146,6 +146,45 @@ test("Escena 04 · móvil: pasos en orden sin saltos, líneas que se rellenan co
   expect(f.slice(i + 1).every((v) => v === 0)).toBe(true);
 });
 
+test("Escena 06 · móvil: la línea vertical se dibuja con el scroll y cada hito se enciende al alcanzarlo", async ({ page }, info) => {
+  test.skip(isDesktop(info.project.name));
+  await open(page);
+  const list = page.locator("[data-proceso-vline-list]");
+  const scale = () => page.locator("[data-proceso-vline]").evaluate((el) => Math.round(new DOMMatrix(getComputedStyle(el).transform).d * 100) / 100);
+  const on = () => page.locator("[data-proceso-vitem]").evaluateAll((els) => els.map((e) => !e.hasAttribute("data-off")));
+  const top = await list.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+  const h = await list.evaluate((el) => (el as HTMLElement).offsetHeight);
+  const vh = page.viewportSize()!.height;
+  const at = async (f: number) => {
+    // f = fracción de la lista que ha cruzado la línea del 70 % de la pantalla
+    await page.evaluate((y) => window.scrollTo(0, y), top + h * f - vh * 0.7);
+    await page.waitForTimeout(400);
+  };
+  await at(-0.3);
+  expect(await scale()).toBe(0);
+  expect(await on()).toEqual([false, false, false, false]);
+  // Recorrido: la línea crece de forma continua y los hitos se encienden en orden, al llegar
+  const marks = await page.locator("[data-proceso-vitem]").evaluateAll((els, hh) => els.map((e) => ((e as HTMLElement).offsetTop + 11) / hh), h);
+  for (const [i, m] of marks.entries()) {
+    await at(m - 0.03);
+    expect((await on())[i]).toBe(false);
+    await at(m + 0.03);
+    const s = await on();
+    expect(s.slice(0, i + 1).every(Boolean)).toBe(true);
+    expect(s.slice(i + 1).some(Boolean)).toBe(false);
+    expect(Math.abs((await scale()) - (m + 0.03))).toBeLessThan(0.03);
+  }
+  await at(1.2);
+  expect(await scale()).toBe(1);
+});
+
+test("Escena 00 · Fig. 01: la flecha de «Tráfico» es un SVG, nunca el carácter ↗ (emoji en móvil)", async ({ page }) => {
+  await open(page);
+  const fig = page.locator("#hero [class*='ProcessLoop'], #hero figure").first();
+  expect(await page.locator("#hero").evaluate((el) => el.textContent?.includes("↗"))).toBe(false);
+  expect(await fig.locator("svg path[d^='M6.5 17.5']").count()).toBeGreaterThan(0);
+});
+
 test("lo que hay dentro de una escena pinneada se ve aunque se llegue de un salto", async ({ page }, info) => {
   test.skip(!isDesktop(info.project.name));
   await open(page);

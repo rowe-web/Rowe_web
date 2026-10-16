@@ -8,6 +8,11 @@ import { AButton, Card, EmptyState, Field, PageTitle, Segmented, StatusDot, Text
 import { mono } from "@/admin/ui/styles";
 import { whatsappHref } from "@/lib/content/settings";
 import { spamHints } from "@/lib/email/spam";
+import { ArrowUpRight } from "@/components/ui/ArrowUpRight";
+
+/** Fecha y hora exactas en que llegó el formulario (hora de Madrid). */
+const sentAt = (iso: string) =>
+  new Date(iso).toLocaleString("es-ES", { timeZone: "Europe/Madrid", day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
 
 type Status = keyof typeof LEAD_STATUS;
 
@@ -291,7 +296,6 @@ function LeadDetail({
           ["Servicio", lead.need],
           ["Presupuesto", lead.budget_label || "Sin indicar"],
           ["Origen", lead.origin === "configurador" ? `Configurador${lead.quote ? ` · ${lead.quote.number}` : ""}` : "Formulario"],
-          ["Recibido", when(lead.created_at)],
         ].map(([k, v]) => (
           <div key={k} className="flex flex-col gap-1.5 bg-surface p-3.5">
             <dt className={`${mono} text-[9px] text-muted`}>{k}</dt>
@@ -299,6 +303,42 @@ function LeadDetail({
           </div>
         ))}
       </dl>
+
+      {/* Contacto arriba del todo: siempre a mano aunque la conversación sea larga */}
+      <div data-lead-contact className="grid gap-px overflow-hidden rounded-md border border-line-soft bg-line-soft min-[1100px]:grid-cols-[minmax(0,1.25fr)_minmax(0,1.25fr)_minmax(0,0.8fr)]">
+        <div className="flex min-w-0 flex-col gap-1.5 bg-surface p-3.5">
+          <span className={`${mono} text-[9px] text-muted`}>Email</span>
+          <span className="flex min-w-0 items-center justify-between gap-3">
+            <a href={`mailto:${lead.email}`} className="truncate text-[14px] underline-offset-4 hover:underline">
+              {lead.email}
+            </a>
+            <button type="button" onClick={copy} className={`${mono} min-h-8 flex-none text-muted hover:text-bone`}>
+              Copiar
+            </button>
+          </span>
+        </div>
+        <div className="flex min-w-0 flex-col gap-1.5 bg-surface p-3.5">
+          <span className={`${mono} text-[9px] text-muted`}>Teléfono</span>
+          <span className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+            {lead.phone ? (
+              <a href={`tel:${lead.phone.replace(/[^d+]/g, "")}`} className="whitespace-nowrap text-[14px] underline-offset-4 hover:underline">
+                {lead.phone}
+              </a>
+            ) : (
+              <span className="text-[14px] text-muted">Sin teléfono</span>
+            )}
+            {wa && (
+              <a href={wa} target="_blank" rel="noopener noreferrer" className={`flex min-h-8 flex-none items-center gap-1.5 rounded-full border border-line px-2.5 ${mono} text-[10px] text-bone hover:border-bone`}>
+                WhatsApp <ArrowUpRight className="h-3 w-3" strokeWidth={2} />
+              </a>
+            )}
+          </span>
+        </div>
+        <div className="flex min-w-0 flex-col gap-1.5 bg-surface p-3.5">
+          <span className={`${mono} text-[9px] text-muted`}>Enviado</span>
+          <span className="text-[14px]">{sentAt(lead.created_at)}</span>
+        </div>
+      </div>
 
       {items && (
         <div className="flex flex-col gap-2">
@@ -309,22 +349,8 @@ function LeadDetail({
 
       <Conversation lead={lead} unseen={unseen} />
 
-      <div className="flex flex-col border-t border-line-soft">
-        <div className="flex items-center justify-between gap-3 border-b border-line-soft py-3">
-          <a href={`mailto:${lead.email}`} className="truncate text-[14px]">{lead.email}</a>
-          <button type="button" onClick={copy} className={`${mono} min-h-8 text-muted hover:text-bone`}>
-            Copiar
-          </button>
-        </div>
-        <div className="flex items-center justify-between gap-3 border-b border-line-soft py-3">
-          <span className="text-[14px]">{lead.phone || "Sin teléfono"}</span>
-          {wa && (
-            <a href={wa} target="_blank" rel="noopener noreferrer" className={`${mono} text-muted hover:text-bone`}>
-              WhatsApp ↗
-            </a>
-          )}
-        </div>
-        {mailLabel && (
+      {mailLabel && (
+        <div className="flex flex-col border-t border-line-soft">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line-soft py-3">
             <span className="flex flex-col gap-1">
               <StatusDot tone={mailLabel.tone} label={mailLabel.text} />
@@ -336,8 +362,8 @@ function LeadDetail({
               </AButton>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {replying && <ReplyBox lead={lead} from={mailFrom} onClose={() => setReplying(false)} onSent={() => lead.status === "nuevo" && onPatch({ status: "contactado" })} />}
 

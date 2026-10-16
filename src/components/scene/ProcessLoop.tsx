@@ -1,4 +1,5 @@
 import { CornerMarks } from "@/components/ui/CornerMarks";
+import { ArrowUpRight } from "@/components/ui/ArrowUpRight";
 import { RecDot } from "@/components/ui/RecDot";
 import styles from "./ProcessLoop.module.css";
 
@@ -18,7 +19,12 @@ export interface ProcessStep {
  */
 export function ProcessLoop({ steps, className = "" }: { steps: ProcessStep[]; className?: string }) {
   const s = [0, 1, 2].map((i) => steps[i] ?? { key: "", label: "" });
-  const label = (i: number) => [String(i + 1).padStart(2, "0"), s[i].key, s[i].label].filter(Boolean).join(" · ");
+  // «↗» (o cualquier flecha) se dibuja en SVG: como carácter, el móvil lo puede pintar como emoji
+  const isArrow = (k: string) => /^[↗↑→]️?$/.test(k.trim());
+  const label = (i: number) =>
+    [String(i + 1).padStart(2, "0"), s[i].key, s[i].label]
+      .filter(Boolean)
+      .flatMap((part, k) => [k ? " · " : null, isArrow(part) ? <ArrowUpRight key={k} className={styles.labelArrow} strokeWidth={2} /> : part]);
 
   return (
     <div aria-hidden="true" className={`${styles.root} relative overflow-hidden bg-ph ${className}`} style={{ aspectRatio: "4 / 5" }}>
@@ -74,7 +80,7 @@ export function ProcessLoop({ steps, className = "" }: { steps: ProcessStep[]; c
             <path d="M2 82 L22 70 L40 74 L58 50 L78 34 L98 8" pathLength={1} />
           </svg>
         </div>
-        <span className={styles.arrow}>↗</span>
+        <ArrowUpRight className={styles.arrow} />
         <span className={styles.label}>{label(2)}</span>
       </div>
 

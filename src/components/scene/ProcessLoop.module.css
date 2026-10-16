@@ -260,11 +260,16 @@
 }
 .arrow {
   position: absolute;
-  right: 11%;
+  right: 10%;
   top: 7%;
-  font-family: var(--font-serif);
-  font-size: 13cqw;
-  line-height: 1;
+  width: 11cqw;
+  height: 11cqw;
+  color: var(--color-bone);
+}
+.labelArrow {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
 }
 
 /* Barra de planos (tipo «historias») */
