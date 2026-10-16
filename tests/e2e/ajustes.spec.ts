@@ -127,7 +127,7 @@ test("menú: «Presupuesto» y «Hablemos» aterrizan exactos, desde la home y d
   };
   const landed = async (sel: string) => {
     await expect(page.locator(".rowe-curtain")).toBeHidden({ timeout: 8000 });
-    await expect.poll(() => page.locator(sel).evaluate((el) => Math.round(el.getBoundingClientRect().top)), { timeout: 8000 }).toBe(0);
+    await expect.poll(() => page.locator(sel).evaluate((el) => Math.abs(Math.round(el.getBoundingClientRect().top))), { timeout: 8000 }).toBe(0);
     await page.waitForTimeout(800); // y se queda ahí
     expect(Math.abs(await page.locator(sel).evaluate((el) => el.getBoundingClientRect().top))).toBeLessThanOrEqual(1);
   };

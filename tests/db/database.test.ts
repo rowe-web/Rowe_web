@@ -96,7 +96,7 @@ describe("seguridad · público (anon)", () => {
     expect(r.s.version).toBeGreaterThan(0);
   });
 
-  it.each(["scenes", "leads", "config_options", "profiles", "site_settings", "audit_log", "quotes", "events", "media"])(
+  it.each(["scenes", "leads", "lead_replies", "config_options", "profiles", "site_settings", "audit_log", "quotes", "events", "media"])(
     "no puede leer %s",
     async (table) => {
       await expect(db.as(null, () => db.query(`select * from public.${table}`))).rejects.toThrow(/permission denied/);
@@ -115,6 +115,29 @@ describe("seguridad · público (anon)", () => {
 
   it("no puede leer el esquema interno", async () => {
     await expect(db.as(null, () => db.query("select * from internal.rate_limits"))).rejects.toThrow(/permission denied/);
+  });
+});
+
+describe("respuestas desde el panel (lead_replies)", () => {
+  it("el equipo las lee; nadie puede escribirlas desde el navegador (solo el servidor)", async () => {
+    const [lead] = await db.query<{ id: string }>(
+      `insert into public.leads (origin, need, name, email, privacy_accepted_at) values ('formulario', 'Web', 'Cliente', 'cliente@example.com', now()) returning id`,
+    );
+    // El servidor (service_role) registra la respuesta
+    await db.query(
+      `insert into public.lead_replies (lead_id, to_email, from_email, subject, body, status) values ($1, 'cliente@example.com', 'rowe.web.contacto@gmail.com', 'Tu proyecto con ROWE', 'Hola', 'sent')`,
+      [lead.id],
+    );
+    const seen = await db.as(editorId, () => db.query("select * from public.lead_replies where lead_id = $1", [lead.id]));
+    expect(seen).toHaveLength(1);
+    expect(await db.as(noRoleId, () => db.query("select * from public.lead_replies"))).toHaveLength(0);
+    await expect(
+      db.as(adminId, () => db.query(`insert into public.lead_replies (lead_id, to_email, subject, body, status) values ($1, 'x@x.es', 'a', 'b', 'sent')`, [lead.id])),
+    ).rejects.toThrow(/permission denied/);
+    await expect(db.as(adminId, () => db.query("update public.lead_replies set body = 'cambiado'"))).rejects.toThrow(/permission denied/);
+    // Si se borra el mensaje, se borran sus respuestas
+    await db.query("delete from public.leads where id = $1", [lead.id]);
+    expect(await db.query("select * from public.lead_replies where lead_id = $1", [lead.id])).toHaveLength(0);
   });
 });
 

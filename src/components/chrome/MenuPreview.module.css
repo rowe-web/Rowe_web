@@ -249,6 +249,8 @@
   top: 6%;
   font-family: var(--font-mono);
   font-size: max(9px, 3.6cqw);
+  /* </> con aire entre los caracteres (igual en la Fig. 01: ProcessLoop) */
+  letter-spacing: 0.24em;
   color: var(--color-bone);
 }
 .caret {

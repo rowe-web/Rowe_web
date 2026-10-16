@@ -93,3 +93,22 @@ export async function inviteEmail(to: string, link: string, role: "admin" | "edi
   const logo = await readFile(path.join(process.cwd(), "src/assets/brand/rowe-logo-negro.png")).catch(() => null);
   return { to: [to], subject: "Tu acceso al panel de ROWE", html, text, attachments: logo ? [{ filename: "rowe.png", content: logo, cid: "rowe-logo" }] : undefined };
 }
+
+/** Respuesta a un mensaje, escrita en el panel y enviada desde la cuenta de ROWE. */
+export async function replyEmail(p: { to: string; subject: string; body: string; from: string }): Promise<Mail> {
+  const html = `<!doctype html><html lang="es"><body style="margin:0;background:#EDEAE4;padding:24px 12px;font-family:Helvetica,Arial,sans-serif;color:#0A0A0A">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #d9d5ce">
+<tr><td style="padding:28px 32px 8px"><img src="cid:rowe-logo" alt="ROWE" height="22" style="display:block;height:22px"></td></tr>
+<tr><td style="padding:18px 32px 30px;font:15px/1.65 Helvetica,Arial,sans-serif;white-space:pre-wrap">${esc(p.body)}</td></tr>
+<tr><td style="padding:16px 32px 26px;border-top:1px solid #ebe7e0;font:10px/1.6 'Courier New',monospace;letter-spacing:.12em;text-transform:uppercase;color:#6B6862"><span style="color:#FF3B1F">●</span> ROWE · Web &amp; Audiovisual${p.from ? ` · ${esc(p.from)}` : ""}</td></tr>
+</table></body></html>`;
+  const logo = await readFile(path.join(process.cwd(), "src/assets/brand/rowe-logo-negro.png")).catch(() => null);
+  return {
+    to: [p.to],
+    replyTo: p.from || undefined,
+    subject: p.subject,
+    html,
+    text: p.body,
+    attachments: logo ? [{ filename: "rowe.png", content: logo, cid: "rowe-logo" }] : undefined,
+  };
+}

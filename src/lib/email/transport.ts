@@ -20,6 +20,17 @@ export class EmailNotConfiguredError extends Error {
 let smtp: Transporter | null = null;
 
 /**
+ * Dirección desde la que sale el correo de ROWE (avisos y respuestas desde el panel),
+ * o "" si el envío no está configurado. Con Gmail es la cuenta SMTP_USER.
+ */
+export function mailSender(): string {
+  const env = serverEnv();
+  if (env.EMAIL_PROVIDER === "smtp") return env.SMTP_USER && env.SMTP_PASSWORD ? env.SMTP_USER : "";
+  if (env.EMAIL_PROVIDER === "resend") return env.RESEND_API_KEY ? (env.EMAIL_FROM.match(/<([^>]+)>/)?.[1] ?? env.EMAIL_FROM) : "";
+  return "";
+}
+
+/**
  * Envía un email con el proveedor configurado:
  *  - smtp:   Gmail con contraseña de aplicación (sin dominio propio).
  *  - resend: API de Resend (cuando haya dominio verificado).
@@ -27,6 +38,8 @@ let smtp: Transporter | null = null;
  */
 export async function sendMail(mail: Mail): Promise<{ id: string }> {
   const env = serverEnv();
+  // Pruebas automáticas: nunca llega nada a ningún buzón (ni a los del equipo)
+  if (env.EMAIL_DRY_RUN === "1" && env.EMAIL_PROVIDER) return { id: `dry-run-${Date.now()}` };
 
   if (env.EMAIL_PROVIDER === "smtp") {
     if (!env.SMTP_USER || !env.SMTP_PASSWORD) throw new EmailNotConfiguredError();

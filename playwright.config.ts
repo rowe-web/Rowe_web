@@ -26,6 +26,7 @@ export default defineConfig({
         url,
         timeout: 300_000,
         reuseExistingServer: true,
-        env: { NEXT_PUBLIC_E2E: "1" },
+        // EMAIL_DRY_RUN: las pruebas escriben en la base real, pero no envían emails reales
+        env: { NEXT_PUBLIC_E2E: "1", EMAIL_DRY_RUN: "1" },
       },
 });

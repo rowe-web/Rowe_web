@@ -14,6 +14,8 @@ const schema = z.object({
   SMTP_USER: z.string().default(""),
   SMTP_PASSWORD: z.string().default(""),
   RESEND_API_KEY: z.string().default(""),
+  /** "1" = no se envía ningún email de verdad (pruebas automáticas): se da por enviado. */
+  EMAIL_DRY_RUN: z.string().default(""),
   /** Secreto para las tareas programadas (reintento de emails). */
   CRON_SECRET: z.string().default(""),
   /** Sal para anonimizar IPs (si falta, se deriva de la clave secret). */

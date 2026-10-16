@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { deleteLead, retryLeadEmail, saveLeadNotes, setLeadStatus } from "@/admin/actions/leads";
+import { deleteLead, replyToLead, retryLeadEmail, saveLeadNotes, setLeadStatus } from "@/admin/actions/leads";
 import { LEAD_STATUS, when } from "@/admin/format";
 import { useFeedback } from "@/admin/ui/feedback";
-import { AButton, Card, EmptyState, PageTitle, Segmented, StatusDot, TextArea, TextInput } from "@/admin/ui/kit";
+import { AButton, Card, EmptyState, Field, PageTitle, Segmented, StatusDot, TextArea, TextInput } from "@/admin/ui/kit";
 import { mono } from "@/admin/ui/styles";
 import { whatsappHref } from "@/lib/content/settings";
 
@@ -28,19 +28,23 @@ export interface LeadRow {
   source: { items?: string; path?: string; variant?: string; utm?: Record<string, string> } | null;
   quote: { number: string; items: { label: string }[] } | null;
   mail: { status: string; attempts: number; last_error: string | null; sent_at: string | null } | null;
+  /** Respuestas enviadas desde el panel (más antigua primero). */
+  replies: { id: number; created_at: string; sent_by_name: string; from_email: string; subject: string; body: string; status: "sent" | "failed"; error: string | null }[];
 }
 
 interface Props {
   leads: LeadRow[];
   needs: string[];
   isAdmin: boolean;
+  /** Cuenta desde la que salen las respuestas ("" si el envío no está configurado). */
+  mailFrom: string;
   initialLead: string | null;
   initialStatus: string;
   loadError: string | null;
 }
 
 /** Bandeja de mensajes (ROWE Admin · Mensajes). */
-export function LeadsScreen({ leads: initial, needs, isAdmin, initialLead, initialStatus, loadError }: Props) {
+export function LeadsScreen({ leads: initial, needs, isAdmin, mailFrom, initialLead, initialStatus, loadError }: Props) {
   const [leads, setLeads] = useState(initial);
   const [statusF, setStatusF] = useState<"todos" | Status>(initialStatus in LEAD_STATUS ? (initialStatus as Status) : "todos");
   const [serviceF, setServiceF] = useState("Todos");
@@ -151,7 +155,7 @@ export function LeadsScreen({ leads: initial, needs, isAdmin, initialLead, initi
         </Card>
 
         {lead ? (
-          <LeadDetail key={lead.id} lead={lead} isAdmin={isAdmin} onBack={() => setSelected(null)} onPatch={(p) => patch(lead.id, p)} onDeleted={() => (setLeads((ls) => ls.filter((l) => l.id !== lead.id)), setSelected(null))} />
+          <LeadDetail key={lead.id} lead={lead} isAdmin={isAdmin} mailFrom={mailFrom} onBack={() => setSelected(null)} onPatch={(p) => patch(lead.id, p)} onDeleted={() => (setLeads((ls) => ls.filter((l) => l.id !== lead.id)), setSelected(null))} />
         ) : (
           <Card className="hidden min-h-[240px] items-center justify-center text-[14px] text-muted min-[820px]:flex">Elige un mensaje para verlo.</Card>
         )}
@@ -160,7 +164,22 @@ export function LeadsScreen({ leads: initial, needs, isAdmin, initialLead, initi
   );
 }
 
-function LeadDetail({ lead, isAdmin, onBack, onPatch, onDeleted }: { lead: LeadRow; isAdmin: boolean; onBack: () => void; onPatch: (p: Partial<LeadRow>) => void; onDeleted: () => void }) {
+function LeadDetail({
+  lead,
+  isAdmin,
+  mailFrom,
+  onBack,
+  onPatch,
+  onDeleted,
+}: {
+  lead: LeadRow;
+  isAdmin: boolean;
+  mailFrom: string;
+  onBack: () => void;
+  onPatch: (p: Partial<LeadRow>) => void;
+  onDeleted: () => void;
+}) {
+  const [replying, setReplying] = useState(false);
   const { toast, confirm } = useFeedback();
   const [notes, setNotes] = useState(lead.notes);
   const [notesState, setNotesState] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -297,10 +316,22 @@ function LeadDetail({ lead, isAdmin, onBack, onPatch, onDeleted }: { lead: LeadR
         )}
       </div>
 
+      {lead.replies.length > 0 && <ReplyHistory replies={lead.replies} />}
+
+      {replying && <ReplyBox lead={lead} from={mailFrom} onClose={() => setReplying(false)} onSent={() => lead.status === "nuevo" && onPatch({ status: "contactado" })} />}
+
       <div className="flex flex-wrap gap-2.5">
-        <a href={`mailto:${lead.email}?subject=${encodeURIComponent("Tu proyecto con ROWE")}`} className="flex h-[42px] items-center rounded-full bg-bone px-5 text-[14px] font-medium text-ink hover:bg-white">
-          Responder por email
-        </a>
+        {/* Con el envío configurado, la respuesta sale de la cuenta de ROWE; si no, del correo propio */}
+        {!replying &&
+          (mailFrom ? (
+            <AButton variant="primary" onClick={() => setReplying(true)} className="!h-[42px] !px-5">
+              Responder
+            </AButton>
+          ) : (
+            <a href={`mailto:${lead.email}?subject=${encodeURIComponent("Tu proyecto con ROWE")}`} className="flex h-[42px] items-center rounded-full bg-bone px-5 text-[14px] font-medium text-ink hover:bg-white">
+              Responder por email
+            </a>
+          ))}
         {lead.status !== "contactado" && (
           <AButton onClick={() => changeStatus("contactado")} disabled={busy}>
             Marcar como contactado
@@ -337,5 +368,113 @@ function LeadDetail({ lead, isAdmin, onBack, onPatch, onDeleted }: { lead: LeadR
         )}
       </label>
     </Card>
+  );
+}
+
+const DEFAULT_SUBJECT = "Tu proyecto con ROWE";
+const draftKey = (id: string) => `rowe:reply:${id}`;
+
+/**
+ * Respuesta desde el panel: sale de la cuenta de ROWE (`from`), no del correo de quien
+ * la escribe. El borrador se guarda en este navegador mientras se escribe, así que cerrar
+ * la pestaña o un fallo de envío no pierde el texto; se borra al enviarse.
+ */
+function ReplyBox({ lead, from, onClose, onSent }: { lead: LeadRow; from: string; onClose: () => void; onSent: () => void }) {
+  const { toast } = useFeedback();
+  const [busy, start] = useTransition();
+  const first = lead.name.trim().split(/\s+/)[0] ?? "";
+  const [draft, setDraft] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(draftKey(lead.id)) ?? "null") as { subject: string; body: string } | null;
+      if (saved?.body) return saved;
+    } catch {
+      /* sin almacenamiento: se empieza de cero */
+    }
+    return { subject: DEFAULT_SUBJECT, body: `Hola${first ? ` ${first}` : ""}:\n\n\n\nUn saludo,\nEl equipo de ROWE` };
+  });
+
+  const update = (patch: Partial<typeof draft>) => {
+    const next = { ...draft, ...patch };
+    setDraft(next);
+    try {
+      localStorage.setItem(draftKey(lead.id), JSON.stringify(next));
+    } catch {
+      /* no crítico */
+    }
+  };
+  const discard = () => {
+    try {
+      localStorage.removeItem(draftKey(lead.id));
+    } catch {
+      /* no crítico */
+    }
+    onClose();
+  };
+
+  const send = () =>
+    start(async () => {
+      const res = await replyToLead(lead.id, draft.subject, draft.body);
+      if (!res.ok) {
+        toast(res.error, "error");
+        return;
+      }
+      toast(`Respuesta enviada a ${lead.email}`);
+      onSent();
+      discard();
+    });
+
+  return (
+    <div data-reply-box className="flex flex-col gap-4 rounded-md border border-line p-4">
+      <div className={`flex flex-col gap-1 ${mono} text-[10px] text-muted`}>
+        <span>
+          De · <span className="text-bone">{from}</span>
+        </span>
+        <span>
+          Para · <span className="text-bone">{lead.email}</span>
+        </span>
+      </div>
+      <Field label="Asunto" count={draft.subject.length} max={200}>
+        <TextInput value={draft.subject} maxLength={200} onChange={(e) => update({ subject: e.target.value })} />
+      </Field>
+      <Field label="Respuesta" count={draft.body.length} max={10000}>
+        <TextArea rows={9} value={draft.body} maxLength={10000} onChange={(e) => update({ body: e.target.value })} />
+      </Field>
+      <div className="flex flex-wrap items-center gap-2.5">
+        <AButton variant="primary" onClick={send} loading={busy} disabled={!draft.subject.trim() || !draft.body.trim()}>
+          Enviar respuesta
+        </AButton>
+        <AButton variant="ghost" onClick={discard} disabled={busy}>
+          Descartar
+        </AButton>
+        <span className="ml-auto text-[12px] text-muted">El borrador se guarda mientras escribes.</span>
+      </div>
+    </div>
+  );
+}
+
+/** Respuestas ya enviadas (o fallidas) desde el panel para este mensaje. */
+function ReplyHistory({ replies }: { replies: LeadRow["replies"] }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <span className={`${mono} text-[9px] text-muted`}>Respuestas desde el panel · {replies.length}</span>
+      <ol className="flex flex-col border-t border-line-soft">
+        {replies.map((r) => (
+          <li key={r.id} className="flex flex-col gap-1.5 border-b border-line-soft py-3">
+            <span className="flex flex-wrap items-center justify-between gap-2">
+              <StatusDot tone={r.status === "sent" ? "half" : "alert"} label={`${r.status === "sent" ? "Enviada" : "No enviada"} · ${when(r.created_at)}`} />
+              <span className="text-[12px] text-muted">
+                {r.sent_by_name} · desde {r.from_email}
+              </span>
+            </span>
+            <span className="text-[14px] font-medium">{r.subject}</span>
+            <details className="text-[14px] text-muted">
+              <summary className="cursor-pointer select-none">Ver texto</summary>
+              <p className="mt-2 max-w-[62ch] whitespace-pre-wrap leading-relaxed text-bone">{r.body}</p>
+            </details>
+            {r.status === "failed" && r.error && <span className="text-[12px] text-rec">{r.error}</span>}
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }

@@ -3,6 +3,7 @@ import { requirePageUser } from "@/admin/auth";
 import { LeadsScreen, type LeadRow } from "@/admin/screens/LeadsScreen";
 import { getHablemosSettings } from "@/features/hablemos/settings";
 import { loadSite } from "@/lib/content/site";
+import { mailSender } from "@/lib/email/transport";
 import { adminClient } from "@/lib/supabase/admin";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
@@ -25,10 +26,18 @@ export default async function MensajesPage({ searchParams }: PageProps<"/admin/m
     : [];
   const mailBy = new Map(mails.map((m) => [m.lead_id, m]));
 
+  // Respuestas enviadas desde el panel (RLS: solo el equipo las lee)
+  const { data: replies } = ids.length
+    ? await supabase.from("lead_replies").select("id, lead_id, created_at, sent_by_name, from_email, subject, body, status, error").in("lead_id", ids).order("created_at", { ascending: true })
+    : { data: [] };
+  const repliesBy = new Map<string, LeadRow["replies"]>();
+  for (const r of replies ?? []) repliesBy.set(r.lead_id, [...(repliesBy.get(r.lead_id) ?? []), r]);
+
   const rows: LeadRow[] = (leads ?? []).map((l) => ({
     ...l,
     quote: (Array.isArray(l.quotes) ? l.quotes[0] : l.quotes) as LeadRow["quote"],
     mail: mailBy.get(l.id) ?? null,
+    replies: repliesBy.get(l.id) ?? [],
   }));
 
   const site = await loadSite();
@@ -39,6 +48,7 @@ export default async function MensajesPage({ searchParams }: PageProps<"/admin/m
       leads={rows}
       needs={needs}
       isAdmin={user.role === "admin"}
+      mailFrom={mailSender()}
       initialLead={typeof sp.lead === "string" ? sp.lead : null}
       initialStatus={typeof sp.estado === "string" ? sp.estado : "todos"}
       loadError={error ? "No se han podido cargar los mensajes. Recarga la página." : null}

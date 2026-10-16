@@ -13,7 +13,7 @@ import { connectPostgres, requireEnv } from "./client";
 
 const TABLES = [
   "site_settings", "scenes", "services", "pages", "projects", "project_media", "config_sections", "config_options",
-  "media", "releases", "audit_log", "profiles", "leads", "quotes", "email_outbox", "events",
+  "media", "releases", "audit_log", "profiles", "leads", "lead_replies", "quotes", "email_outbox", "events",
 ];
 
 async function main() {
@@ -23,6 +23,12 @@ async function main() {
   await mkdir(dir, { recursive: true });
   try {
     for (const t of TABLES) {
+      // Una tabla de una migración aún sin aplicar no impide copiar el resto
+      const [{ exists }] = await db.query<{ exists: boolean }>("select to_regclass($1) is not null as exists", [`public.${t}`]);
+      if (!exists) {
+        console.log(`· ${t.padEnd(16)} aún no existe (migración pendiente)`);
+        continue;
+      }
       const rows = await db.query(`select * from public.${t}`);
       await writeFile(path.join(dir, `${t}.json`), JSON.stringify(rows, null, 1));
       console.log(`✓ ${t.padEnd(16)} ${rows.length} filas`);

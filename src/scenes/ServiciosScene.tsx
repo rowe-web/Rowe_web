@@ -6,14 +6,14 @@ import type { SceneProps } from "./types";
 
 /**
  * Escena 02 · Servicios — diseño nuevo siguiendo el sistema.
- * Dos «pistas» paralelas, WE (web) y RO (rodaje), con la misma estructura:
+ * Dos «pistas» paralelas, RO (rodaje) y WE (web) — se leen en el orden de la marca —, con la misma estructura:
  * letra grande, figura, lista numerada de servicios (tabla services) y enlace.
  * Hover (o scroll en móvil): la pista activa se ilumina y la otra se apaga.
  */
 export function ServiciosScene({ scene, site }: SceneProps) {
   const columns = [
-    { key: "WE", label: "Web", discipline: "web" as const, href: "/web", word: "WE", caption: "Fig. 03 — Web a medida", textured: false },
-    { key: "RO", label: "Rodaje", discipline: "audiovisual" as const, href: "/audiovisual", word: "RO", caption: "Fig. 04 — Rodaje", textured: true },
+    { key: "RO", label: "Rodaje", discipline: "audiovisual" as const, href: "/audiovisual", word: "RO", caption: "Fig. 03 — Rodaje", textured: true },
+    { key: "WE", label: "Web", discipline: "web" as const, href: "/web", word: "WE", caption: "Fig. 04 — Web a medida", textured: false },
   ];
 
   return (

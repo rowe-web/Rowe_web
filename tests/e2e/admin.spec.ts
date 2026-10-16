@@ -210,6 +210,21 @@ test("mensajes: cambia el estado y guarda las notas solas", async ({ page }) => 
   await expect(page.getByText("Guardado ✓")).toBeVisible();
   const { data } = await db.from("leads").select("notes").eq("id", lead.id).single();
   expect(data!.notes).toBe("Llamar el martes");
+
+  // Responder: sale de la cuenta de ROWE y el borrador no se pierde al recargar (no se envía)
+  await page.getByRole("button", { name: "Responder", exact: true }).click();
+  const box = page.locator("[data-reply-box]");
+  await expect(box).toContainText(`De · ${process.env.SMTP_USER}`);
+  await expect(box).toContainText(`Para · ${email("lead")}`);
+  await expect(box.getByLabel("Asunto")).toHaveValue("Tu proyecto con ROWE");
+  await box.getByLabel("Respuesta").fill("Hola:\n\nBorrador E2E");
+  await page.reload();
+  await page.getByRole("button", { name: "Responder", exact: true }).click();
+  await expect(page.locator("[data-reply-box]").getByLabel("Respuesta")).toHaveValue("Hola:\n\nBorrador E2E");
+  await page.locator("[data-reply-box]").getByRole("button", { name: "Descartar" }).click();
+  await expect(page.locator("[data-reply-box]")).toHaveCount(0);
+  await page.getByRole("button", { name: "Responder", exact: true }).click();
+  await expect(page.locator("[data-reply-box]").getByLabel("Respuesta")).not.toHaveValue(/Borrador E2E/);
 });
 
 test("medios: sube con progreso, guarda el texto alternativo y borra del almacenamiento", async ({ page }) => {

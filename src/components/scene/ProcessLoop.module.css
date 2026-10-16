@@ -148,6 +148,8 @@
   gap: 1cqw;
   font-family: var(--font-mono);
   font-size: max(9px, 5cqw);
+  /* </> con aire entre los caracteres (igual en el menú: MenuPreview) */
+  letter-spacing: 0.24em;
   color: var(--color-muted);
 }
 .caret {

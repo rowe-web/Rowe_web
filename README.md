@@ -105,15 +105,19 @@ Los permisos los exige la propia base de datos (RLS), no solo la interfaz.
 - **Plan Pro de Supabase (25 $/mes):** copias diarias automáticas (7 días) que se restauran con un clic en **Database → Backups**. Con *Point-in-Time Recovery* (de pago aparte) se vuelve a cualquier minuto.
 - Además, cada versión publicada se guarda completa en la tabla `releases`: desde **Historial** se puede volver a publicar cualquiera.
 
-## Email de avisos (nuevo lead)
+## Email: avisos de nuevo lead y respuestas desde el panel
 
 Cada solicitud se guarda **siempre** en la base de datos. Después se envía un aviso por email al equipo (ajuste «notifications»: por defecto `rowe.web.agency@gmail.com` y `rowe.web.contacto@gmail.com`). Si el envío falla, queda registrado en la cola (`email_outbox`) con el motivo y se reintenta (1 min, 5 min, 30 min, 2 h, 12 h).
 
 **Ahora (sin dominio propio): Gmail con contraseña de aplicación**
 
-1. Entra en <https://myaccount.google.com> con `rowe.web.agency@gmail.com` → **Seguridad** → activa la **Verificación en dos pasos** (obligatoria para lo siguiente).
+La cuenta que envía es `rowe.web.contacto@gmail.com` (ya configurada en `.env.local`). Para cambiarla:
+
+1. Entra en <https://myaccount.google.com> con la cuenta que enviará → **Seguridad** → activa la **Verificación en dos pasos** (obligatoria para lo siguiente).
 2. Ve a <https://myaccount.google.com/apppasswords>, crea una contraseña de aplicación llamada «ROWE web» y copia las 16 letras (sin espacios).
-3. En `.env.local`: `EMAIL_PROVIDER=smtp`, `SMTP_USER=rowe.web.agency@gmail.com` y `SMTP_PASSWORD=` esas 16 letras. Reinicia `npm run dev`.
+3. En `.env.local`: `EMAIL_PROVIDER=smtp`, `SMTP_USER=` esa cuenta y `SMTP_PASSWORD=` esas 16 letras. Reinicia `npm run dev`.
+
+**Responder desde el panel:** en Mensajes, el botón **Responder** abre un formulario (asunto + texto) que envía la respuesta desde esa misma cuenta, no desde el correo personal de quien responde. El borrador se guarda mientras escribes; cada respuesta (enviada o fallida) queda en el historial del mensaje (tabla `lead_replies`) y el mensaje pasa de «Nuevo» a «Contactado». Sin el envío configurado, el botón vuelve a abrir el programa de correo.
 
 Limitaciones: unos 500 destinatarios al día, el remitente es una dirección @gmail.com y Google puede bloquear el envío si detecta un uso anómalo (el lead nunca se pierde: queda en la cola).
 

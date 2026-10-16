@@ -127,6 +127,14 @@ export async function applyContentUpdates(db: Db, log: (msg: string) => void): P
     "Menú: resumen de cada sección",
   );
 
+  // --- Título de la pestaña al salir --------------------------------------------
+  done(
+    await updateJson(db, "site_settings", "value", "key", "brand", (v) =>
+      swap(v, "tab_away_title", "● REC en pausa — vuelve pronto", "● ROWE en pausa — vuelve pronto"),
+    ),
+    "Pestaña en segundo plano: «ROWE en pausa»",
+  );
+
   // --- Hero: Fig. 01 pasa a ser el vídeo del proceso -----------------------------
   done(
     await updateJson(db, "scenes", "data", "key", "hero", (v) => {
