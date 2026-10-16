@@ -101,6 +101,51 @@ test("Escena 05: ecosistema pinneado en 4 pasos", async ({ page }, info) => {
   }
 });
 
+test("Escena 04 · móvil: pasos en orden sin saltos, líneas que se rellenan con su paso y señal REC por las líneas", async ({ page }, info) => {
+  test.skip(isDesktop(info.project.name));
+  await open(page);
+  const scene = page.locator("#ecosistema");
+  const fills = () => scene.locator("[data-eco-seg]").evaluateAll((els) => els.map((e) => Math.round(new DOMMatrix(getComputedStyle(e).transform).a * 100) / 100));
+  const active = () => scene.locator("[data-eco-step]").evaluateAll((els) => els.findIndex((e) => !e.hasAttribute("data-off")));
+  const listTop = await scene.locator("ol").evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+  const listH = await scene.locator("ol").evaluate((el) => el.getBoundingClientRect().height);
+  const vh = page.viewportSize()!.height;
+
+  // Antes de llegar a los pasos: líneas vacías y paso 01
+  await page.evaluate((y) => window.scrollTo(0, y), listTop - vh);
+  await page.waitForTimeout(1200);
+  expect(await fills()).toEqual([0, 0, 0, 0]);
+  expect(await active()).toBe(0);
+  await expect(scene.locator("[data-eco-bar-signal]")).toHaveCSS("opacity", "1");
+
+  // Un deslizamiento brusco hasta el final: el progreso recorre 01 → 02 → 03 → 04, sin saltos
+  const seen = await page.evaluate(async ({ y }) => {
+    const out: number[] = [];
+    const read = () => [...document.querySelectorAll("#ecosistema [data-eco-step]")].findIndex((e) => !e.hasAttribute("data-off"));
+    window.scrollTo(0, y);
+    const t0 = performance.now();
+    while (performance.now() - t0 < 2500) {
+      const i = read();
+      if (out[out.length - 1] !== i) out.push(i);
+      await new Promise((r) => requestAnimationFrame(r));
+    }
+    return out;
+  }, { y: listTop + listH - vh * 0.4 });
+  expect(seen).toEqual([0, 1, 2, 3]);
+  expect(await fills()).toEqual([1, 1, 1, 1]);
+  await expect(scene.locator("[data-eco-current]")).toHaveText("04");
+  const sig = await scene.locator("[data-eco-bar-signal]").evaluate((el) => (el as HTMLElement).style.left);
+  expect(parseFloat(sig)).toBeGreaterThan(99);
+
+  // A mitad de la lista: el paso del centro y las líneas hasta él
+  await page.evaluate((y) => window.scrollTo(0, y), listTop + listH * 0.4 - vh * 0.62);
+  await page.waitForTimeout(1500);
+  const i = await active();
+  const f = await fills();
+  expect(f.slice(0, i).every((v) => v === 1)).toBe(true);
+  expect(f.slice(i + 1).every((v) => v === 0)).toBe(true);
+});
+
 test("lo que hay dentro de una escena pinneada se ve aunque se llegue de un salto", async ({ page }, info) => {
   test.skip(!isDesktop(info.project.name));
   await open(page);

@@ -4,7 +4,11 @@ import { q, qa, type SceneSetup } from "./types";
 /**
  * Escena 05 · Ecosistema — scroll pinneado en N pasos (escritorio).
  * Cada tramo de scroll activa un paso; la señal REC viaja de forma continua por el
- * diagrama RO → WE. En tablet/móvil no hay pin: los pasos se iluminan al cruzar el centro.
+ * diagrama RO → WE. En tablet no hay pin: los pasos se iluminan al cruzar el centro.
+ * En móvil (< 768 px) tampoco hay pin (scroll nativo), pero el avance es continuo como en
+ * escritorio: un único progreso, suavizado, recorre la lista de pasos; los pasos se encienden
+ * en orden (01 → 02 → 03 → 04, sin saltos aunque se deslice rápido), cada línea de progreso se
+ * rellena con su paso y la señal REC viaja por las líneas (y por el diagrama si se ve).
  */
 export const ecosistemaSetup: SceneSetup = ({ root, mm }) => {
   const steps = qa(root, "[data-eco-step]");
@@ -13,6 +17,7 @@ export const ecosistemaSetup: SceneSetup = ({ root, mm }) => {
   const signal = q(root, "[data-eco-signal]");
   const current = q(root, "[data-eco-current]");
   const stage = q(root, "[data-eco-stage]");
+  const barSignal = q(root, "[data-eco-bar-signal]");
   const n = steps.length;
   if (!n || !stage) return;
 
@@ -83,7 +88,8 @@ export const ecosistemaSetup: SceneSetup = ({ root, mm }) => {
     };
   });
 
-  mm.add(MQ.notDesktop, () => {
+  // Tablet: como estaba (cada paso se enciende al cruzar el centro)
+  mm.add(MQ.tablet, () => {
     setActive(0);
     const triggers = steps.map((s, i) =>
       ScrollTrigger.create({
@@ -95,6 +101,56 @@ export const ecosistemaSetup: SceneSetup = ({ root, mm }) => {
     );
     return () => {
       triggers.forEach((t) => t.kill());
+      reset();
+    };
+  });
+
+  // Móvil: progreso continuo y suavizado sobre la lista de pasos
+  mm.add(MQ.mobile, () => {
+    const list = steps[0].parentElement;
+    if (!list) return;
+    const state = { p: 0 };
+    const render = () => {
+      const p = state.p;
+      setActive(Math.min(n - 1, Math.floor(p * n)));
+      segs.forEach((s, k) => {
+        s.style.transform = `scaleX(${gsap.utils.clamp(0, 1, p * n - k)})`;
+      });
+      if (barSignal) barSignal.style.left = `${p * 100}%`;
+      moveSignal(p);
+    };
+    setActive(0);
+    if (barSignal) barSignal.style.opacity = "1";
+    // scrub con retardo: aunque el dedo salte varios pasos de golpe, el progreso los recorre
+    // todos en orden (01 → 02 → 03 → 04) en lugar de saltar directamente al último.
+    const tween = gsap.fromTo(
+      state,
+      { p: 0 },
+      {
+        p: 1,
+        ease: "none",
+        onUpdate: render,
+        scrollTrigger: {
+          trigger: list,
+          start: "top 72%",
+          end: "bottom 52%",
+          scrub: 0.8,
+          invalidateOnRefresh: true,
+          onRefresh: () => {
+            measure();
+            render();
+          },
+        },
+      },
+    );
+    render();
+    return () => {
+      tween.scrollTrigger?.kill();
+      tween.kill();
+      if (barSignal) {
+        barSignal.style.opacity = "";
+        barSignal.style.left = "";
+      }
       reset();
     };
   });

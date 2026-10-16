@@ -60,7 +60,13 @@ export function EcosistemaScene({ scene, previewStep }: SceneProps<{ steps?: Eco
                 </span>
                 <span>RO → WE</span>
               </div>
-              <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0,1fr))` }}>
+              <div className="relative grid gap-1" style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0,1fr))` }}>
+                {/* Móvil (sin diagrama): la señal REC viaja por las líneas de progreso. La muestra src/motion. */}
+                <span
+                  data-eco-bar-signal
+                  className="pointer-events-none absolute top-1/2 z-[1] h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-rec opacity-0 shadow-[0_0_14px_rgb(255_59_31/0.6)] will-change-[left] sm:hidden"
+                  style={{ left: 0 }}
+                />
                 {steps.map((s, i) => (
                   <span key={s.key} className="relative h-[2px] overflow-hidden bg-[rgb(237_234_228/0.12)]">
                     <span
