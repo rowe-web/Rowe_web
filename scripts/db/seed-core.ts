@@ -1,6 +1,7 @@
 import type { Db } from "./client";
 import * as data from "../../src/content/seed-data";
 import { legacyPageText } from "../../src/content/seed-pages";
+import { applyContentUpdates } from "./content-updates";
 
 export interface SeedOptions {
   /** Borra y vuelve a cargar todo el contenido editable (NO toca leads, usuarios ni medios). */
@@ -103,17 +104,20 @@ export async function seedContent(db: Db, opts: SeedOptions = {}): Promise<{ pub
     await db.query(
       `insert into public.config_options (section_key, key, position, control, set_key, set_label, set_description, badge,
          label, description, line_label, price_min, price_max, price_mode, unit_label, track, is_base, components,
-         modifies_base, base_suffix, weeks_min, weeks_max, weeks_factor, stepper_min, stepper_max, stepper_included, is_default)
+         modifies_base, base_suffix, weeks_min, weeks_max, weeks_factor, stepper_min, stepper_max, stepper_included, is_default, requires)
        values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::public.price_mode, $15, $16, $17, $18::text::jsonb,
-         $19, $20, $21, $22, $23, $24, $25, $26, $27)
+         $19, $20, $21, $22, $23, $24, $25, $26, $27, $28::text::jsonb)
        on conflict (key) do nothing`,
       [o.section, o.key, i * 10, o.control, o.setKey ?? null, o.setLabel ?? "", o.setDescription ?? "", o.badge ?? "",
         o.label, o.description ?? "", o.lineLabel ?? "", o.priceMin, o.priceMax, o.priceMode ?? "once", o.unitLabel ?? "",
         o.track ?? "WE", o.isBase ?? false, o.components ? j(o.components) : null, o.modifiesBase ?? false, o.baseSuffix ?? "",
         o.weeksMin ?? 0, o.weeksMax ?? 0, o.weeksFactor ?? null, o.stepper?.min ?? null, o.stepper?.max ?? null,
-        o.stepper?.included ?? null, o.isDefault ?? false],
+        o.stepper?.included ?? null, o.isDefault ?? false, o.requires ? j(o.requires) : null],
     );
   }
+
+  // Cambios de contenido posteriores (solo donde sigue el texto antiguo)
+  await applyContentUpdates(db, log);
 
   if (opts.demo) {
     for (const l of data.demoLeads) {

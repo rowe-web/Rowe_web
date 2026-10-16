@@ -48,6 +48,8 @@ export interface NavigationSettings {
   legal: { label: string; href: string }[];
   preloader_label: string;
   preloader_meta: string;
+  /** Líneas de «build» del preloader (la parte web): avanzan con la carga. */
+  preloader_steps: string[];
 }
 
 export const emptyNavigation: NavigationSettings = {
@@ -62,6 +64,7 @@ export const emptyNavigation: NavigationSettings = {
   legal: [],
   preloader_label: "",
   preloader_meta: "",
+  preloader_steps: [],
 };
 
 export function getSetting<T>(site: SiteSnapshot, key: string, fallback: T): T {

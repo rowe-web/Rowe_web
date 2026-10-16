@@ -77,7 +77,7 @@ export default function SistemaPage() {
             <RichText text="Calcula tu *presupuesto.*" />
           </p>
           <p className="headline-serif text-[clamp(44px,6vw,96px)]">
-            <RichText text="¿Grabamos tu próxima *escena?*" />
+            <RichText text="¿Empezamos tu próximo *proyecto?*" />
           </p>
           <p className="max-w-[44ch] text-lg leading-relaxed text-muted">
             Inter Tight 300/400/500 para texto. Estudio boutique de web y audiovisual para empresas y negocios que quieren verse profesionales en

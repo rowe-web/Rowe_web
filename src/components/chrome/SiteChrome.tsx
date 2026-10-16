@@ -163,7 +163,7 @@ export function SiteChrome({ nav, contact, brand, hablemosSettings, cookies, amb
 
   return (
     <>
-      <PreloaderGate label={nav.preloader_label} meta={nav.preloader_meta} />
+      <PreloaderGate label={nav.preloader_label} meta={nav.preloader_meta} steps={nav.preloader_steps} />
       <SiteHeader nav={nav} menuOpen={menuOpen} onMenu={() => (menuOpen ? closeMenu() : openMenu())} />
       <SiteMenu nav={nav} contact={contact} brand={brand} open={menuOpen} onClose={() => closeMenu(true)} onCloseAnimated={() => closeMenu()} />
       <HablemosOverlay settings={hablemosSettings} contact={contact} closeLabel={nav.close_label} />

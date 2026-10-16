@@ -1,6 +1,6 @@
 /** Tablero de revisión de diseño (Fase 2). Cada entrada se ve a 1440 y a 390 px. */
 export const boards = [
-  { key: "preloader", title: "Preloader", note: "Timecode ligado a la carga real · apertura letterbox al terminar · solo primera visita por sesión.", desk: 900, mob: 844 },
+  { key: "preloader", title: "Preloader", note: "Timecode y registro de build ligados a la carga real · logo como etiqueta de código < ROWE /> · apertura letterbox al terminar · solo primera visita por sesión.", desk: 900, mob: 844 },
   { key: "header", title: "Cabecera", note: "De ROWE Presupuesto: se oculta al bajar, reaparece al subir, fondo desenfocado tras 40 px.", desk: 120, mob: 100 },
   { key: "hero", title: "Escena 00 · Hero (mezcla d)", note: "1c titular + Fig. 01 + Fig. 02 · al hacer scroll el showreel crece hasta el letterbox 2.39:1 (1a) con pistas RO/WE y cabezal (1b).", desk: 1800, mob: 1700 },
   { key: "estudio", title: "Escena 01 · El estudio (mezcla d)", note: "Pin + manifiesto que se ilumina palabra a palabra con el cabezal (aquí a mitad) · hover RO: vídeo en las letras · hover WE: web en movimiento.", desk: 900, mob: 1500 },

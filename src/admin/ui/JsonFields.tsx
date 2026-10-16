@@ -17,7 +17,9 @@ const LABELS: Record<string, string> = {
   stats: "Cifras", tracks: "Pistas", clips: "Clips", size: "Tamaño relativo", duration: "Duración", sector: "Sector", track: "Pista",
   word: "Palabra", hover: "Al pasar el ratón", master: "Máster", reels: "Reels", formats: "Formatos", specs: "Ficha técnica",
   secondary_cta: "Botón secundario", reel_label: "Texto del showreel", sound_label: "Texto de sonido", scroll_hint: "Texto «Desliza»",
-  photo_caption: "Pie de la foto", video_caption: "Pie del vídeo", program_label: "Rótulo del programa", format_label: "Formato",
+  photo_caption: "Pie de la Fig. 01 (proceso)", video_caption: "Pie del vídeo", process_video_media_id: "Vídeo del proceso 4:5 (la foto hace de póster)",
+  process_steps: "Fases de la animación del proceso", view_desktop: "Botón vista escritorio", view_mobile: "Botón vista móvil",
+  mobile_media_id: "Grabación de la web en móvil (vertical)", photo_media_id: "Póster del vídeo del proceso (4:5)", program_label: "Rótulo del programa", format_label: "Formato",
   sequence_label: "Rótulo de la secuencia", url_label: "Dirección de ejemplo", screen_caption: "Pie del visor", all_label: "Texto «ver todos»",
   all_href: "Enlace «ver todos»", drag_label: "Texto del cursor de arrastre", kicker: "Antetítulo", meta: "Metadatos", promise: "Promesa",
   email_contact: "Email de contacto", email_admin: "Email de administración", email_social: "Email de redes", phone: "Teléfono",
@@ -27,7 +29,7 @@ const LABELS: Record<string, string> = {
   not_found_title: "Titular de la página 404", not_found_body: "Texto de la página 404", enabled: "Activado", accept: "Botón aceptar",
   reject: "Botón rechazar", configure: "Botón configurar", menu_label: "Texto «Menú»", close_label: "Texto «Cerrar»", cta_label: "Texto del botón",
   cta_href: "Enlace del botón", menu_kicker: "Antetítulo del menú", footer_title: "Titular del pie", footer_end: "Texto final del pie",
-  legal: "Enlaces legales", preloader_label: "Rótulo del preloader", preloader_meta: "Metadatos del preloader", lead_recipients: "Destinatarios de los avisos",
+  legal: "Enlaces legales", preloader_label: "Rótulo del preloader", preloader_meta: "Metadatos del preloader", preloader_steps: "Líneas de código del preloader", lead_recipients: "Destinatarios de los avisos",
   steps_: "Pasos", needs: "Opciones «¿Qué necesitas?»", sectors: "Sectores", budgets: "Rangos de presupuesto", fields: "Campos",
   errors: "Mensajes de error", next: "Botón siguiente", back: "Botón atrás", submit: "Botón enviar", loading: "Texto enviando", retry: "Botón reintentar",
   success_meta: "Rótulo de éxito", success_title: "Titular de éxito", success_body: "Texto de éxito", success_reset: "Botón «enviar otra»",
@@ -40,8 +42,8 @@ const LABELS: Record<string, string> = {
   monitor_label: "Rótulo del monitor", rec_label: "Texto «Rec»", standby_label: "Texto «Standby»", empty_text: "Texto sin selección",
   once_text: "Texto «pago único»", level_label: "Rótulo del nivel", levels: "Niveles", below: "Hasta (€, vacío = resto)", vu_bars: "Barras del medidor",
   vu_max: "Importe del medidor lleno (€)", round_once: "Redondeo del pago único (€)", round_monthly: "Redondeo mensual (€)", min_weeks: "Plazo mínimo (semanas)",
-  weeks_label: "Rótulo del plazo", includes_label: "Rótulo «incluye»", includes: "Incluye siempre", cta_send: "Botón enviar", cta_pdf: "Botón PDF",
-  need_first: "Aviso «elige primero»", disclaimer: "Nota legal de precios", empty_track: "Texto pista vacía", add_content_hint: "Texto «añade contenido»",
+  weeks_label: "Rótulo del plazo", includes_label: "Rótulo «incluye»", includes: "Incluye siempre", includes_content: "Incluye siempre (solo contenido)", cta_send: "Botón enviar", cta_pdf: "Botón PDF",
+  need_first: "Aviso «elige primero»", disclaimer: "Nota legal de precios", empty_track: "Texto pista vacía", add_content_hint: "Texto «añade contenido»", add_web_hint: "Texto «añade web»",
   mobile_label: "Rótulo barra móvil", mobile_cta: "Botón barra móvil", pdf: "PDF", note: "Nota", validity_days: "Validez (días)", file_name: "Nombre del archivo",
   seo_title: "Título en Google", seo_description: "Descripción en Google",
   discipline: "Disciplina (web o audiovisual)", category: "Categoría (Web, Audiovisual o vacío = todas)", limit: "Máximo de proyectos",
@@ -50,7 +52,7 @@ const LABELS: Record<string, string> = {
   owner: "Titular (nombre y apellidos o razón social)", nif: "NIF / CIF", hosting: "Proveedor de alojamiento web", updated: "Última actualización",
 };
 
-const LONG = new Set(["a", "body", "text", "lead", "description", "note", "message_placeholder", "success_body", "send_body", "not_found_body", "overlay_lead", "disclaimer", "includes"]);
+const LONG = new Set(["a", "body", "text", "lead", "description", "note", "message_placeholder", "success_body", "send_body", "not_found_body", "overlay_lead", "disclaimer", "includes", "includes_content"]);
 
 export function humanize(key: string) {
   return LABELS[key] ?? key.replace(/_media_id$/, "").replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());

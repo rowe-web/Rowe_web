@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { RichText } from "@/components/ui/RichText";
 import { MediaFrame } from "@/components/scene/MediaFrame";
+import { ProcessLoop, type ProcessStep } from "@/components/scene/ProcessLoop";
 import { Timecode } from "@/components/scene/Timecode";
 import { getSetting, emptyBrand, type BrandSettings } from "@/lib/content/settings";
 import { SceneMotion } from "@/motion/SceneMotion";
@@ -17,13 +18,18 @@ interface HeroData {
   program_label?: string;
   format_label?: string;
   sequence_label?: string;
+  /** Póster del vídeo del proceso (4:5). */
   photo_media_id?: string | null;
+  /** Vídeo del proceso integral (web → contenido → tráfico), 4:5. Sin él, animación en bucle. */
+  process_video_media_id?: string | null;
+  process_steps?: ProcessStep[];
   tracks?: { key: string; label: string; clips: { label: string; href: string; size: number }[] }[];
 }
 
 /**
  * Escena 00 · Hero — mezcla (d):
- *  1c titular editorial + foto «Fig. 01» + showreel pequeño «Fig. 02»
+ *  1c titular editorial + «Fig. 01» (vídeo del proceso ROWE: web → contenido → tráfico)
+ *     + showreel pequeño «Fig. 02»
  *  1a el showreel crece con el scroll hasta el letterbox 2.39:1 a pantalla completa
  *  1b timecode del programa y pistas RO/WE con cabezal ligado al scroll
  */
@@ -34,6 +40,14 @@ export function HeroScene({ scene, site }: SceneProps<HeroData>) {
   const video = getMedia(site, scene.media_id);
   const poster = getMedia(site, scene.poster_id);
   const photo = getMedia(site, d.photo_media_id);
+  const processVideo = getMedia(site, d.process_video_media_id);
+  // Fig. 01: el vídeo del proceso si está subido (la foto hace de póster); si no, la animación
+  const fig01 = (sizes: string, className = "", priority = false) =>
+    processVideo ? (
+      <MediaFrame media={processVideo} poster={photo} aspect="4 / 5" sizes={sizes} className={className} priority={priority} />
+    ) : (
+      <ProcessLoop steps={d.process_steps ?? []} className={className} />
+    );
   const tracks = d.tracks ?? [];
 
   return (
@@ -59,11 +73,11 @@ export function HeroScene({ scene, site }: SceneProps<HeroData>) {
             ))}
           </h1>
 
-          {/* Fig. 01 — foto 4:5 (escritorio) */}
+          {/* Fig. 01 — proceso ROWE 4:5 (escritorio) */}
           <figure data-parallax="0.12" className="absolute right-0 top-[-8px] hidden w-[17.9vw] md:block">
             <figcaption data-hero-intro className="mb-2.5 text-right label-mono text-[10px] text-muted">{d.photo_caption}</figcaption>
             <div data-hero-intro>
-              <MediaFrame media={photo} aspect="4 / 5" placeholder="[ Foto 4:5 ]" sizes="18vw" priority />
+              {fig01("18vw", "", true)}
             </div>
           </figure>
         </div>
@@ -74,7 +88,7 @@ export function HeroScene({ scene, site }: SceneProps<HeroData>) {
             <div className="flex items-start gap-4">
               <p className="max-w-[44ch] text-[14px] leading-[1.55] text-muted md:text-[17px]">{scene.body}</p>
               {/* Fig. 01 en móvil, junto al texto */}
-              <MediaFrame media={photo} aspect="4 / 5" placeholder="[ Foto 4:5 ]" sizes="40vw" className="w-[36%] shrink-0 md:hidden" />
+              {fig01("40vw", "w-[36%] shrink-0 md:hidden")}
             </div>
             <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:gap-7">
               {scene.cta_label && (

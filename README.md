@@ -58,6 +58,7 @@ Este comando aplica las migraciones, carga todo el contenido del diseño, crea t
 
 - Si añades `-- --demo`, también se cargan en la bandeja los mensajes de ejemplo del diseño.
 - Se puede repetir sin miedo: nunca pisa lo que hayas editado desde el panel. Si una página interna sigue vacía (sin secciones), la rellena con el contenido inicial.
+- Los cambios de contenido posteriores (por ejemplo, la opción «Solo contenido» del configurador o los textos nuevos del preloader) están en `scripts/db/content-updates.ts`: solo se aplican donde sigue el texto antiguo. Después, publica desde el panel para que la web los use.
 
 ### 5. Arrancar
 
@@ -141,6 +142,13 @@ Limitaciones: unos 500 destinatarios al día, el remitente es una dirección @gm
 - **Caso de estudio** (`/proyectos/<slug>`): sale de cada proyecto (reto, solución, resultado, cifras, galería, web del cliente) y enlaza con el siguiente.
 - **404 «Escena eliminada en el montaje»**: textos en Ajustes → Marca. Una dirección que no existe, o un proyecto no publicado, responde **404 de verdad** (el proxy consulta los proyectos publicados antes de pintar la página).
 - **Textos legales** (aviso legal, privacidad, cookies): en Ajustes → Páginas y legal. Los datos del titular se rellenan en **Ajustes → Datos legales** y se insertan solos donde el texto pone `{titular}`, `{nif}`, `{domicilio}`, `{email}`, `{alojamiento}` y `{actualizado}`; `{web}` y `{dominio}` salen de `NEXT_PUBLIC_SITE_URL`. Lo que va `[entre corchetes]` es provisional. **Que un abogado o gestor revise los textos antes del lanzamiento.**
+
+## Web y audiovisual a partes iguales
+
+- **Preloader**: además del timecode de rodaje, el logo aparece como etiqueta de código `< ROWE />` con cursor y un registro de *build → render → deploy* que avanza con la carga real. Las líneas se editan en Ajustes → Menú y pie (`preloader_steps`).
+- **Hero · Fig. 01**: «Proceso ROWE · web, contenido y tráfico». Mientras no subas el vídeo del proceso (escena Hero → *Vídeo del proceso 4:5*), se ve una animación en bucle de tres planos (la web se construye → contenido vertical grabando → las visitas suben). La foto 4:5 hace de póster del vídeo.
+- **Escena 03 · Desarrollo web**: selector **Escritorio / Móvil**. Las dos vistas se desplazan con el mismo progreso de scroll, así que cambiar de vista no salta. Se puede subir una grabación vertical de la web en móvil (*Grabación de la web en móvil*).
+- **Configurador · «Solo contenido»**: tipo de proyecto para presupuestar solo el rodaje para redes. Bloquea tamaño, funciones y mantenimiento (aviso «Sin web, de momento» con botón «Añadir web») y abre el bloque audiovisual. Precios y reglas en Precios del panel; el servidor recalcula igual.
 
 ## Dominio e indexación
 

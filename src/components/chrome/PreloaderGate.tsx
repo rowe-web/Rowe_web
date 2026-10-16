@@ -6,7 +6,7 @@ import { EASE, gsap } from "@/motion/gsap";
 import { prefersReducedMotion } from "@/motion/media";
 import { useMotion } from "@/motion/MotionProvider";
 import { markReady } from "@/motion/ready";
-import { Preloader } from "./Preloader";
+import { COUNT_FRAMES, Preloader, preloaderStep } from "./Preloader";
 
 const SESSION_KEY = "rowe:intro";
 const MIN_MS = 1400;
@@ -17,7 +17,7 @@ const MAX_MS = 4200;
  * avanza con la carga real (fuentes + página), se abre en letterbox y libera el scroll.
  * Solo la primera visita de cada sesión; nunca con movimiento reducido.
  */
-export function PreloaderGate({ label, meta }: { label: string; meta: string }) {
+export function PreloaderGate({ label, meta, steps = [] }: { label: string; meta: string; steps?: string[] }) {
   const [done, setDone] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const { lock, unlock } = useMotion();
@@ -38,10 +38,21 @@ export function PreloaderGate({ label, meta }: { label: string; meta: string }) 
     const el = root.current;
     const tc = el?.querySelector<HTMLElement>("[data-preloader-tc]");
     const bar = el?.querySelector<HTMLElement>("[data-preloader-bar]");
+    const pct = el?.querySelector<HTMLElement>("[data-preloader-pct]");
+    const step = el?.querySelector<HTMLElement>("[data-preloader-step]");
     const state = { p: 0 };
     const render = () => {
-      if (tc) tc.textContent = formatTimecode(state.p * 62);
+      if (tc) tc.textContent = formatTimecode(state.p * COUNT_FRAMES);
       if (bar) bar.style.transform = `scaleX(${state.p})`;
+      if (pct) pct.textContent = String(Math.round(state.p * 100));
+      const line = preloaderStep(steps, state.p);
+      if (step && step.textContent !== line) {
+        step.textContent = line;
+        // Reinicia el «tecleo» de la línea nueva
+        step.style.animation = "none";
+        void step.offsetWidth;
+        step.style.animation = "";
+      }
     };
     lock();
     let locked = true;
@@ -90,12 +101,13 @@ export function PreloaderGate({ label, meta }: { label: string; meta: string }) 
       tl.kill();
       release();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- las líneas solo se leen al empezar
   }, [lock, unlock]);
 
   if (done) return null;
   return (
     <div ref={root} className="rowe-preloader">
-      <Preloader label={label} meta={meta} />
+      <Preloader label={label} meta={meta} steps={steps} />
     </div>
   );
 }

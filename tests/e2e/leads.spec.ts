@@ -174,6 +174,12 @@ test("PDF del presupuesto: real, numerado y registrado", async ({ request }) => 
   createdQuotes.push(q!.id);
   expect(q!.pdf_downloaded_at).toBeTruthy();
   expect([q!.one_min, q!.one_max, q!.monthly_min, q!.monthly_max]).toEqual([1500, 2300, 480, 640]);
+  // «Solo contenido»: el servidor recalcula sin partidas de web aunque lleguen marcadas
+  const redes = await request.post("/api/quote/pdf", { data: { selection: { tipo: "redes", reels: "reels4", tienda: true, mant: true } } });
+  expect(redes.status()).toBe(200);
+  const { data: qr } = await db.from("quotes").select("id, one_min, one_max, monthly_min, monthly_max").eq("number", redes.headers()["x-quote-number"]).single();
+  createdQuotes.push(qr!.id);
+  expect([qr!.one_min, qr!.one_max, qr!.monthly_min, qr!.monthly_max]).toEqual([350, 500, 260, 360]);
   const empty = await request.post("/api/quote/pdf", { data: { selection: {} } });
   expect(empty.status()).toBe(400);
 });

@@ -188,7 +188,8 @@ const inverted = (on: boolean) =>
 
 function Cards({ options, sel, set }: { options: ConfigOption[]; sel: Selection; set: (k: string, v: string) => void }) {
   return (
-    <div role="radiogroup" className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
+    // Cuatro tipos (A–D): rejilla de 2 × 2 para que ninguno quede solo en otra fila
+    <div role="radiogroup" className={`grid gap-3 ${options.length % 2 === 0 && options.length % 3 !== 0 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-[repeat(auto-fit,minmax(200px,1fr))]"}`}>
       {options.map((o) => {
         const on = sel[o.set_key!] === o.key;
         const from = o.components?.length ? o.components.reduce((a, c) => a + c.min, 0) : o.price_min;
@@ -303,17 +304,20 @@ function Rows({ options, config, sel, set, locked }: { options: ConfigOption[]; 
             </div>
           );
         }
-        // Interruptor
-        const on = sel[o.key] === true && isAvailable(config, o, sel);
+        // Interruptor (apagado y sin pulsar si su requisito no se cumple: p. ej. mantenimiento sin web)
+        const available = isAvailable(config, o, sel);
+        const on = sel[o.key] === true && available;
+        const off = !locked && !available;
         return (
           <button
             key={o.key}
             type="button"
             role="switch"
             aria-checked={on}
+            disabled={off || undefined}
             tabIndex={locked ? -1 : undefined}
             onClick={() => set(o.key, !(sel[o.key] === true))}
-            className={`${styles.row} flex w-full items-center gap-5 border-b border-line px-1 py-[18px] text-left transition-[padding,background-color] duration-[350ms] ease-[var(--ease-out)] ${on ? "bg-[rgb(237_234_228/0.03)]" : ""}`}
+            className={`${styles.row} flex w-full items-center gap-5 border-b border-line px-1 py-[18px] text-left transition-[padding,background-color,opacity] duration-[350ms] ease-[var(--ease-out)] ${on ? "bg-[rgb(237_234_228/0.03)]" : ""} ${off ? "pointer-events-none opacity-30" : ""}`}
           >
             <span className="flex min-w-0 flex-1 flex-col gap-1">
               <span className="text-[18px]">{o.label}</span>
@@ -390,6 +394,9 @@ function Monitor({ quote, settings, narrow, onSend, onPdf, ref }: MonitorProps) 
   }, [quote]);
 
   const lit = quote?.lit ?? 0;
+  // «Solo contenido»: sin partidas de web, el «incluye» y la pista WE hablan del vídeo
+  const contentOnly = !!quote && !quote.items.some((i) => i.track === "WE");
+  const includes = contentOnly && settings.includes_content ? settings.includes_content : settings.includes;
   const bars = Array.from({ length: settings.vu_bars }, (_, i) => i);
   const third = settings.vu_bars / 3;
 
@@ -452,7 +459,7 @@ function Monitor({ quote, settings, narrow, onSend, onPdf, ref }: MonitorProps) 
                     </span>
                   ))}
                   <span className="flex items-center overflow-hidden whitespace-nowrap pl-1.5 label-mono text-[9px] text-muted" style={{ flexGrow: clips.scale - filled, flexBasis: 0 }}>
-                    {list.length ? "" : t === "RO" && quote ? settings.add_content_hint : settings.empty_track}
+                    {list.length ? "" : quote ? (t === "RO" ? settings.add_content_hint : settings.add_web_hint) : settings.empty_track}
                   </span>
                 </div>
               </div>
@@ -467,7 +474,7 @@ function Monitor({ quote, settings, narrow, onSend, onPdf, ref }: MonitorProps) 
           </div>
           <div className="flex justify-between gap-4 border-b border-line py-3.5">
             <dt className="flex-none label-mono text-[10px] text-muted">{settings.includes_label}</dt>
-            <dd className="text-right font-mono text-[10px] uppercase leading-[1.7] tracking-[0.08em]">{settings.includes}</dd>
+            <dd className="text-right font-mono text-[10px] uppercase leading-[1.7] tracking-[0.08em]">{includes}</dd>
           </div>
         </dl>
 

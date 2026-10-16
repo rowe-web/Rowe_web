@@ -22,7 +22,7 @@ export const pages: SeedPage[] = [
     seoTitle: "Desarrollo web a medida — ROWE",
     seoDescription: "Diseño y desarrollo de webs a medida para empresas y negocios: rápidas, claras, fáciles de editar y preparadas para Google.",
     blocks: [
-      { type: "cabecera", kicker: "WE — Desarrollo web", meta: ["Diseño", "Desarrollo", "SEO"], image_media_id: null, video_media_id: null, caption: "Fig. 01 — Web en movimiento · sustituir", cta: PRESUPUESTO, secondary: HABLEMOS },
+      { type: "cabecera", kicker: "WE — Desarrollo web", meta: ["Diseño", "Desarrollo", "SEO"], image_media_id: null, video_media_id: null, caption: "Fig. 01 — Web en movimiento", cta: PRESUPUESTO, secondary: HABLEMOS },
       { type: "servicios", kicker: "Escaleta — Qué construimos", title: "Una web para *cada momento.*", discipline: "web" },
       { type: "escena", key: "web", kicker: "Ficha técnica — WE" },
       {
@@ -64,7 +64,7 @@ export const pages: SeedPage[] = [
     seoTitle: "Producción audiovisual — ROWE",
     seoDescription: "Reels para redes, vídeo corporativo y fotografía para negocios. Rodaje, edición y entrega lista para publicar.",
     blocks: [
-      { type: "cabecera", kicker: "RO — Producción audiovisual", meta: ["Reels", "Vídeo", "Foto"], image_media_id: null, video_media_id: null, caption: "Fig. 01 — Showreel · sustituir", cta: PRESUPUESTO, secondary: HABLEMOS },
+      { type: "cabecera", kicker: "RO — Producción audiovisual", meta: ["Reels", "Vídeo", "Foto"], image_media_id: null, video_media_id: null, caption: "Fig. 01 — Showreel", cta: PRESUPUESTO, secondary: HABLEMOS },
       { type: "servicios", kicker: "Escaleta — Qué rodamos", title: "Contenido que *se queda.*", discipline: "audiovisual" },
       { type: "escena", key: "audiovisual", kicker: "Formatos — RO" },
       {

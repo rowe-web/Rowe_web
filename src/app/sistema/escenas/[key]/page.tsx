@@ -51,7 +51,7 @@ function renderBoard(key: string, site: SiteSnapshot, nav: NavigationSettings): 
   const brand = getSetting<BrandSettings>(site, "brand", emptyBrand);
   const scene = site.scenes.find((s) => s.key === key);
 
-  if (key === "preloader") return <Preloader label={nav.preloader_label} meta={nav.preloader_meta} progress={0.68} preview />;
+  if (key === "preloader") return <Preloader label={nav.preloader_label} meta={nav.preloader_meta} steps={nav.preloader_steps} progress={0.68} preview />;
   if (key === "header") return <SiteHeader nav={nav} preview />;
   if (key === "menu") return <SiteMenu nav={nav} contact={contact} brand={brand} open preview />;
   if (key === "footer") return <SiteFooter site={site} />;

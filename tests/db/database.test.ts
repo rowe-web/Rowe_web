@@ -345,6 +345,39 @@ describe("páginas internas y direcciones de proyectos (Fase 5)", () => {
     expect(pages.web.title).toBe("Mi título");
     expect(pages.contacto.title).toBe("Contacto editado");
   });
+
+  it("equilibrio web / audiovisual: cambia los textos antiguos, añade «Solo contenido» y respeta lo editado", async () => {
+    // Estado de una base cargada antes del cambio
+    await db.exec(`
+      delete from public.config_options where key = 'redes';
+      update public.config_sections set requires = null, locked_title = '' where key in ('tamano', 'funciones');
+      update public.config_sections set requires = '{"set":"tipo","in":["contenido"]}' where key = 'audiovisual';
+      update public.config_options set requires = null where key = 'mant';
+      update public.site_settings set value = jsonb_set(value, '{title}', '"¿Grabamos tu próxima *escena?*"') where key = 'hablemos';
+      update public.site_settings set value = (value - 'preloader_steps') || '{"footer_title":"Mi pie editado"}' where key = 'navigation';
+      update public.scenes set data = (data - 'process_steps') || '{"photo_caption":"Fig. 01 — Rodaje en clínica"}' where key = 'hero';
+      update public.scenes set data = data || '{"screen_caption":"Mi pie del visor"}' where key = 'web';
+    `);
+    await seedContent(db, { log: () => {} });
+    const [redes] = await db.query<{ track: string; is_base: boolean }>("select track, is_base from public.config_options where key = 'redes'");
+    expect(redes).toEqual({ track: "RO", is_base: true });
+    const secs = Object.fromEntries((await db.query<{ key: string; requires: { in: string[] } | null; locked_title: string }>("select key, requires, locked_title from public.config_sections")).map((r) => [r.key, r]));
+    expect(secs.tamano.requires?.in).not.toContain("redes");
+    expect(secs.tamano.locked_title).toMatch(/Sin web/);
+    expect(secs.funciones.requires?.in).toContain("nueva");
+    expect(secs.audiovisual.requires?.in).toEqual(["contenido", "redes"]);
+    const [mant] = await db.query<{ requires: { in: string[] } }>("select requires from public.config_options where key = 'mant'");
+    expect(mant.requires.in).not.toContain("redes");
+    const settings = Object.fromEntries((await db.query<{ key: string; value: Record<string, unknown> }>("select key, value from public.site_settings")).map((r) => [r.key, r.value]));
+    expect(settings.hablemos.title).toBe("¿Empezamos tu próximo *proyecto?*");
+    expect(settings.navigation.footer_title).toBe("Mi pie editado");
+    expect(settings.navigation.preloader_steps).toHaveLength(3);
+    const scenes = Object.fromEntries((await db.query<{ key: string; data: Record<string, unknown> }>("select key, data from public.scenes")).map((r) => [r.key, r.data]));
+    expect(scenes.hero.photo_caption).toMatch(/Proceso ROWE/);
+    expect(scenes.hero.process_steps).toHaveLength(3);
+    expect(scenes.web.screen_caption).toBe("Mi pie del visor");
+    expect(scenes.web.view_mobile).toBe("Móvil");
+  });
 });
 
 describe("servidor (service_role)", () => {

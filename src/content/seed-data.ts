@@ -100,6 +100,8 @@ export interface SeedConfigOption {
   weeksFactor?: number;
   stepper?: { min: number; max: number; included: number };
   isDefault?: boolean;
+  /** Solo cuenta (y solo se puede pulsar) si se cumple: p. ej. mantenimiento ⇢ hay web. */
+  requires?: Json;
 }
 
 export interface SeedLead {
@@ -214,12 +216,14 @@ export const settings: SeedSetting[] = [
       weeks_label: "Plazo estimado",
       includes_label: "Incluye siempre",
       includes: "Diseño a medida · Responsive · Formulario · Panel para editar · Velocidad · SEO básico",
+      includes_content: "Guion · Rodaje vertical 9:16 · Edición y color · Subtítulos · Música con licencia",
       cta_send: "Enviar y hablemos",
       cta_pdf: "Descargar PDF",
       need_first: "Elige primero qué necesitas",
       disclaimer: "Precios orientativos de ejemplo · sustituir por tarifas ROWE. IVA no incluido.",
       empty_track: "Sin clips",
       add_content_hint: "Añade contenido",
+      add_web_hint: "Añade web",
       mobile_label: "Orientativo",
       mobile_cta: "Resumen ↓",
       pdf: {
@@ -238,7 +242,7 @@ export const settings: SeedSetting[] = [
     editorCanEdit: true,
     value: {
       kicker: "Escena 10 — Hablemos",
-      title: "¿Grabamos tu próxima *escena?*",
+      title: "¿Empezamos tu próximo *proyecto?*",
       lead: "Cuéntanos qué necesitas. Te respondemos en menos de 24 h.",
       promise: "Sin compromiso · Presupuesto cerrado · Respuesta en 24 h",
       overlay_title: "*Hablemos.*",
@@ -313,9 +317,9 @@ export const settings: SeedSetting[] = [
         { label: "Producción audiovisual", href: "/audiovisual", caption: "Fig. 02 — Rodaje" },
         { label: "Proyectos", href: "/proyectos", caption: "Fig. 03 — Trabajos recientes" },
         { label: "Presupuesto", href: "/#presupuesto", caption: "Fig. 04 — Calcula tu presupuesto" },
-        { label: "Hablemos", href: "/#hablemos", caption: "Fig. 05 — ¿Grabamos tu próxima escena?" },
+        { label: "Hablemos", href: "/#hablemos", caption: "Fig. 05 — ¿Empezamos tu próximo proyecto?" },
       ],
-      footer_title: "¿Grabamos tu próxima *escena?*",
+      footer_title: "¿Empezamos tu próximo *proyecto?*",
       footer_end: "Fin",
       legal: [
         { label: "Aviso legal", href: "/aviso-legal" },
@@ -324,6 +328,7 @@ export const settings: SeedSetting[] = [
       ],
       preloader_label: "Escena 00 — Hero",
       preloader_meta: "2.39:1 · 25 fps",
+      preloader_steps: ["npm run build", "render · 2.39:1 · 25 fps", "deploy → producción"],
     },
   },
   {
@@ -370,7 +375,13 @@ export const scenes: SeedScene[] = [
       reel_label: "Showreel",
       sound_label: "Sonido off · R",
       scroll_hint: "Desliza",
-      photo_caption: "Fig. 01 — Rodaje en clínica",
+      photo_caption: "Fig. 01 — Proceso ROWE · web, contenido y tráfico",
+      process_video_media_id: null,
+      process_steps: [
+        { key: "WE", label: "Web" },
+        { key: "RO", label: "Contenido" },
+        { key: "↗", label: "Tráfico" },
+      ],
       video_caption: "Fig. 02 — Showreel 2026 · 2.39:1",
       program_label: "PGM — Showreel_v12",
       format_label: "2.39:1 · 25 fps",
@@ -441,7 +452,10 @@ export const scenes: SeedScene[] = [
     ctaHref: "/web",
     data: {
       url_label: "tu-negocio.es",
-      screen_caption: "Fig. 03 — Web en movimiento · sustituir",
+      screen_caption: "Fig. 03 — Web en movimiento",
+      view_desktop: "Escritorio",
+      view_mobile: "Móvil",
+      mobile_media_id: null,
       specs: [
         { label: "Velocidad", value: "Carga en menos de 1,5 s" },
         { label: "Responsive", value: "Móvil · tablet · escritorio" },
@@ -542,7 +556,7 @@ export const scenes: SeedScene[] = [
     key: "hablemos",
     name: "Hablemos",
     kicker: "Escena 10 — Hablemos",
-    title: "¿Grabamos tu próxima *escena?*",
+    title: "¿Empezamos tu próximo *proyecto?*",
     body: "Cuéntanos qué necesitas. Te respondemos en menos de 24 h.",
     ctaLabel: "Enviar solicitud",
     ctaHref: "",
@@ -636,15 +650,29 @@ export const projects: SeedProject[] = [
 // ---------------------------------------------------------------------------
 // Configurador (ROWE Presupuesto.dc.html · Escena 09). Precios de ejemplo del diseño.
 // ---------------------------------------------------------------------------
+/** Tipos de proyecto que llevan web (los que no, «Solo contenido», bloquean tamaño y funciones). */
+export const WEB_TYPES = ["nueva", "rediseno", "contenido"];
+/** Tipos de proyecto que llevan rodaje. */
+export const CONTENT_TYPES = ["contenido", "redes"];
+
 export const configSections: SeedConfigSection[] = [
   { key: "tipo", takeLabel: "Toma 01", title: "¿Qué necesitas?" },
-  { key: "tamano", takeLabel: "Toma 02", title: "Tamaño de la web" },
-  { key: "funciones", takeLabel: "Toma 03", title: "Funciones" },
+  {
+    key: "tamano",
+    takeLabel: "Toma 02",
+    title: "Tamaño de la web",
+    requires: { set: "tipo", in: WEB_TYPES },
+    lockedTitle: "Sin web, *de momento.*",
+    lockedBody: "Este presupuesto es solo de contenido. Si también quieres la web, la hacemos con el mismo equipo y la misma estética.",
+    lockedCta: "Añadir web",
+    lockedSelect: "contenido",
+  },
+  { key: "funciones", takeLabel: "Toma 03", title: "Funciones", requires: { set: "tipo", in: WEB_TYPES } },
   {
     key: "audiovisual",
     takeLabel: "Toma 04",
     title: "Contenido audiovisual",
-    requires: { set: "tipo", in: ["contenido"] },
+    requires: { set: "tipo", in: CONTENT_TYPES },
     lockedTitle: "El vídeo atrae. *La web convierte.*",
     lockedBody: "Añade contenido y trabajamos las dos patas con el mismo equipo y la misma estética.",
     lockedCta: "Añadir contenido",
@@ -665,6 +693,10 @@ export const configOptions: SeedConfigOption[] = [
       { label: "Jornada de rodaje", track: "RO", min: 350, max: 500 },
     ],
   },
+  {
+    section: "tipo", key: "redes", control: "card", setKey: "tipo", badge: "D", label: "Solo contenido", lineLabel: "Rodaje para redes",
+    description: "Sin web: guion, rodaje y edición de vídeo vertical para tus redes.", priceMin: 350, priceMax: 500, track: "RO", isBase: true, weeksMin: 1, weeksMax: 2,
+  },
   // Toma 02 · Tamaño (excluyente)
   { section: "tamano", key: "landing", control: "segment", setKey: "paginas", label: "Landing · 1 página", priceMin: -300, priceMax: -450, modifiesBase: true, baseSuffix: " · landing", weeksMin: -1, weeksMax: -1 },
   { section: "tamano", key: "p5", control: "segment", setKey: "paginas", label: "Hasta 5 páginas", priceMin: 0, priceMax: 0, isDefault: true },
@@ -675,7 +707,7 @@ export const configOptions: SeedConfigOption[] = [
   { section: "funciones", key: "tienda", control: "toggle", label: "Tienda online", lineLabel: "Tienda online", description: "Catálogo, carrito y pagos seguros.", priceMin: 900, priceMax: 1500, weeksMin: 2, weeksMax: 2 },
   { section: "funciones", key: "seo", control: "toggle", label: "SEO local", lineLabel: "SEO local", description: "Que te encuentren en Google en tu zona.", priceMin: 250, priceMax: 400 },
   { section: "funciones", key: "idiomas", control: "stepper", label: "Idiomas", lineLabel: "Idiomas ×{n}", description: "El primero va incluido. Cada idioma extra suma.", priceMin: 200, priceMax: 300, unitLabel: "c/u", stepper: { min: 1, max: 4, included: 1 } },
-  // Toma 04 · Audiovisual (solo con «Web + contenido»)
+  // Toma 04 · Audiovisual (con «Web + contenido» o «Solo contenido»)
   { section: "audiovisual", key: "reels0", control: "segment", setKey: "reels", setLabel: "Reels al mes", setDescription: "Rodaje y edición de piezas cortas para redes. Cuota mensual.", label: "No", priceMin: 0, priceMax: 0, priceMode: "monthly", track: "RO", isDefault: true },
   { section: "audiovisual", key: "reels4", control: "segment", setKey: "reels", setLabel: "Reels al mes", label: "4", lineLabel: "4 reels/mes", priceMin: 260, priceMax: 360, priceMode: "monthly", unitLabel: "/mes", track: "RO" },
   { section: "audiovisual", key: "reels8", control: "segment", setKey: "reels", setLabel: "Reels al mes", label: "8", lineLabel: "8 reels/mes", priceMin: 480, priceMax: 640, priceMode: "monthly", unitLabel: "/mes", track: "RO" },
@@ -683,7 +715,7 @@ export const configOptions: SeedConfigOption[] = [
   { section: "audiovisual", key: "fotos", control: "toggle", label: "Sesión de fotografía", lineLabel: "Sesión de fotos", description: "Fotos profesionales de tu negocio, equipo y producto.", priceMin: 250, priceMax: 400, track: "RO" },
   { section: "audiovisual", key: "video", control: "toggle", label: "Vídeo corporativo", lineLabel: "Vídeo corporativo", description: "Una pieza de 60–90 s que cuenta quién eres.", priceMin: 600, priceMax: 1100, track: "RO", weeksMin: 0, weeksMax: 1 },
   // Toma 05 · Después del estreno
-  { section: "post", key: "mant", control: "toggle", label: "Mantenimiento mensual", lineLabel: "Mantenimiento", description: "Actualizaciones, copias de seguridad y cambios menores.", priceMin: 35, priceMax: 60, priceMode: "monthly", unitLabel: "/mes" },
+  { section: "post", key: "mant", control: "toggle", label: "Mantenimiento mensual", lineLabel: "Mantenimiento", description: "Actualizaciones, copias de seguridad y cambios menores.", priceMin: 35, priceMax: 60, priceMode: "monthly", unitLabel: "/mes", requires: { set: "tipo", in: WEB_TYPES } },
   { section: "post", key: "urgente", control: "toggle", label: "Entrega urgente", lineLabel: "Entrega urgente", description: "Priorizamos tu proyecto. Plazo ~40 % más corto.", priceMin: 20, priceMax: 20, priceMode: "percent_once", unitLabel: "%", weeksFactor: 0.6 },
 ];
 

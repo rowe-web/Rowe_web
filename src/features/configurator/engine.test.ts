@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildFallbackSnapshot } from "@/content/fallback";
-import { computeQuote, defaultSelection, normalizeSelection, quoteLabel, type Selection } from "./engine";
+import { computeQuote, defaultSelection, needFromSelection, normalizeSelection, quoteLabel, type Selection } from "./engine";
 import { delta, range } from "./format";
 
 const config = buildFallbackSnapshot().configurator;
@@ -112,6 +112,31 @@ describe("motor de precios", () => {
     // Con un tipo que no es «Web + contenido», los reels no cuentan aunque lleguen marcados
     const q = computeQuote(config, { ...normalizeSelection(config, { tipo: "nueva", reels: "reels12" }) })!;
     expect(q.monthly).toEqual([0, 0]);
+  });
+
+  it("«Solo contenido»: presupuesta solo el rodaje, sin web", () => {
+    const q = computeQuote(config, { ...defaultSelection(config), tipo: "redes" })!;
+    expect(q.items.map((i) => [i.label, i.track])).toEqual([["Rodaje para redes", "RO"]]);
+    expect(q.one).toEqual([350, 500]);
+    expect(q.monthly).toEqual([0, 0]);
+    expect(q.weeks).toEqual([1, 2]);
+    expect(needFromSelection(config, { tipo: "redes" })).toBe("Audiovisual");
+    expect(needFromSelection(config, { tipo: "contenido" })).toBe("Las dos cosas");
+    expect(needFromSelection(config, { tipo: "nueva" })).toBe("Web");
+  });
+
+  it("«Solo contenido» suma reels, fotos y vídeo, e ignora todo lo que es de web", () => {
+    const web = { paginas: "landing", tienda: true, reservas: true, seo: true, idiomas: 3, mant: true };
+    const q = computeQuote(config, normalizeSelection(config, { tipo: "redes", reels: "reels8", fotos: true, video: true, ...web }))!;
+    expect(q.items.every((i) => i.track === "RO")).toBe(true);
+    expect(q.one).toEqual([350 + 250 + 600, 500 + 400 + 1100]);
+    expect(q.monthly).toEqual([480, 640]);
+    expect(q.weeks).toEqual([1, 3]); // vídeo corporativo: +0 / +1
+    expect(quoteLabel(q)).toBe("1.200 – 2.000 € + 480 – 640 €/mes");
+    // Entrega urgente sí aplica (+20 % y plazo ×0,6)
+    const u = computeQuote(config, { tipo: "redes", urgente: true })!;
+    expect(u.one).toEqual([400, 600]);
+    expect(u.weeks).toEqual([1, 2]);
   });
 
   it("formato de precios", () => {

@@ -122,7 +122,7 @@ export function buildFallbackSnapshot(): SiteSnapshot {
     stepper_max: o.stepper?.max ?? null,
     stepper_included: o.stepper?.included ?? null,
     is_default: o.isDefault ?? false,
-    requires: null,
+    requires: (o.requires as ConfigOption["requires"]) ?? null,
   }));
 
   return {

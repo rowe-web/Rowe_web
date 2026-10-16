@@ -14,7 +14,8 @@ import { range } from "./format";
  *  - Interruptor (toggle): una línea si está activo.
  *  - Contador (stepper): cuenta solo lo que pasa de `stepper_included`; «{n}» en la etiqueta = esa cantidad.
  *  - `price_mode`: once (pago único) · monthly (al mes) · percent_once (% sobre el pago único, al final).
- *  - `requires` (en la opción o su sección): solo cuenta si se cumple (p. ej. audiovisual ⇢ «Web + contenido»).
+ *  - `requires` (en la opción o su sección): solo cuenta si se cumple (p. ej. audiovisual ⇢ «Web + contenido»
+ *    o «Solo contenido»; tamaño, funciones y mantenimiento ⇢ un tipo con web).
  *  - Plazo: semanas de la base + incrementos; mínimo `min_weeks`; luego `weeks_factor` (urgente ×0,6, redondeo arriba).
  *  - Redondeo: pago único a `round_once` (50 €), mensual a `round_monthly` (10 €).
  */
@@ -264,5 +265,7 @@ export function quoteLabel(q: Quote): string {
 /** Lo que el cliente necesita según el tipo elegido (para precargar «Hablemos»). */
 export function needFromSelection(config: Config, sel: Selection): string {
   const base = config.options.find((o) => o.is_base && o.set_key && sel[o.set_key] === o.key);
-  return base?.components?.some((c) => c.track === "RO") ? "Las dos cosas" : "Web";
+  const tracks = new Set(base?.components?.length ? base.components.map((c) => c.track) : base ? [base.track] : []);
+  if (tracks.has("RO") && tracks.has("WE")) return "Las dos cosas";
+  return tracks.has("RO") ? "Audiovisual" : "Web";
 }
