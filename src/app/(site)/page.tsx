@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getSetting } from "@/lib/content/settings";
 import { loadSite } from "@/lib/content/site";
-import { sceneRegistry } from "@/scenes/registry";
+import { HomeScenes } from "@/scenes/HomeScenes";
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await loadSite();
@@ -19,12 +19,5 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export default async function Home() {
   const site = await loadSite();
-  return (
-    <main id="contenido">
-      {site.scenes.map((scene) => {
-        const Scene = sceneRegistry[scene.key];
-        return Scene ? <Scene key={scene.id} scene={scene} site={site} /> : null;
-      })}
-    </main>
-  );
+  return <HomeScenes site={site} />;
 }

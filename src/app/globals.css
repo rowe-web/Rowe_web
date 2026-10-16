@@ -338,3 +338,9 @@ html.reduced .rowe-preloader {
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
+
+/* Panel: esqueleto de carga */
+@keyframes skel {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}

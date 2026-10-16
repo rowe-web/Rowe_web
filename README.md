@@ -67,6 +67,43 @@ npm run dev
 
 Abre <http://localhost:3000>. La portada debe decir «Base de datos conectada · versión publicada 1 · 11 escenas…».
 
+## Panel de administración (`/admin`)
+
+Entra en `/admin` con tu email y contraseña. Todo lo que ves en la web se edita aquí: textos y escenas, proyectos, precios del configurador, medios, ajustes, páginas legales y menú.
+
+**Borrador y publicación.** Lo que guardas queda en **borrador**: la web pública no cambia hasta que un administrador pulsa **Publicar**. Antes puedes verlo en **Vista previa** (`/vista-previa`, solo para el equipo). Cada publicación crea una versión que se puede volver a publicar desde **Historial → Versiones publicadas**.
+
+**Roles.**
+
+| | Administrador | Editor |
+|---|---|---|
+| Textos, escenas, proyectos, medios | ✓ | ✓ |
+| Mensajes (estado y notas) | ✓ (y borrar) | ✓ |
+| Ajustes | todos | solo los marcados como editables (marca, menú y pie, formulario) |
+| Precios del configurador | ✓ | — |
+| Usuarios | ✓ | — |
+| Publicar | ✓ | — (guarda borradores) |
+
+Los permisos los exige la propia base de datos (RLS), no solo la interfaz.
+
+**Nunca se pierde lo que escribes.** Cada editor guarda una copia local mientras escribes (si se cierra el navegador, al volver ofrece «Recuperar»), avisa si sales con cambios sin guardar y tiene **Deshacer** en la barra superior. Además, **Historial** registra cada cambio con quién y cuándo, y **Restaurar** lo deshace (también recrea lo borrado).
+
+**Medios.** Imágenes (JPG, PNG, WEBP, AVIF), vídeo (MP4, WEBM) y audio (MP3), máx. 20 MB. Las imágenes se reducen a 2560 px y se pasan a WebP al subirlas; los vídeos generan su imagen de reserva. El plan gratuito de Supabase da 1 GB (la barra de Medios lo muestra). Si borras un archivo que la web publicada aún usa, el archivo se elimina del almacenamiento al publicar, para que la web nunca muestre una imagen rota.
+
+**Invitar a alguien.** Usuarios → **Invitar usuario** → email y rol. Si el email está configurado (ver abajo), le llega la invitación; si no, el panel te da un **enlace para copiar** y mandárselo por WhatsApp o email. Al abrirlo, crea su contraseña. **Quitar acceso** bloquea la cuenta y conserva su historial.
+
+**Ajustes de Supabase necesarios (una vez):**
+
+1. **Authentication → Sign In / Providers**: *Allow new users to sign up* **desactivado** (solo por invitación).
+2. **Authentication → URL Configuration**: *Site URL* = la dirección de la web (ahora `http://localhost:3000`; en la Fase 6, el dominio) y en *Redirect URLs* añade `http://localhost:3000/**` (y después `https://tu-dominio/**`). Lo usa «¿Olvidaste tu contraseña?».
+3. Los emails de acceso que envía Supabase por defecto tienen un límite muy bajo (unos pocos por hora). Las invitaciones del panel no dependen de ellos (usan el email de la web o el enlace copiable).
+
+## Copias de seguridad
+
+- **Plan gratuito de Supabase:** no hay copias descargables. Haz una copia con `npm run db:backup` (todas las tablas en JSON en `backups/`) o `npm run db:backup -- --media` (además, todos los archivos). Recomendado: una vez al mes y antes de cambios grandes. La carpeta `backups/` no se sube a git porque contiene datos de clientes: guárdala en un sitio privado.
+- **Plan Pro de Supabase (25 $/mes):** copias diarias automáticas (7 días) que se restauran con un clic en **Database → Backups**. Con *Point-in-Time Recovery* (de pago aparte) se vuelve a cualquier minuto.
+- Además, cada versión publicada se guarda completa en la tabla `releases`: desde **Historial** se puede volver a publicar cualquiera.
+
 ## Email de avisos (nuevo lead)
 
 Cada solicitud se guarda **siempre** en la base de datos. Después se envía un aviso por email al equipo (ajuste «notifications»: por defecto `rowe.web.agency@gmail.com` y `rowe.web.contacto@gmail.com`). Si el envío falla, queda registrado en la cola (`email_outbox`) con el motivo y se reintenta (1 min, 5 min, 30 min, 2 h, 12 h).
@@ -91,9 +128,10 @@ Limitaciones: unos 500 destinatarios al día, el remitente es una dirección @gm
 | `npm run build` / `npm start` | Build de producción y servidor de producción |
 | `npm run check` | Lint + tipos + tests + build (antes de cada entrega) |
 | `npm test` | Tests (incluye base de datos real en memoria: permisos, publicación, historial) |
-| `npm run test:e2e` | Pruebas en navegador real: scroll, navegación, configurador, formulario, leads, PDF, cookies (construye y arranca la web de producción; crea y borra datos de prueba en Supabase) |
+| `npm run test:e2e` | Pruebas en navegador real: scroll, navegación, configurador, formulario, leads, PDF, cookies y panel (construye y arranca la web de producción; crea y borra sus propios usuarios y datos de prueba en Supabase) |
 | `npm run db:migrate` | Aplica migraciones nuevas |
 | `npm run db:seed` | Carga el contenido que falte y asegura el admin |
+| `npm run db:backup` | Copia de seguridad de la base de datos (`-- --media`: también los archivos) |
 | `npm run db:seed -- --reset-content` | Vuelve a cargar TODO el contenido del diseño (pide confirmación; no toca mensajes ni usuarios) |
 | `npm run brand` | Regenera favicon, iconos e imagen para compartir desde los logos de `design/assets` |
 
@@ -111,7 +149,8 @@ docs/                   Documentación (base de datos…)
 public/brand/           Logos oficiales y símbolo
 scripts/                gen-brand (iconos/OG) · db/ (migraciones y seed)
 supabase/migrations/    SQL versionado: tablas, funciones, RLS, storage
-src/app/                Rutas (web, /sistema; panel en la Fase 4)
+src/app/                Rutas: web pública, /admin (panel), /vista-previa, /api, /sistema
+src/admin/              Panel: acciones del servidor, pantallas, editor (deshacer/copia local), medios
 src/components/         brand/ (Logo) · ui/ (Button, RecDot, Grain, CornerMarks, RichText)
 src/content/seed-data.ts  Contenido inicial del diseño
 src/lib/                site (URL, indexación) · content (versión publicada) · timecode · rich-text

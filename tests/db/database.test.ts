@@ -231,6 +231,90 @@ describe("administrador", () => {
   });
 });
 
+describe("panel: estado de publicación, estadísticas y usuarios", () => {
+  it("detecta cambios sin publicar y deja de hacerlo al publicar", async () => {
+    type Status = { dirty: boolean; version: number; last_change: string };
+    const st = async () => (await db.as(adminId, () => db.query<{ s: Status }>("select public.draft_status() as s")))[0].s;
+    await db.as(adminId, () => db.query("select public.publish_release('limpio')"));
+    expect((await st()).dirty).toBe(false);
+    await db.as(editorId, () => db.query("update public.scenes set body = 'Borrador' where key = 'servicios'"));
+    const s = await st();
+    expect(s.dirty).toBe(true);
+    expect(s.last_change).toBe("Editó «Servicios»");
+    await db.as(adminId, () => db.query("select public.publish_release('ok')"));
+    expect((await st()).dirty).toBe(false);
+  });
+
+  it("estadísticas del periodo con embudo y origen", async () => {
+    await db.exec(`
+      insert into public.events (type, path, referrer_source, session_hash, created_at) values
+        ('pageview', '/', 'Instagram', 's1', now() - interval '2 hours'),
+        ('pageview', '/web', 'Interno', 's1', now() - interval '1 hour'),
+        ('config_open', '/', 'Interno', 's1', now() - interval '1 hour'),
+        ('lead', '/', 'Interno', 's1', now() - interval '50 minutes'),
+        ('pageview', '/', 'Google', 's2', now() - interval '1 day'),
+        ('video_play', '/', 'Google', 's2', now() - interval '1 day'),
+        ('pageview', '/', 'Directo', 's3', now() - interval '10 days');`);
+    const [{ s }] = await db.as(editorId, () => db.query<{ s: Record<string, unknown> }>("select public.admin_stats(7) as s"));
+    expect(s).toMatchObject({ visits: 3, uniques: 2, visits_prev: 1, lead_sessions: 1, unit: "day" });
+    expect(s.funnel).toEqual({ visits: 2, video: 1, config: 1, lead: 1 });
+    expect((s.sources as { label: string }[]).map((x) => x.label).sort()).toEqual(["Google", "Instagram"]);
+    expect((s.bars as unknown[]).length).toBe(8);
+    expect(s.avg_seconds).toBe(2100); // media de s1 (1 h 10 min) y s2 (dos eventos en el mismo instante: 0 s)
+    await expect(db.as(null, () => db.query("select public.admin_stats(7)"))).rejects.toThrow(/permission denied/);
+  });
+
+  it("lista de usuarios solo para administradores", async () => {
+    const rows = await db.as(adminId, () => db.query<{ email: string; role: string }>("select * from public.admin_users()"));
+    expect(rows.map((r) => r.email)).toContain("rowe.web.agency@gmail.com");
+    await expect(db.as(editorId, () => db.query("select * from public.admin_users()"))).rejects.toThrow(/Solo un administrador/);
+  });
+});
+
+describe("historial: restaurar cambios", () => {
+  const lastLog = async (table: string) =>
+    (await db.query<{ id: number; action: string; summary: string }>("select id, action, summary from public.audit_log where table_name = $1 order by id desc limit 1", [table]))[0];
+
+  it("deshace una edición y queda como «Restauró»", async () => {
+    await db.as(editorId, () => db.query("update public.scenes set title = 'Titular temporal' where key = 'estudio'"));
+    const edit = await lastLog("scenes");
+    await db.as(editorId, () => db.query("select public.restore_change($1)", [edit.id]));
+    const [{ title }] = await db.query<{ title: string }>("select title from public.scenes where key = 'estudio'");
+    expect(title).toBe(data.scenes.find((x) => x.key === "estudio")!.title);
+    const log = await lastLog("scenes");
+    expect(log.action).toBe("restore");
+    expect(log.summary).toMatch(/^Restauró/);
+  });
+
+  it("recrea lo borrado y elimina lo creado", async () => {
+    const [p] = await db.as(editorId, () =>
+      db.query<{ id: string }>("insert into public.projects (slug, title) values ('temporal', 'Temporal') returning id"),
+    );
+    const created = await lastLog("projects");
+    await db.as(editorId, () => db.query("delete from public.projects where id = $1", [p.id]));
+    const deleted = await lastLog("projects");
+    await db.as(editorId, () => db.query("select public.restore_change($1)", [deleted.id]));
+    expect(await db.query("select 1 from public.projects where id = $1", [p.id])).toHaveLength(1);
+    await db.as(editorId, () => db.query("select public.restore_change($1)", [created.id]));
+    expect(await db.query("select 1 from public.projects where id = $1", [p.id])).toHaveLength(0);
+  });
+
+  it("respeta los permisos: un editor no restaura precios", async () => {
+    await db.as(adminId, () => db.query("update public.config_options set price_max = price_max + 10 where key = 'seo'"));
+    const change = await lastLog("config_options");
+    await expect(db.as(editorId, () => db.query("select public.restore_change($1)", [change.id]))).rejects.toThrow(/ya no existe|permission|Sin permiso/);
+    await db.as(adminId, () => db.query("select public.restore_change($1)", [change.id]));
+    const [{ price_max }] = await db.query<{ price_max: number }>("select price_max from public.config_options where key = 'seo'");
+    expect(price_max).toBe(data.configOptions.find((o) => o.key === "seo")!.priceMax);
+  });
+
+  it("nadie sin rol puede usarlo", async () => {
+    const change = await lastLog("scenes");
+    const outsider = await db.createUser("sin-rol@example.com", null);
+    await expect(db.as(outsider, () => db.query("select public.restore_change($1)", [change.id]))).rejects.toThrow(/Sin permiso/);
+  });
+});
+
 describe("servidor (service_role)", () => {
   it("numera los presupuestos ROWE-AAAA-NNNN", async () => {
     const [q] = await db.query<{ number: string }>(

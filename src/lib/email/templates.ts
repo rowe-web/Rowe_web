@@ -77,3 +77,19 @@ ${rows.map(([k, v]) => `<tr><td style="padding:9px 0;border-top:1px solid #ebe7e
     attachments: logo ? [{ filename: "rowe.png", content: logo, cid: "rowe-logo" }] : undefined,
   };
 }
+
+/** Invitación al panel (o enlace para volver a crear la contraseña). */
+export async function inviteEmail(to: string, link: string, role: "admin" | "editor", invitedBy: string): Promise<Mail> {
+  const roleText = role === "admin" ? "administrador" : "editor";
+  const html = `<!doctype html><html lang="es"><body style="margin:0;background:#EDEAE4;padding:24px 12px;font-family:Helvetica,Arial,sans-serif;color:#0A0A0A">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #d9d5ce">
+<tr><td style="padding:28px 32px 8px"><img src="cid:rowe-logo" alt="ROWE" height="22" style="display:block;height:22px"></td></tr>
+<tr><td style="padding:14px 32px 6px;font:400 30px/1.1 Georgia,serif">Te damos acceso al panel de ROWE</td></tr>
+<tr><td style="padding:8px 32px 0;font:15px/1.6 Helvetica,Arial,sans-serif">${esc(invitedBy)} te ha invitado como <strong>${roleText}</strong>. Pulsa el botón para crear tu contraseña.</td></tr>
+<tr><td style="padding:26px 32px 12px"><a href="${esc(link)}" style="display:inline-block;background:#0A0A0A;color:#EDEAE4;text-decoration:none;padding:13px 22px;border-radius:999px;font:500 14px Helvetica,Arial,sans-serif">Crear mi contraseña</a></td></tr>
+<tr><td style="padding:0 32px 32px;font:12px/1.6 Helvetica,Arial,sans-serif;color:#6B6862">El enlace caduca pronto y solo sirve una vez. Si no esperabas este email, ignóralo.</td></tr>
+</table></body></html>`;
+  const text = `${invitedBy} te ha invitado al panel de ROWE como ${roleText}.\n\nCrea tu contraseña aquí:\n${link}\n\nEl enlace caduca pronto y solo sirve una vez.`;
+  const logo = await readFile(path.join(process.cwd(), "src/assets/brand/rowe-logo-negro.png")).catch(() => null);
+  return { to: [to], subject: "Tu acceso al panel de ROWE", html, text, attachments: logo ? [{ filename: "rowe.png", content: logo, cid: "rowe-logo" }] : undefined };
+}

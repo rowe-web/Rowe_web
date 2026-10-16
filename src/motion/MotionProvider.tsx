@@ -2,7 +2,7 @@
 
 import Lenis from "lenis";
 import { usePathname } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, type ReactNode } from "react";
+import { createContext, Suspense, useCallback, useContext, useEffect, useMemo, useRef, type ReactNode } from "react";
 import { timecodeFromScroll } from "@/lib/timecode";
 import { gsap, ScrollTrigger } from "./gsap";
 import { prefersReducedMotion } from "./media";
@@ -45,7 +45,6 @@ export function MotionProvider({ children }: { children: ReactNode }) {
   const listeners = useRef(new Set<(y: number, d: number) => void>());
   const tcNodes = useRef<HTMLElement[]>([]);
   const lastTc = useRef("");
-  const pathname = usePathname();
 
   // --- Arranque (una sola vez) ------------------------------------------------
   useEffect(() => {
@@ -184,7 +183,7 @@ export function MotionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // --- Cambio de ruta: arriba del todo (o al ancla), timecodes y refresco ---------
-  useEffect(() => {
+  const onRouteChange = useCallback(() => {
     collectTimecodes();
     const hash = window.location.hash;
     const id = requestAnimationFrame(() => {
@@ -199,8 +198,7 @@ export function MotionProvider({ children }: { children: ReactNode }) {
       writeTimecode(window.scrollY);
     });
     return () => cancelAnimationFrame(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  }, [refresh, scrollTo]);
 
   // --- Anclas internas: «#presupuesto», «/#hablemos» (estando en la home) ---------
   useEffect(() => {
@@ -225,5 +223,20 @@ export function MotionProvider({ children }: { children: ReactNode }) {
   }, [scrollTo]);
 
   const api = useMemo<MotionApi>(() => ({ lock, unlock, scrollTo, onScroll, refresh }), [lock, unlock, scrollTo, onScroll, refresh]);
-  return <MotionContext.Provider value={api}>{children}</MotionContext.Provider>;
+  return (
+    <MotionContext.Provider value={api}>
+      {/* La ruta solo se conoce al pedir la página: fuera del «shell» estático (Suspense) */}
+      <Suspense fallback={null}>
+        <RouteWatcher onChange={onRouteChange} />
+      </Suspense>
+      {children}
+    </MotionContext.Provider>
+  );
+}
+
+function RouteWatcher({ onChange }: { onChange: () => () => void }) {
+  const pathname = usePathname();
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- solo al cambiar de ruta
+  useEffect(() => onChange(), [pathname]);
+  return null;
 }

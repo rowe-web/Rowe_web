@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { HablemosOverlay } from "@/features/hablemos/HablemosOverlay";
 import type { HablemosSettings } from "@/features/hablemos/settings";
 import type { BrandSettings, ContactSettings, CookieSettings, NavigationSettings } from "@/lib/content/settings";
@@ -171,7 +171,9 @@ export function SiteChrome({ nav, contact, brand, hablemosSettings, cookies, amb
       <Cursor />
       <Toaster />
       <CookieBanner settings={cookies} />
-      <Analytics />
+      <Suspense fallback={null}>
+        <Analytics />
+      </Suspense>
     </>
   );
 }

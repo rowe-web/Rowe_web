@@ -46,6 +46,8 @@ const sentOnce = new Set<string>();
 /** Registra un evento. `once`: como mucho una vez por sesión de página. */
 export function track(type: EventType, meta: Record<string, unknown> = {}, { once = false } = {}) {
   if (typeof window === "undefined" || getConsent() !== "granted") return;
+  // La vista previa del panel no cuenta como visita
+  if (location.pathname.startsWith("/vista-previa") || location.pathname.startsWith("/admin")) return;
   const key = `${type}:${location.pathname}`;
   if (once) {
     if (sentOnce.has(key)) return;
