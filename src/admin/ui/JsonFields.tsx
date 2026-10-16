@@ -29,7 +29,7 @@ const LABELS: Record<string, string> = {
   not_found_title: "Titular de la página 404", not_found_body: "Texto de la página 404", enabled: "Activado", accept: "Botón aceptar",
   reject: "Botón rechazar", configure: "Botón configurar", menu_label: "Texto «Menú»", close_label: "Texto «Cerrar»", cta_label: "Texto del botón",
   cta_href: "Enlace del botón", menu_kicker: "Antetítulo del menú", footer_title: "Titular del pie", footer_end: "Texto final del pie",
-  legal: "Enlaces legales", preloader_label: "Rótulo del preloader", preloader_meta: "Metadatos del preloader", preloader_steps: "Líneas de código del preloader", lead_recipients: "Destinatarios de los avisos",
+  legal: "Enlaces legales", preloader_label: "Rótulo del preloader", preloader_meta: "Metadatos del preloader", preloader_steps: "Líneas de código del preloader", summary: "Resumen al pasar por encima", lead_recipients: "Destinatarios de los avisos",
   steps_: "Pasos", needs: "Opciones «¿Qué necesitas?»", sectors: "Sectores", budgets: "Rangos de presupuesto", fields: "Campos",
   errors: "Mensajes de error", next: "Botón siguiente", back: "Botón atrás", submit: "Botón enviar", loading: "Texto enviando", retry: "Botón reintentar",
   success_meta: "Rótulo de éxito", success_title: "Titular de éxito", success_body: "Texto de éxito", success_reset: "Botón «enviar otra»",
@@ -52,7 +52,7 @@ const LABELS: Record<string, string> = {
   owner: "Titular (nombre y apellidos o razón social)", nif: "NIF / CIF", hosting: "Proveedor de alojamiento web", updated: "Última actualización",
 };
 
-const LONG = new Set(["a", "body", "text", "lead", "description", "note", "message_placeholder", "success_body", "send_body", "not_found_body", "overlay_lead", "disclaimer", "includes", "includes_content"]);
+const LONG = new Set(["a", "body", "text", "lead", "description", "note", "message_placeholder", "success_body", "send_body", "not_found_body", "overlay_lead", "disclaimer", "includes", "includes_content", "summary"]);
 
 export function humanize(key: string) {
   return LABELS[key] ?? key.replace(/_media_id$/, "").replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());

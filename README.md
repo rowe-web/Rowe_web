@@ -149,6 +149,9 @@ Limitaciones: unos 500 destinatarios al día, el remitente es una dirección @gm
 - **Hero · Fig. 01**: «Proceso ROWE · web, contenido y tráfico». Mientras no subas el vídeo del proceso (escena Hero → *Vídeo del proceso 4:5*), se ve una animación en bucle de tres planos (la web se construye → contenido vertical grabando → las visitas suben). La foto 4:5 hace de póster del vídeo.
 - **Escena 03 · Desarrollo web**: selector **Escritorio / Móvil**. Las dos vistas se desplazan con el mismo progreso de scroll, así que cambiar de vista no salta. Se puede subir una grabación vertical de la web en móvil (*Grabación de la web en móvil*).
 - **Configurador · «Solo contenido»**: tipo de proyecto para presupuestar solo el rodaje para redes. Bloquea tamaño, funciones y mantenimiento (aviso «Sin web, de momento» con botón «Añadir web») y abre el bloque audiovisual. Precios y reglas en Precios del panel; el servidor recalcula igual.
+- **Punto REC ↔ `</>`**: el punto rojo de la cabecera, del pie y de «Hablemos» alterna cada 6 s con el símbolo web (`RecDot morph`). Con movimiento reducido se queda el punto quieto.
+- **Logo**: siempre lleva al inicio. En la home sube hasta el Hero con el scroll suave y quita el ancla de la dirección; desde otra página entra con la cortinilla.
+- **Menú**: al pasar por cada elemento, el recuadro de la derecha muestra una vista previa animada de esa sección y su resumen. El resumen se edita en Ajustes → Menú y pie (*Resumen al pasar por encima*). La animación se elige por el enlace (`/`, `/web`, `/audiovisual`, `/proyectos`, `#presupuesto`, `#hablemos`); un enlace distinto muestra el recuadro de siempre.
 
 ## Dominio e indexación
 

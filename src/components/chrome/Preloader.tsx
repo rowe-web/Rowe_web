@@ -55,7 +55,9 @@ export function Preloader({ label, meta, steps = [], progress = 0, preview = fal
         <span className="flex items-center gap-[0.75em] font-mono text-[clamp(17px,2vw,22px)] leading-none text-muted" aria-hidden="true">
           <span className={styles.open}>&lt;</span>
           <Logo height={20} href={null} interactive={false} rec={false} />
-          <span className={styles.close}>/&gt;</span>
+          <span className={styles.close}>
+            /<span className="ml-[0.2em]">&gt;</span>
+          </span>
           <span className={`${styles.caret} -ml-[0.45em] h-[1.05em] w-[0.5em] bg-bone`} />
         </span>
 

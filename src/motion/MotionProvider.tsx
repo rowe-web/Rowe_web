@@ -201,6 +201,8 @@ export function MotionProvider({ children }: { children: ReactNode }) {
   }, [refresh, scrollTo]);
 
   // --- Anclas internas: «#presupuesto», «/#hablemos» (estando en la home) ---------
+  // Un enlace a la propia página sin ancla (el logo, «Inicio» estando en la home) vuelve
+  // arriba con el mismo scroll suave y quita el ancla de la dirección.
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -208,15 +210,15 @@ export function MotionProvider({ children }: { children: ReactNode }) {
       if (!a || a.target === "_blank") return;
       const href = a.getAttribute("href") ?? "";
       const url = new URL(href, window.location.href);
-      if (url.origin !== window.location.origin || url.pathname !== window.location.pathname || !url.hash) return;
-      const el = document.querySelector<HTMLElement>(url.hash);
-      if (!el) return;
+      if (url.origin !== window.location.origin || url.pathname !== window.location.pathname || url.search !== window.location.search) return;
+      const el = url.hash ? document.querySelector<HTMLElement>(url.hash) : 0;
+      if (el === null) return;
       // Fase de captura: antes que <Link> (que saltaría de golpe al ancla)
       e.preventDefault();
       e.stopPropagation();
       window.dispatchEvent(new Event("rowe:navigate"));
       scrollTo(el);
-      history.replaceState(history.state, "", url.hash);
+      history.replaceState(history.state, "", url.hash || url.pathname + url.search);
     };
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);

@@ -42,7 +42,8 @@ export interface NavigationSettings {
   cta_label: string;
   cta_href: string;
   menu_kicker: string;
-  items: { label: string; href: string; caption: string }[];
+  /** Elementos del menú. `summary`: resumen al pasar por encima (la animación depende del enlace). */
+  items: { label: string; href: string; caption: string; summary?: string }[];
   footer_title: string;
   footer_end: string;
   legal: { label: string; href: string }[];

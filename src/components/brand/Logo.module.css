@@ -6,7 +6,8 @@
 .root {
   display: inline-flex;
   align-items: center;
-  gap: calc(var(--logo-h) * 0.62);
+  /* El REC ↔ </> ocupa 1,8 × su alto: el hueco compensa para que el punto quede donde estaba */
+  gap: calc(var(--logo-h) * 0.4);
 }
 
 .mark {

@@ -35,7 +35,7 @@ export function HablemosScene({ site }: SceneProps) {
         <SceneHeader kicker={s.kicker} />
         <div className="mt-[9vh] flex flex-wrap items-start gap-[clamp(40px,6vw,110px)]">
           <div className="flex min-w-0 flex-[1_1_420px] flex-col gap-[34px]">
-            <RecDot size={56} className="!h-[clamp(44px,5vw,72px)] !w-[clamp(44px,5vw,72px)]" />
+            <RecDot size="clamp(44px,5vw,72px)" morph="start" />
             <h2 data-reveal="mask" className="headline-serif text-[clamp(56px,7.5vw,128px)] leading-[0.92]">
               <RichText text={s.title} />
             </h2>

@@ -378,6 +378,21 @@ describe("páginas internas y direcciones de proyectos (Fase 5)", () => {
     expect(scenes.web.screen_caption).toBe("Mi pie del visor");
     expect(scenes.web.view_mobile).toBe("Móvil");
   });
+
+  it("menú: añade el resumen de cada sección sin pisar uno editado", async () => {
+    await db.exec(`
+      update public.site_settings set value = jsonb_set(value, '{items}', (
+        select jsonb_agg(case when it->>'href' = '/web' then it || '{"summary":"Mi resumen"}' else it - 'summary' end)
+        from jsonb_array_elements(value->'items') it
+      )) where key = 'navigation';
+    `);
+    await seedContent(db, { log: () => {} });
+    const [{ value }] = await db.query<{ value: { items: { href: string; summary: string }[] } }>("select value from public.site_settings where key = 'navigation'");
+    const byHref = Object.fromEntries(value.items.map((i) => [i.href, i.summary]));
+    expect(byHref["/web"]).toBe("Mi resumen");
+    expect(byHref["/proyectos"]).toMatch(/Trabajos recientes/);
+    expect(byHref["/#hablemos"]).toMatch(/24 h/);
+  });
 });
 
 describe("servidor (service_role)", () => {

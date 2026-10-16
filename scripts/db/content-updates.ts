@@ -11,6 +11,16 @@ type Obj = Record<string, unknown>;
 const OLD_HABLEMOS = "¿Grabamos tu próxima *escena?*";
 const NEW_HABLEMOS = "¿Empezamos tu próximo *proyecto?*";
 
+/** Resumen de cada elemento del menú, por enlace (los demás quedan vacíos para rellenar en el panel). */
+const MENU_SUMMARIES: Record<string, string> = {
+  "/": "El showreel y el método ROWE de un vistazo: web, contenido y tráfico trabajando juntos.",
+  "/web": "Webs a medida, rápidas y pensadas para convertir: diseño, desarrollo, SEO y mantenimiento.",
+  "/audiovisual": "Guion, rodaje y edición: reels verticales, vídeo corporativo y fotografía para tu marca.",
+  "/proyectos": "Trabajos recientes de web y audiovisual: el reto, la solución y lo que consiguieron.",
+  "/#presupuesto": "Elige lo que necesitas y ve al momento un precio orientativo, sin compromiso.",
+  "/#hablemos": "Cuéntanos tu idea por formulario, WhatsApp o email. Te respondemos en menos de 24 h.",
+};
+
 /** Cambia `obj[key]` de `from` a `to` solo si sigue valiendo `from`. */
 function swap(obj: Obj, key: string, from: unknown, to: unknown): boolean {
   if (JSON.stringify(obj[key]) !== JSON.stringify(from)) return false;
@@ -103,6 +113,18 @@ export async function applyContentUpdates(db: Db, log: (msg: string) => void): P
       return changed;
     }),
     "Menú, pie y preloader: textos mixtos web / audiovisual",
+  );
+
+  // --- Menú: resumen de cada sección al pasar por encima --------------------------
+  done(
+    await updateJson(db, "site_settings", "value", "key", "navigation", (v) => {
+      let changed = false;
+      for (const it of (Array.isArray(v.items) ? v.items : []) as Obj[]) {
+        changed = add(it, "summary", MENU_SUMMARIES[String(it.href)] ?? "") || changed;
+      }
+      return changed;
+    }),
+    "Menú: resumen de cada sección",
   );
 
   // --- Hero: Fig. 01 pasa a ser el vídeo del proceso -----------------------------

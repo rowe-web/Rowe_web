@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { MediaFrame } from "@/components/scene/MediaFrame";
+import { MenuPreview, MenuSummary, menuPreviewKind } from "./MenuPreview";
 import { Timecode } from "@/components/scene/Timecode";
 import type { BrandSettings, ContactSettings, NavigationSettings } from "@/lib/content/settings";
 import { instagramHref, whatsappHref } from "@/lib/content/settings";
@@ -24,13 +25,16 @@ interface SiteMenuProps {
 /**
  * Menú a pantalla completa — diseño nuevo siguiendo el sistema.
  * «Índice de escenas» numerado en tipografía grande; al pasar por un elemento se apagan
- * los demás y cambia la figura de la derecha. Abre con el corte desde el centro del
+ * los demás y la figura de la derecha pasa a una vista previa animada de esa sección, con
+ * su resumen (src/components/chrome/MenuPreview). Abre con el corte desde el centro del
  * overlay del diseño (clip-path) y bloquea el scroll mientras está abierto.
  */
 export function SiteMenu({ nav, contact, brand, open, onClose, onCloseAnimated, preview = false }: SiteMenuProps) {
   const [hover, setHover] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const current = hover ?? 0;
+  const item = nav.items[current];
+  const kind = item ? menuPreviewKind(item.href) : null;
 
   const copy = async () => {
     try {
@@ -91,8 +95,16 @@ export function SiteMenu({ nav, contact, brand, open, onClose, onCloseAnimated, 
 
         <aside className="flex flex-col gap-10">
           <figure className="hidden lg:block">
-            <MediaFrame aspect="4 / 5" marks={16} placeholder={`[ ${nav.items[current]?.caption ?? ""} ]`} sizes="30vw" />
-            <figcaption className="mt-2.5 label-mono text-[10px] text-muted">{nav.items[current]?.caption}</figcaption>
+            {/* Se monta de nuevo al cambiar de elemento (y al abrir): la animación empieza desde el principio */}
+            {open && kind ? (
+              <MenuPreview key={`${current}-${kind}`} kind={kind} />
+            ) : (
+              <MediaFrame aspect="4 / 5" marks={16} placeholder={`[ ${item?.caption ?? ""} ]`} sizes="30vw" />
+            )}
+            <figcaption className="mt-2.5 flex flex-col gap-3">
+              <span className="label-mono text-[10px] text-muted">{item?.caption}</span>
+              {open && item?.summary ? <MenuSummary key={current} text={item.summary} className="max-w-[34ch] text-[17px] leading-snug text-bone" /> : null}
+            </figcaption>
           </figure>
 
           <div className="flex flex-col gap-2">

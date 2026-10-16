@@ -50,7 +50,7 @@ export function Logo({ height = 18, tone = "light", href = "/", interactive = tr
           </>
         )}
       </span>
-      {rec && <RecDot size={Math.max(6, Math.round(height * 0.42))} />}
+      {rec && <RecDot size={Math.max(6, Math.round(height * 0.42))} morph />}
     </span>
   );
 
