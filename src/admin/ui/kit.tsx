@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from "react";
+import { cloneElement, forwardRef, isValidElement, useId, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from "react";
 
 /* Kit visual del panel (ROWE Admin.dc.html): superficies #121212, bordes 8 px,
    campos #1A1A1A con radio 6 px, botones píldora, etiquetas monoespaciadas. */
@@ -64,9 +64,13 @@ interface FieldProps {
 
 export function Field({ label, htmlFor, hint, error, count, max, children, className = "" }: FieldProps) {
   const over = max !== undefined && count !== undefined && count > max;
+  // Sin htmlFor, la etiqueta se asocia sola al campo (lectores de pantalla y clic en la etiqueta)
+  const autoId = useId();
+  const child = !htmlFor && isValidElement<{ id?: string }>(children) && !children.props.id ? cloneElement(children, { id: autoId }) : children;
+  const forId = htmlFor ?? (child !== children ? autoId : undefined);
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
-      <label htmlFor={htmlFor} className={`flex justify-between gap-3 ${mono} text-muted`}>
+      <label htmlFor={forId} className={`flex justify-between gap-3 ${mono} text-muted`}>
         <span>{label}</span>
         {max !== undefined && (
           <span className={over ? "text-rec" : ""}>
@@ -74,7 +78,7 @@ export function Field({ label, htmlFor, hint, error, count, max, children, class
           </span>
         )}
       </label>
-      {children}
+      {child}
       {error ? <span className="text-[12px] text-rec">{error}</span> : hint ? <span className="text-[12px] text-muted">{hint}</span> : null}
     </div>
   );

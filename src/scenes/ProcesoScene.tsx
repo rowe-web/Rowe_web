@@ -38,7 +38,7 @@ export function ProcesoScene({ scene, previewHead }: SceneProps<{ steps?: Proces
 
       {/* Escritorio: línea de tiempo horizontal */}
       <div data-proceso-timeline className="relative mt-[10vh] hidden md:block">
-        <div className="flex h-7 border-b border-line label-mono text-[9px] text-ghost">
+        <div className="flex h-7 border-b border-line label-mono text-[9px] text-muted">
           {steps.map((s) => (
             <span key={s.key} className="border-l border-line pl-1.5 leading-7" style={{ flexGrow: s.size, flexBasis: 0 }}>
               {s.duration}

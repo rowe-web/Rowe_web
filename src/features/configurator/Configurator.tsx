@@ -451,7 +451,7 @@ function Monitor({ quote, settings, narrow, onSend, onPdf, ref }: MonitorProps) 
                       {c.label}
                     </span>
                   ))}
-                  <span className="flex items-center overflow-hidden whitespace-nowrap pl-1.5 label-mono text-[9px] text-ghost" style={{ flexGrow: clips.scale - filled, flexBasis: 0 }}>
+                  <span className="flex items-center overflow-hidden whitespace-nowrap pl-1.5 label-mono text-[9px] text-muted" style={{ flexGrow: clips.scale - filled, flexBasis: 0 }}>
                     {list.length ? "" : t === "RO" && quote ? settings.add_content_hint : settings.empty_track}
                   </span>
                 </div>

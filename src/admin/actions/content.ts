@@ -71,6 +71,7 @@ const SETTING_RULES: Record<string, z.ZodType> = {
   notifications: z.object({ lead_recipients: z.array(email).min(1, "Pon al menos un email para recibir los avisos.").max(10) }).passthrough(),
   contact: z.object({ email_contact: email.or(z.literal("")), email_admin: email.or(z.literal("")), email_social: email.or(z.literal("")) }).partial().passthrough(),
   seo: z.object({ title: z.string().max(120), description: z.string().max(320) }).partial().passthrough(),
+  legal: z.object({ email: email.or(z.literal("")) }).partial().passthrough(),
 };
 
 /** Ajuste por clave (contacto, SEO, marca, formulario…). RLS decide si un editor puede. */

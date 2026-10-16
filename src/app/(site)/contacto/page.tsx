@@ -1,19 +1,13 @@
 import type { Metadata } from "next";
-import { ProvisionalPage } from "@/components/scene/ProvisionalPage";
+import { InternalPage } from "@/components/page/InternalPage";
 import { loadSite } from "@/lib/content/site";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const site = await loadSite();
-  const page = site.pages["contacto"];
-  return {
-    title: { absolute: page?.seo_title || "Contacto — ROWE" },
-    description: page?.seo_description || undefined,
-    alternates: { canonical: "/contacto" },
-  };
+  return pageMetadata(await loadSite(), "contacto", "Contacto — ROWE");
 }
 
-/** Provisional (Fase 2). Diseño definitivo en la Fase 5. */
+/** /contacto: secciones editables en Ajustes → Páginas y legal. */
 export default async function Page() {
-  const site = await loadSite();
-  return <ProvisionalPage site={site} slug="contacto" scenes={["hablemos"]} />;
+  return <InternalPage site={await loadSite()} slug="contacto" />;
 }

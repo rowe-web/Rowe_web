@@ -95,7 +95,7 @@ export function EstudioScene({ scene, site, previewLit }: SceneProps<EstudioData
             </div>
           )}
 
-          <p className="pt-3 label-mono text-[10px] leading-[1.7] text-ghost max-lg:hidden">
+          <p className="pt-3 label-mono text-[10px] leading-[1.7] text-muted max-lg:hidden">
             {ro && <span className="block">Hover «{ro.word}»: {ro.hover.toLowerCase()}</span>}
             {we && <span className="block">Hover «{we.word}»: {we.hover.toLowerCase()}</span>}
           </p>

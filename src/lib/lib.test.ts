@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { parseRich, plainText } from "./rich-text";
 import { formatTimecode, timecodeFromScroll } from "./timecode";
+import { inCategory, legalBlocks, pageBlocks } from "./content/blocks";
+import { fillLegal } from "./content/settings";
 
 describe("parseRich", () => {
   it("convierte *texto* en cursiva y \\n en salto de línea", () => {
@@ -35,5 +37,30 @@ describe("timecode", () => {
   it("avanza con el scroll (1 fotograma cada 3 px) y nunca es negativo", () => {
     expect(timecodeFromScroll(75)).toBe("00:00:01:00");
     expect(timecodeFromScroll(-40)).toBe("00:00:00:00");
+  });
+});
+
+describe("páginas internas: secciones y textos legales", () => {
+  it("completa las secciones con su plantilla y descarta tipos desconocidos", () => {
+    const blocks = pageBlocks([{ type: "preguntas", title: "FAQ" }, { type: "inventado" }, null, { title: "Legal", body: "x" }]);
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0]).toMatchObject({ type: "preguntas", title: "FAQ", kicker: "", items: [{ q: "", a: "" }] });
+  });
+
+  it("separa los apartados legales de las secciones", () => {
+    expect(legalBlocks([{ title: "Uno", body: "Texto" }, { type: "cierre", body: "no" }])).toEqual([{ title: "Uno", body: "Texto" }]);
+  });
+
+  it("«Web + Audiovisual» entra en los dos filtros", () => {
+    expect(inCategory("Web + Audiovisual", "Web")).toBe(true);
+    expect(inCategory("Web + Audiovisual", "Audiovisual")).toBe(true);
+    expect(inCategory("Web", "Audiovisual")).toBe(false);
+    expect(inCategory("Audiovisual", "")).toBe(true);
+  });
+
+  it("rellena las marcas legales y deja a la vista las que faltan", () => {
+    const legal = { owner: "ROWE SL", nif: "B000", address: "", email: "a@b.es", hosting: "Vercel", updated: "hoy" };
+    const out = fillLegal("{titular} ({nif}) · {domicilio} · {dominio} · {web} · {raro}", legal, { url: "https://ejemplo.es", host: "ejemplo.es" });
+    expect(out).toBe("ROWE SL (B000) · {domicilio} · ejemplo.es · https://ejemplo.es · {raro}");
   });
 });

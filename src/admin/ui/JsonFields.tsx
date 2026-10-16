@@ -44,9 +44,13 @@ const LABELS: Record<string, string> = {
   need_first: "Aviso «elige primero»", disclaimer: "Nota legal de precios", empty_track: "Texto pista vacía", add_content_hint: "Texto «añade contenido»",
   mobile_label: "Rótulo barra móvil", mobile_cta: "Botón barra móvil", pdf: "PDF", note: "Nota", validity_days: "Validez (días)", file_name: "Nombre del archivo",
   seo_title: "Título en Google", seo_description: "Descripción en Google",
+  discipline: "Disciplina (web o audiovisual)", category: "Categoría (Web, Audiovisual o vacío = todas)", limit: "Máximo de proyectos",
+  q: "Pregunta", a: "Respuesta", cta: "Botón principal", secondary: "Botón secundario", image_media_id: "Imagen 2.39:1",
+  video_media_id: "Vídeo 2.39:1 (opcional, usa la imagen como póster)", channels_label: "Rótulo de los canales", form_label: "Rótulo del formulario",
+  owner: "Titular (nombre y apellidos o razón social)", nif: "NIF / CIF", hosting: "Proveedor de alojamiento web", updated: "Última actualización",
 };
 
-const LONG = new Set(["body", "text", "lead", "description", "note", "message_placeholder", "success_body", "send_body", "not_found_body", "overlay_lead", "disclaimer", "includes"]);
+const LONG = new Set(["a", "body", "text", "lead", "description", "note", "message_placeholder", "success_body", "send_body", "not_found_body", "overlay_lead", "disclaimer", "includes"]);
 
 export function humanize(key: string) {
   return LABELS[key] ?? key.replace(/_media_id$/, "").replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());

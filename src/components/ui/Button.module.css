@@ -149,7 +149,7 @@
 .disabled .rollInner,
 .root:disabled .rollInner { transform: none !important; }
 
-.dimmed { opacity: 0.35; }
+.dimmed { opacity: 0.55; } /* AA: el texto sigue por encima de 4,5:1 */
 
 /* Punto REC del botón: late al hover (diseño «REC · hover, el punto late») */
 .recDot {

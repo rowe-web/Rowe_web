@@ -8,7 +8,7 @@
  *   public/brand/rowe-logo-blanco.png · rowe-logo-negro.png   (copias exactas)
  *   public/brand/rowe-mark-{192,512}.png                       (símbolo para manifest/PWA)
  *   src/app/favicon.ico (16/32/48) · icon.png (512) · apple-icon.png (180)
- *   src/app/opengraph-image.png (1200×630) · twitter-image.png
+ *   public/brand/og-default.png (1200×630): imagen para compartir por defecto (la del panel tiene prioridad)
  */
 import { copyFile, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -106,8 +106,7 @@ async function main() {
   await writeFile(path.join(PUBLIC_BRAND, "rowe-mark-512.png"), await markTile(512, 0.16));
 
   const og = await ogImage();
-  await writeFile(path.join(APP, "opengraph-image.png"), og);
-  await writeFile(path.join(APP, "twitter-image.png"), og);
+  await writeFile(path.join(PUBLIC_BRAND, "og-default.png"), og);
 
   console.log("✓ Recursos de marca generados");
 }

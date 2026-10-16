@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/scene/LegalPage";
 import { loadSite } from "@/lib/content/site";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const site = await loadSite();
-  const page = site.pages["privacidad"];
-  return { title: { absolute: page?.seo_title || "ROWE" }, alternates: { canonical: "/privacidad" } };
+  return pageMetadata(await loadSite(), "privacidad", "Política de privacidad — ROWE");
 }
 
 export default async function Page() {

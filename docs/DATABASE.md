@@ -12,6 +12,7 @@ Panel (editar) ──► tablas de contenido (borrador) ──► «Publicar» �
 - El panel siempre edita las tablas de contenido. Nada de eso es visible para el público.
 - `publish_release()` (solo admin) congela todo el contenido en `releases.snapshot` como una versión nueva.
 - La web solo lee la última versión (`latest_release()`), cacheada y renovada al publicar.
+- El proxy pregunta `published_project_slugs()` (solo lectura de lo publicado) para responder 404 real a proyectos que no existen.
 - `republish_release(n)` vuelve a publicar una versión anterior (restaurar la web entera).
 - Cada cambio en el contenido queda en `audit_log` con quién, cuándo, antes y después (historial y «Restaurar» de un cambio concreto).
 

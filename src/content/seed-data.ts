@@ -327,6 +327,20 @@ export const settings: SeedSetting[] = [
     },
   },
   {
+    key: "legal",
+    label: "Datos legales (titular de la web)",
+    isPublic: true,
+    editorCanEdit: false,
+    value: {
+      owner: "[Nombre y apellidos o razón social]",
+      nif: "[NIF / CIF]",
+      address: "[Dirección completa, CP, ciudad]",
+      email: "rowe.web.contacto@gmail.com",
+      hosting: "[Vercel Inc. · por confirmar]",
+      updated: "16 de octubre de 2026",
+    },
+  },
+  {
     key: "notifications",
     label: "Avisos por email (interno)",
     isPublic: false,
@@ -554,17 +568,9 @@ export const services: SeedService[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Páginas internas y legales (los textos legales se completan en la Fase 5)
+// Páginas internas y legales: ver seed-pages.ts
 // ---------------------------------------------------------------------------
-export const pages: SeedPage[] = [
-  { slug: "web", kind: "service", title: "Desarrollo *web*", intro: "Webs a medida, rápidas y pensadas para convertir visitas en clientes.", blocks: [], seoTitle: "Desarrollo web a medida — ROWE", seoDescription: "Diseño y desarrollo de webs a medida para empresas y negocios: rápidas, claras y fáciles de editar." },
-  { slug: "audiovisual", kind: "service", title: "Producción *audiovisual*", intro: "Vídeo y foto para redes y comunicación comercial.", blocks: [], seoTitle: "Producción audiovisual — ROWE", seoDescription: "Reels, vídeo corporativo y fotografía para negocios que quieren que se fijen en ellos." },
-  { slug: "proyectos", kind: "projects", title: "Proyectos", intro: "Trabajos recientes de web y audiovisual.", blocks: [], seoTitle: "Proyectos — ROWE", seoDescription: "Casos de estudio de webs a medida y producción audiovisual." },
-  { slug: "contacto", kind: "contact", title: "*Hablemos.*", intro: "Cuéntanos qué necesitas. Te respondemos en menos de 24 h.", blocks: [], seoTitle: "Contacto — ROWE", seoDescription: "Pide tu propuesta de web o vídeo. Respuesta en menos de 24 h." },
-  { slug: "aviso-legal", kind: "legal", title: "Aviso legal", intro: "[Texto legal pendiente de completar]", blocks: [], seoTitle: "Aviso legal — ROWE", seoDescription: "" },
-  { slug: "privacidad", kind: "legal", title: "Política de privacidad", intro: "[Texto legal pendiente de completar]", blocks: [], seoTitle: "Política de privacidad — ROWE", seoDescription: "" },
-  { slug: "cookies", kind: "legal", title: "Política de cookies", intro: "[Texto legal pendiente de completar]", blocks: [], seoTitle: "Política de cookies — ROWE", seoDescription: "" },
-];
+export { pages } from "./seed-pages";
 
 // ---------------------------------------------------------------------------
 // Proyectos de EJEMPLO del diseño (is_placeholder = true).

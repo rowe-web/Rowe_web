@@ -43,6 +43,9 @@ export function AudiovisualScene({ scene, site }: SceneProps<AudiovisualData>) {
 
       <div
         data-reels
+        tabIndex={0}
+        role="region"
+        aria-label="Reels: desliza en horizontal"
         className="mt-14 flex snap-x snap-mandatory gap-3 overflow-x-auto gutter-x pb-4 [scrollbar-width:none] md:mt-[8vh] md:grid md:snap-none md:grid-cols-3 md:gap-[3vw] md:overflow-visible md:px-[12vw] [&::-webkit-scrollbar]:hidden"
       >
         {reels.map((r, i) => (

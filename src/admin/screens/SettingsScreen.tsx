@@ -11,6 +11,7 @@ import { useFeedback } from "@/admin/ui/feedback";
 import { JsonFields, type Json } from "@/admin/ui/JsonFields";
 import { AButton, Card, Field, PageTitle, Segmented, Switch, TextArea, TextInput } from "@/admin/ui/kit";
 import { mono } from "@/admin/ui/styles";
+import { SectionsEditor } from "./SectionsEditor";
 
 export interface SettingRow {
   key: string;
@@ -26,7 +27,8 @@ export interface PageRow {
   kind: string;
   title: string;
   intro: string;
-  blocks: { title: string; body: string }[];
+  /** Legales: apartados { title, body }. Resto: secciones con «type» (src/lib/content/blocks.ts). */
+  blocks: Record<string, Json>[];
   seo_title: string;
   seo_description: string;
   og_media_id: string | null;
@@ -38,6 +40,7 @@ const TABS = [
   { id: "contacto", label: "Contacto", setting: "contact" },
   { id: "seo", label: "SEO", setting: "seo" },
   { id: "paginas", label: "Páginas y legal", setting: null },
+  { id: "legal", label: "Datos legales", setting: "legal" },
   { id: "cookies", label: "Cookies", setting: "cookies" },
   { id: "marca", label: "Marca", setting: "brand" },
   { id: "navegacion", label: "Menú y pie", setting: "navigation" },
@@ -53,6 +56,7 @@ const HINTS: Partial<Record<string, string>> = {
   navigation: "Enlaces del menú (con su pie de foto), botón «Hablemos», pie de página y preloader.",
   configurator: "Textos de la escena «Tu presupuesto», del PDF, niveles del medidor y redondeos. Los precios están en Precios.",
   hablemos: "Pasos, opciones, textos y mensajes de error del formulario.",
+  legal: "Titular de la web para el aviso legal y la privacidad. En los textos legales, {titular}, {nif}, {domicilio}, {email}, {alojamiento} y {actualizado} se sustituyen por estos datos, y {web} y {dominio} por la dirección real de la web. Lo que va entre corchetes es provisional.",
   notifications: "A quién se envía el aviso de cada mensaje nuevo. No se publica: se aplica al guardar.",
 };
 
@@ -299,7 +303,8 @@ function PageEditor({ page, isAdmin, host, onBack }: { page: PageRow; isAdmin: b
           {legal && (
             <fieldset className="flex flex-col gap-3">
               <legend className={`${mono} mb-1 text-muted`}>Apartados · {v.blocks.length}</legend>
-              {v.blocks.map((b, i) => (
+              <p className="text-[12px] leading-relaxed text-muted">Marcas que se rellenan solas: {"{titular} {nif} {domicilio} {email} {alojamiento} {actualizado}"} (Ajustes → Datos legales) y {"{web} {dominio}"} (la dirección de la web).</p>
+              {(v.blocks as { title: string; body: string }[]).map((b, i) => (
                 <div key={i} className="flex flex-col gap-2.5 rounded-md border border-line-soft p-3.5">
                   <div className="flex items-center justify-between">
                     <span className={`${mono} text-muted`}>{String(i + 1).padStart(2, "0")}</span>
@@ -324,6 +329,7 @@ function PageEditor({ page, isAdmin, host, onBack }: { page: PageRow; isAdmin: b
               </AButton>
             </fieldset>
           )}
+          {!legal && <SectionsEditor blocks={v.blocks} onChange={(b) => set("blocks", b)} />}
         </Card>
         <div className="flex flex-col gap-4">
           <Card className="flex flex-col gap-4">

@@ -57,7 +57,7 @@ npm run db:setup
 Este comando aplica las migraciones, carga todo el contenido del diseño, crea tu usuario administrador (`SEED_ADMIN_EMAIL`) y publica la versión 1.
 
 - Si añades `-- --demo`, también se cargan en la bandeja los mensajes de ejemplo del diseño.
-- Se puede repetir sin miedo: nunca pisa lo que hayas editado desde el panel.
+- Se puede repetir sin miedo: nunca pisa lo que hayas editado desde el panel. Si una página interna sigue vacía (sin secciones), la rellena con el contenido inicial.
 
 ### 5. Arrancar
 
@@ -135,9 +135,18 @@ Limitaciones: unos 500 destinatarios al día, el remitente es una dirección @gm
 | `npm run db:seed -- --reset-content` | Vuelve a cargar TODO el contenido del diseño (pide confirmación; no toca mensajes ni usuarios) |
 | `npm run brand` | Regenera favicon, iconos e imagen para compartir desde los logos de `design/assets` |
 
+## Páginas internas, 404 y textos legales
+
+- **/web, /audiovisual, /proyectos y /contacto** se montan con *secciones* que se añaden, quitan, reordenan y editan en **Ajustes → Páginas y legal**: cabecera (con imagen o vídeo 2.39:1 opcional), lista de servicios, una escena de la home, «qué incluye», proyectos relacionados, listado con filtros, preguntas frecuentes, contacto + formulario y cierre. Los tipos están en `src/lib/content/blocks.ts`.
+- **Caso de estudio** (`/proyectos/<slug>`): sale de cada proyecto (reto, solución, resultado, cifras, galería, web del cliente) y enlaza con el siguiente.
+- **404 «Escena eliminada en el montaje»**: textos en Ajustes → Marca. Una dirección que no existe, o un proyecto no publicado, responde **404 de verdad** (el proxy consulta los proyectos publicados antes de pintar la página).
+- **Textos legales** (aviso legal, privacidad, cookies): en Ajustes → Páginas y legal. Los datos del titular se rellenan en **Ajustes → Datos legales** y se insertan solos donde el texto pone `{titular}`, `{nif}`, `{domicilio}`, `{email}`, `{alojamiento}` y `{actualizado}`; `{web}` y `{dominio}` salen de `NEXT_PUBLIC_SITE_URL`. Lo que va `[entre corchetes]` es provisional. **Que un abogado o gestor revise los textos antes del lanzamiento.**
+
 ## Dominio e indexación
 
-- Nunca se escribe el dominio en el código: todo (canonical, sitemap, robots, Open Graph) sale de `NEXT_PUBLIC_SITE_URL`.
+- Nunca se escribe el dominio en el código: todo (canonical, sitemap, robots, Open Graph, datos estructurados) sale de `NEXT_PUBLIC_SITE_URL`.
+- Cada página tiene título y descripción de Google (editables), canónica, imagen para compartir (la de la página o proyecto, si no la de Ajustes → SEO, si no `public/brand/og-default.png`) y datos estructurados (organización, servicios, migas de pan y casos de estudio).
+- El sitemap incluye los proyectos publicados y se renueva al publicar.
 - Mientras `NEXT_PUBLIC_ALLOW_INDEXING=false`, la web sale con `noindex` (meta + cabecera `X-Robots-Tag`) y `robots.txt` bloquea a los buscadores.
 - El día del lanzamiento: `NEXT_PUBLIC_SITE_URL=https://tu-dominio` y `NEXT_PUBLIC_ALLOW_INDEXING=true` (guía completa en la Fase 6).
 
@@ -152,10 +161,12 @@ supabase/migrations/    SQL versionado: tablas, funciones, RLS, storage
 src/app/                Rutas: web pública, /admin (panel), /vista-previa, /api, /sistema
 src/admin/              Panel: acciones del servidor, pantallas, editor (deshacer/copia local), medios
 src/components/         brand/ (Logo) · ui/ (Button, RecDot, Grain, CornerMarks, RichText)
-src/content/seed-data.ts  Contenido inicial del diseño
-src/lib/                site (URL, indexación) · content (versión publicada) · timecode · rich-text
+src/components/page/    Secciones de las páginas internas (cabecera, servicios, FAQ, cierre…)
+src/content/            Contenido inicial: seed-data.ts (escenas, ajustes, proyectos) · seed-pages.ts (páginas y legales)
+src/lib/                site (URL, indexación) · seo (metadatos, JSON-LD) · content (versión publicada, secciones) · timecode · rich-text
 src/motion/             Movimiento (magnético; Lenis/ScrollTrigger en la Fase 2)
 tests/db/               Pruebas de base de datos con PGlite
+tests/e2e/              Navegador: scroll, leads, panel, páginas, 404 y accesibilidad (axe)
 ```
 
 ## Texto editable

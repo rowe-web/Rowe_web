@@ -315,6 +315,38 @@ describe("historial: restaurar cambios", () => {
   });
 });
 
+describe("páginas internas y direcciones de proyectos (Fase 5)", () => {
+  it("el público obtiene los slugs de los proyectos publicados (para el 404 del proxy)", async () => {
+    const [{ slugs }] = await db.as(null, () => db.query<{ slugs: string[] }>("select public.published_project_slugs() as slugs"));
+    const snap = await latest();
+    expect([...slugs].sort()).toEqual(snap.projects.map((p) => p.slug).sort());
+    expect(slugs).not.toContain("logistica-vela"); // en borrador
+  });
+
+  it("las páginas llegan con sus secciones y los textos legales con sus apartados", async () => {
+    const rows = await db.query<{ slug: string; kind: string; n: number }>("select slug, kind, jsonb_array_length(blocks) as n from public.pages order by slug");
+    expect(rows.every((r) => r.n > 0)).toBe(true);
+    const [legal] = await db.query<{ blocks: { title: string }[] }>("select blocks from public.pages where slug = 'privacidad'");
+    expect(legal.blocks[0].title).toBe("Responsable del tratamiento");
+  });
+
+  it("la actualización de contenido rellena páginas vacías sin pisar lo editado", async () => {
+    await db.query("update public.pages set blocks = '[]'::jsonb, intro = '[Texto legal pendiente de completar]' where slug = 'cookies'");
+    await db.query("update public.pages set blocks = '[]'::jsonb, intro = 'Mi entradilla editada', title = 'Mi título' where slug = 'web'");
+    await db.query("update public.pages set title = 'Contacto editado' where slug = 'contacto'");
+    await seedContent(db, { log: () => {} });
+    const pages = Object.fromEntries(
+      (await db.query<{ slug: string; title: string; intro: string; n: number }>("select slug, title, intro, jsonb_array_length(blocks) as n from public.pages")).map((r) => [r.slug, r]),
+    );
+    expect(pages.cookies.n).toBeGreaterThan(0);
+    expect(pages.cookies.intro).not.toMatch(/pendiente/);
+    expect(pages.web.n).toBeGreaterThan(0);
+    expect(pages.web.intro).toBe("Mi entradilla editada");
+    expect(pages.web.title).toBe("Mi título");
+    expect(pages.contacto.title).toBe("Contacto editado");
+  });
+});
+
 describe("servidor (service_role)", () => {
   it("numera los presupuestos ROWE-AAAA-NNNN", async () => {
     const [q] = await db.query<{ number: string }>(

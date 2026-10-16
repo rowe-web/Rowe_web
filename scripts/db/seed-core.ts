@@ -1,5 +1,6 @@
 import type { Db } from "./client";
 import * as data from "../../src/content/seed-data";
+import { legacyPageText } from "../../src/content/seed-pages";
 
 export interface SeedOptions {
   /** Borra y vuelve a cargar todo el contenido editable (NO toca leads, usuarios ni medios). */
@@ -62,6 +63,19 @@ export async function seedContent(db: Db, opts: SeedOptions = {}): Promise<{ pub
        values ($1, $2, $3, $4, $5::text::jsonb, $6, $7) on conflict (slug) do nothing`,
       [p.slug, p.kind, p.title, p.intro, j(p.blocks), p.seoTitle, p.seoDescription],
     );
+    // Actualización de contenido (Fase 5): solo rellena las páginas que siguen sin secciones
+    // y con la entradilla provisional. Lo editado desde el panel nunca se pisa.
+    const filled = await db.query(
+      `update public.pages set blocks = $4::text::jsonb,
+         title = case when title = any($7::text[]) then $2 else title end,
+         intro = case when intro = any($8::text[]) then $3 else intro end,
+         seo_title = case when seo_title = '' then $5 else seo_title end,
+         seo_description = case when seo_description = '' then $6 else seo_description end
+       where slug = $1 and blocks = '[]'::jsonb
+       returning slug`,
+      [p.slug, p.title, p.intro, j(p.blocks), p.seoTitle, p.seoDescription, legacyPageText.titles, legacyPageText.intros],
+    );
+    if (filled.length) log(`✓ Página /${p.slug}: contenido de la Fase 5`);
   }
 
   for (const [i, p] of data.projects.entries()) {

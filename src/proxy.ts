@@ -1,15 +1,34 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isPublishedProject } from "@/lib/project-slugs";
 import { REMEMBER_COOKIE, sessionCookieOptions } from "@/lib/supabase/cookies";
 
 /**
- * Proxy del panel (/admin y /vista-previa):
+ * Proxy:
+ *  - /proyectos/<slug>: si el proyecto no está publicado, 404 real (antes de renderizar,
+ *    así no se envía un 200 con la página de error). Ver src/lib/project-slugs.ts.
+ *
+ * Panel (/admin y /vista-previa):
  *  - Renueva la sesión de Supabase en cada petición (cookies).
  *  - Sin sesión → al login, recordando a dónde iba.
  *  - Con sesión en el login → al panel.
  * El ROL se comprueba después, en el servidor (src/admin/auth.ts) y en la base de datos (RLS).
  */
 export async function proxy(request: NextRequest) {
+  const project = request.nextUrl.pathname.match(/^\/proyectos\/([^/]+)\/?$/);
+  if (project) {
+    let slug = "";
+    try {
+      slug = decodeURIComponent(project[1]);
+    } catch {
+      /* dirección mal codificada: no existe */
+    }
+    const known = slug ? await isPublishedProject(slug) : false;
+    // Dirección sin ruta → la 404 global («Escena eliminada en el montaje») con estado 404
+    if (known === false) return NextResponse.rewrite(new URL("/_escena-eliminada", request.url), { status: 404 });
+    return NextResponse.next();
+  }
+
   let response = NextResponse.next({ request });
   const remember = request.cookies.get(REMEMBER_COOKIE)?.value !== "0";
 
@@ -47,5 +66,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/vista-previa/:path*"],
+  matcher: ["/admin/:path*", "/vista-previa/:path*", "/proyectos/:slug"],
 };

@@ -1,19 +1,13 @@
 import type { Metadata } from "next";
-import { ProvisionalPage } from "@/components/scene/ProvisionalPage";
+import { InternalPage } from "@/components/page/InternalPage";
 import { loadSite } from "@/lib/content/site";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const site = await loadSite();
-  const page = site.pages["proyectos"];
-  return {
-    title: { absolute: page?.seo_title || "Proyectos — ROWE" },
-    description: page?.seo_description || undefined,
-    alternates: { canonical: "/proyectos" },
-  };
+  return pageMetadata(await loadSite(), "proyectos", "Proyectos — ROWE");
 }
 
-/** Provisional (Fase 2). Diseño definitivo en la Fase 5. */
+/** /proyectos: secciones editables en Ajustes → Páginas y legal. */
 export default async function Page() {
-  const site = await loadSite();
-  return <ProvisionalPage site={site} slug="proyectos" scenes={["proyectos", "filosofia"]} />;
+  return <InternalPage site={await loadSite()} slug="proyectos" />;
 }

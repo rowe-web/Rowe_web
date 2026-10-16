@@ -114,3 +114,33 @@ export function instagramHref(handle: string): string {
 export function mediaUrl(supabaseUrl: string, bucket: string, path: string): string {
   return `${supabaseUrl.replace(/\/$/, "")}/storage/v1/object/public/${bucket}/${path}`;
 }
+
+export interface LegalSettings {
+  owner: string;
+  nif: string;
+  address: string;
+  email: string;
+  hosting: string;
+  updated: string;
+}
+
+export const emptyLegal: LegalSettings = { owner: "", nif: "", address: "", email: "", hosting: "", updated: "" };
+
+/**
+ * Rellena las marcas de los textos legales: {titular}, {nif}, {domicilio}, {email},
+ * {alojamiento}, {actualizado} (Ajustes → Datos legales) y {web}, {dominio} (la dirección
+ * real de la web). Una marca desconocida se deja tal cual para que se vea y se corrija.
+ */
+export function fillLegal(text: string, legal: LegalSettings, site: { url: string; host: string }): string {
+  const values: Record<string, string> = {
+    titular: legal.owner,
+    nif: legal.nif,
+    domicilio: legal.address,
+    email: legal.email,
+    alojamiento: legal.hosting,
+    actualizado: legal.updated,
+    web: site.url,
+    dominio: site.host,
+  };
+  return text.replace(/\{([a-z]+)\}/g, (m, k: string) => (k in values && values[k] ? values[k] : m));
+}

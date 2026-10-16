@@ -163,10 +163,37 @@ test("admin: edita, publica, la web lo muestra; restaura y vuelve a publicar", a
   // Tras publicar, las páginas que se regeneran siguen funcionando (p. ej. el detalle de proyecto)
   const { data: project } = await db.from("projects").select("slug").eq("status", "publicado").limit(1).maybeSingle();
   if (project) expect((await request.get(`/proyectos/${project.slug}`)).status()).toBe(200);
-  // Proyecto inexistente: página «no encontrado» con noindex (con streaming, Next mantiene el 200)
+  // Proyecto inexistente: 404 real (lo responde el proxy antes de pintar) con noindex
   const missing = await request.get("/proyectos/no-existe");
-  expect(missing.status()).toBeLessThan(500);
-  expect(await missing.text()).toMatch(/<meta name="robots" content="noindex"/);
+  expect(missing.status()).toBe(404);
+  expect(await missing.text()).toMatch(/<meta name="robots" content="noindex/);
+});
+
+test("páginas: añade, edita, reordena y quita secciones de /web (borrador)", async ({ page }) => {
+  const { data: before } = await db.from("pages").select("blocks").eq("slug", "web").single();
+  try {
+    await login(page, "editor", "/admin/ajustes?tab=paginas");
+    await page.locator("div", { hasText: /^Desarrollo web/ }).getByRole("button", { name: "Editar →" }).first().click();
+    await expect(page.getByText("Secciones de la página")).toBeVisible();
+    const sections = page.locator("fieldset", { hasText: "Secciones de la página" });
+    await sections.getByRole("button", { name: /Preguntas frecuentes/ }).click();
+    const q = sections.getByLabel("Pregunta").first();
+    await q.fill(`¿Pregunta E2E ${run}?`);
+    await sections.locator("#add-section").selectOption("cierre");
+    await sections.getByRole("button", { name: "+ Añadir sección" }).click();
+    const count = (before!.blocks as unknown[]).length + 1;
+    await sections.getByRole("button", { name: `Subir sección ${count}` }).click();
+    await sections.getByRole("button", { name: `Quitar sección ${count - 1}` }).click();
+    // Un editor no publica: su botón es «Guardar» (el borrador)
+    await page.getByRole("button", { name: "Guardar", exact: true }).click();
+    await toast(page, "Borrador guardado");
+    const { data: after } = await db.from("pages").select("blocks").eq("slug", "web").single();
+    const blocks = after!.blocks as { type: string; items?: { q: string }[] }[];
+    expect(blocks).toHaveLength(count - 1);
+    expect(blocks.find((b) => b.type === "preguntas")!.items![0].q).toBe(`¿Pregunta E2E ${run}?`);
+  } finally {
+    await db.from("pages").update({ blocks: before!.blocks }).eq("slug", "web");
+  }
 });
 
 test("mensajes: cambia el estado y guarda las notas solas", async ({ page }) => {

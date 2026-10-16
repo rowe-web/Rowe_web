@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Instrument_Serif, Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { DEFAULT_OG } from "@/lib/seo";
 import { allowIndexing, siteUrl } from "@/lib/site";
 import "./globals.css";
 
@@ -34,7 +35,6 @@ export const metadata: Metadata = {
   robots: allowIndexing
     ? { index: true, follow: true }
     : { index: false, follow: false, googleBot: { index: false, follow: false } },
-  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "es_ES",
@@ -42,8 +42,9 @@ export const metadata: Metadata = {
     title: "ROWE — Estudio de web y audiovisual",
     description,
     url: "/",
+    images: [DEFAULT_OG],
   },
-  twitter: { card: "summary_large_image", title: "ROWE — Estudio de web y audiovisual", description },
+  twitter: { card: "summary_large_image", title: "ROWE — Estudio de web y audiovisual", description, images: [DEFAULT_OG.url] },
 };
 
 export const viewport: Viewport = {
