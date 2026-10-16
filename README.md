@@ -123,6 +123,12 @@ El email al cliente tiene la estética de la web (fondo negro, logotipo, titular
 
 Limitaciones: unos 500 destinatarios al día, el remitente es una dirección @gmail.com y Google puede bloquear el envío si detecta un uso anómalo (el lead nunca se pierde: queda en la cola).
 
+**Respuestas de los clientes (conversación):** cuando un cliente contesta un email de ROWE, la respuesta se lee del buzón de `rowe.web.contacto@gmail.com` por IMAP (misma contraseña de aplicación; el buzón se abre en solo lectura: nada se marca como leído ni se mueve) y se guarda en su mensaje (tabla `lead_inbound`). Se asocia por las cabeceras del email (contesta a una respuesta enviada desde el panel) o, si no, por el remitente (su mensaje más reciente); el resto del correo se ignora. En el panel, cada mensaje muestra la **conversación** en orden: formulario inicial (borde discontinuo), respuestas de ROWE (a la derecha, punto rojo) y respuestas del cliente (a la izquierda, ✉, «Nueva» hasta que se ve).
+
+El buzón se lee cada minuto mientras el panel está abierto (y con «Comprobar correo»). Con el panel cerrado lo hará la tarea programada `GET /api/cron/inbox` (`Authorization: Bearer CRON_SECRET`; se programa en la Fase 6). Nunca hay dos lecturas a la vez.
+
+**Avisos en tiempo real:** con el panel abierto, abajo a la derecha aparece un aviso al llegar un mensaje o presupuesto nuevo desde la web y cuando un cliente responde por email (Supabase Realtime, solo para el equipo por RLS). La bandeja y la conversación se actualizan solas.
+
 **Con dominio propio:** `EMAIL_PROVIDER=resend`, `RESEND_API_KEY` y `EMAIL_FROM=avisos@tu-dominio` (se verifica el dominio en Resend). Sin dominio, Resend solo deja enviar a la dirección con la que te registraste.
 
 **Reintentos:** `GET /api/cron/email-retry` con `Authorization: Bearer CRON_SECRET` (la tarea programada se configura en la Fase 6).

@@ -4,6 +4,7 @@ import { refresh } from "next/cache";
 import { z } from "zod";
 import { action, ActionError, check, requireRole } from "@/admin/auth";
 import { processOutbox } from "@/lib/email/outbox";
+import { inboxConfigured, syncInbox } from "@/lib/email/inbox";
 import { buildReplyMail, REPLY_LEAD_COLUMNS, type ReplyLeadRow } from "@/lib/email/reply";
 import { EmailNotConfiguredError, mailSender, sendMail } from "@/lib/email/transport";
 import { adminClient } from "@/lib/supabase/admin";
@@ -79,6 +80,30 @@ export async function replyToLead(leadId: string, subject: string, body: string)
     refresh();
     // El email ya ha salido: si solo falla el registro, se avisa sin decir que no se envió
     if (error) throw new ActionError("La respuesta se ha enviado, pero no se ha podido guardar en el historial.");
+  });
+}
+
+/**
+ * Lee ya el buzón de ROWE y guarda las respuestas de clientes que hayan llegado. El panel lo
+ * llama solo cada minuto mientras está abierto (y con «Comprobar correo»); el servidor no
+ * deja que se solape con otra lectura ni que se repita en menos de 20 s.
+ */
+export async function checkInbox() {
+  return action(async () => {
+    await requireRole("staff");
+    if (!inboxConfigured()) return { configured: false, imported: 0 };
+    const res = await syncInbox({ minInterval: 20 });
+    if (res.error) throw new ActionError(`No se ha podido leer el correo: ${res.error}`);
+    if (res.imported) refresh();
+    return { configured: true, imported: res.imported };
+  });
+}
+
+/** Las respuestas del cliente de este mensaje pasan a vistas (se quita el aviso «nueva»). */
+export async function markInboundSeen(leadId: string) {
+  return action(async () => {
+    await requireRole("staff");
+    await adminClient().from("lead_inbound").update({ seen_at: new Date().toISOString() }).eq("lead_id", id.parse(leadId)).is("seen_at", null);
   });
 }
 

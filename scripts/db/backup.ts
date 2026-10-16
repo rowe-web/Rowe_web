@@ -13,7 +13,7 @@ import { connectPostgres, requireEnv } from "./client";
 
 const TABLES = [
   "site_settings", "scenes", "services", "pages", "projects", "project_media", "config_sections", "config_options",
-  "media", "releases", "audit_log", "profiles", "leads", "lead_replies", "quotes", "email_outbox", "events",
+  "media", "releases", "audit_log", "profiles", "leads", "lead_replies", "lead_inbound", "quotes", "email_outbox", "events",
 ];
 
 async function main() {

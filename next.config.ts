@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   poweredByHeader: false,
   // react-pdf se ejecuta tal cual en Node (no se empaqueta)
-  serverExternalPackages: ["@react-pdf/renderer"],
+  serverExternalPackages: ["@react-pdf/renderer", "imapflow", "mailparser"],
   // Fuentes y logo que leen del disco el PDF y los emails: se incluyen en el despliegue
   outputFileTracingIncludes: {
     "/api/quote/pdf": ["./src/assets/**/*"],

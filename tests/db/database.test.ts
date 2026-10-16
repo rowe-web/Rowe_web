@@ -96,7 +96,7 @@ describe("seguridad · público (anon)", () => {
     expect(r.s.version).toBeGreaterThan(0);
   });
 
-  it.each(["scenes", "leads", "lead_replies", "config_options", "profiles", "site_settings", "audit_log", "quotes", "events", "media"])(
+  it.each(["scenes", "leads", "lead_replies", "lead_inbound", "mail_sync_state", "config_options", "profiles", "site_settings", "audit_log", "quotes", "events", "media"])(
     "no puede leer %s",
     async (table) => {
       await expect(db.as(null, () => db.query(`select * from public.${table}`))).rejects.toThrow(/permission denied/);
@@ -138,6 +138,41 @@ describe("respuestas desde el panel (lead_replies)", () => {
     // Si se borra el mensaje, se borran sus respuestas
     await db.query("delete from public.leads where id = $1", [lead.id]);
     expect(await db.query("select * from public.lead_replies where lead_id = $1", [lead.id])).toHaveLength(0);
+  });
+});
+
+describe("respuestas de clientes por email (lead_inbound) y lectura del buzón", () => {
+  it("el equipo las lee; nadie las escribe desde el navegador; un mismo email no se guarda dos veces", async () => {
+    const [lead] = await db.query<{ id: string }>(
+      `insert into public.leads (origin, need, name, email, privacy_accepted_at) values ('formulario', 'Web', 'Cliente', 'cliente2@example.com', now()) returning id`,
+    );
+    const insert = (mid: string) =>
+      db.query(
+        `insert into public.lead_inbound (lead_id, received_at, from_email, subject, body, full_text, message_id, matched_by)
+         values ($1, now(), 'cliente2@example.com', 'Re: Tu proyecto con ROWE', 'Perfecto', 'Perfecto', $2, 'thread') on conflict (message_id) do nothing returning id`,
+        [lead.id, mid],
+      );
+    expect(await insert("<a@mail>")).toHaveLength(1);
+    expect(await insert("<a@mail>")).toHaveLength(0);
+    expect(await db.as(editorId, () => db.query("select * from public.lead_inbound where lead_id = $1", [lead.id]))).toHaveLength(1);
+    expect(await db.as(noRoleId, () => db.query("select * from public.lead_inbound"))).toHaveLength(0);
+    await expect(db.as(adminId, () => db.query("update public.lead_inbound set body = 'x'"))).rejects.toThrow(/permission denied/);
+    await expect(db.as(adminId, () => db.query("select * from public.mail_sync_state"))).rejects.toThrow(/permission denied/);
+    await expect(db.as(adminId, () => db.query("select * from public.claim_mail_sync(0)"))).rejects.toThrow(/permission denied/);
+    await db.query("delete from public.leads where id = $1", [lead.id]);
+  });
+
+  it("la lectura del buzón nunca se solapa ni se repite antes de tiempo", async () => {
+    const claim = (s: number) => db.query("select * from public.claim_mail_sync($1)", [s]);
+    expect(await claim(0)).toHaveLength(1); // reservada
+    expect(await claim(0)).toHaveLength(0); // ya hay una en marcha
+    await db.query("update public.mail_sync_state set running_since = null, last_run_at = now()");
+    expect(await claim(60)).toHaveLength(0); // la última fue hace menos de 60 s
+    expect(await claim(0)).toHaveLength(1);
+    // Una lectura colgada más de 3 minutos se da por perdida
+    await db.query("update public.mail_sync_state set running_since = now() - interval '4 minutes'");
+    expect(await claim(0)).toHaveLength(1);
+    await db.query("update public.mail_sync_state set running_since = null, last_run_at = null");
   });
 });
 

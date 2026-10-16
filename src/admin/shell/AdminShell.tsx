@@ -10,6 +10,7 @@ import type { AdminUser, Role } from "@/admin/auth";
 import { EditorProvider, useEditor } from "@/admin/editor";
 import { ICONS, navFor, sectionFor } from "@/admin/nav";
 import { useFeedback } from "@/admin/ui/feedback";
+import { LiveFeed } from "./LiveFeed";
 import { AButton, mono } from "@/admin/ui/kit";
 
 export interface DraftStatus {
@@ -183,6 +184,7 @@ function Shell({ user, status, newLeads, children }: Props) {
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 pb-24 min-[820px]:p-7 min-[820px]:pb-12">{children}</div>
+        <LiveFeed />
 
         {/* Pestañas (móvil) */}
         <nav aria-label="Secciones" className="absolute inset-x-0 bottom-0 z-20 grid h-[68px] grid-cols-4 border-t border-line-soft bg-[rgb(10_10_10/0.94)] backdrop-blur-md min-[820px]:hidden">

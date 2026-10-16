@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { deleteLead, replyToLead, retryLeadEmail, saveLeadNotes, setLeadStatus } from "@/admin/actions/leads";
+import { useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
+import { checkInbox, deleteLead, markInboundSeen, replyToLead, retryLeadEmail, saveLeadNotes, setLeadStatus } from "@/admin/actions/leads";
 import { LEAD_STATUS, when } from "@/admin/format";
 import { useFeedback } from "@/admin/ui/feedback";
 import { AButton, Card, EmptyState, Field, PageTitle, Segmented, StatusDot, TextArea, TextInput } from "@/admin/ui/kit";
@@ -30,6 +30,8 @@ export interface LeadRow {
   mail: { status: string; attempts: number; last_error: string | null; sent_at: string | null } | null;
   /** Respuestas enviadas desde el panel (más antigua primero). */
   replies: { id: number; created_at: string; sent_by_name: string; from_email: string; subject: string; body: string; status: "sent" | "failed"; error: string | null }[];
+  /** Respuestas del cliente por email (más antigua primero). */
+  inbound: { id: number; received_at: string; from_email: string; from_name: string; subject: string; body: string; full_text: string; attachments: number; matched_by: "thread" | "sender"; seen_at: string | null }[];
 }
 
 interface Props {
@@ -57,6 +59,12 @@ export function LeadsScreen({ leads: initial, needs, isAdmin, mailFrom, initialL
     setPrevInitial(initial);
     setLeads(initial);
   }
+  // Un enlace a otro mensaje estando ya en Mensajes (p. ej. un aviso en tiempo real) lo abre
+  const [prevLead, setPrevLead] = useState(initialLead);
+  if (initialLead !== prevLead) {
+    setPrevLead(initialLead);
+    if (initialLead) setSelected(initialLead);
+  }
 
   // La URL refleja el mensaje abierto (se puede compartir o volver con «atrás»)
   useEffect(() => {
@@ -83,7 +91,7 @@ export function LeadsScreen({ leads: initial, needs, isAdmin, mailFrom, initialL
 
   return (
     <div className="toast-in flex max-w-[1240px] flex-col gap-5">
-      <PageTitle title="Mensajes" subtitle="Solicitudes del formulario y del configurador de presupuesto." />
+      <PageTitle title="Mensajes" subtitle="Solicitudes del formulario y del configurador, y las respuestas de los clientes por email." actions={mailFrom ? <CheckMailButton /> : undefined} />
       {loadError && <p role="alert" className="rounded-lg border border-rec px-4 py-3 text-[14px] text-rec">{loadError}</p>}
 
       <div className="flex flex-wrap items-center gap-2.5">
@@ -145,6 +153,12 @@ export function LeadsScreen({ leads: initial, needs, isAdmin, mailFrom, initialL
                         <span className="truncate font-mono text-[10px] tracking-[0.06em] text-muted">
                           {l.need} · {l.budget_label || "Sin presupuesto"}
                         </span>
+                        {l.inbound.some((r) => !r.seen_at) && (
+                          <span data-unseen-reply className="mt-0.5 flex w-fit items-center gap-1.5 rounded-full border border-rec px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-bone">
+                            <span className="h-[6px] w-[6px] animate-rec rounded-full bg-rec" aria-hidden="true" />
+                            Respuesta nueva por email
+                          </span>
+                        )}
                       </span>
                     </button>
                   </li>
@@ -199,6 +213,17 @@ function LeadDetail({
     }, 800);
   };
   useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  // Respuestas del cliente: las que no se habían visto al abrir el mensaje, y las que llegan
+  // con él abierto, se señalan como «Nueva» mientras sigue abierto y se marcan como vistas.
+  const [known] = useState(() => ({ ids: new Set(lead.inbound.map((r) => r.id)), unseen: new Set(lead.inbound.filter((r) => !r.seen_at).map((r) => r.id)) }));
+  const unseen = new Set(lead.inbound.filter((r) => known.unseen.has(r.id) || !known.ids.has(r.id)).map((r) => r.id));
+  const pendingSeen = lead.inbound.some((r) => !r.seen_at);
+  useEffect(() => {
+    if (!pendingSeen) return;
+    markInboundSeen(lead.id).then((res) => res.ok && onPatch({ inbound: lead.inbound.map((r) => (r.seen_at ? r : { ...r, seen_at: new Date().toISOString() })) }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- cada vez que llega una sin ver
+  }, [pendingSeen, lead.inbound.length]);
 
   const changeStatus = (s: Status) =>
     start(async () => {
@@ -281,10 +306,7 @@ function LeadDetail({
         </div>
       )}
 
-      <div className="flex flex-col gap-2">
-        <span className={`${mono} text-[9px] text-muted`}>Mensaje</span>
-        <p className="max-w-[62ch] whitespace-pre-wrap text-[15px] leading-relaxed">{lead.message || "Sin mensaje. Esta solicitud llegó sin texto adicional."}</p>
-      </div>
+      <Conversation lead={lead} unseen={unseen} />
 
       <div className="flex flex-col border-t border-line-soft">
         <div className="flex items-center justify-between gap-3 border-b border-line-soft py-3">
@@ -315,8 +337,6 @@ function LeadDetail({
           </div>
         )}
       </div>
-
-      {lead.replies.length > 0 && <ReplyHistory replies={lead.replies} />}
 
       {replying && <ReplyBox lead={lead} from={mailFrom} onClose={() => setReplying(false)} onSent={() => lead.status === "nuevo" && onPatch({ status: "contactado" })} />}
 
@@ -452,52 +472,155 @@ function ReplyBox({ lead, from, onClose, onSent }: { lead: LeadRow; from: string
   );
 }
 
+type ThreadItem =
+  | { kind: "form"; at: string }
+  | { kind: "rowe"; at: string; reply: LeadRow["replies"][number] }
+  | { kind: "client"; at: string; msg: LeadRow["inbound"][number] };
+
+/** Etiqueta de cada tipo de mensaje (la leyenda usa las mismas marcas que los bloques). */
+const KIND = {
+  form: { label: "Formulario de la web", mark: <span aria-hidden="true" className="h-[9px] w-[9px] rounded-[2px] border border-dashed border-bone" /> },
+  rowe: { label: "Respuesta de ROWE", mark: <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-rec" /> },
+  client: { label: "Respuesta del cliente", mark: <span aria-hidden="true" className="text-[11px] leading-none">✉</span> },
+} as const;
+
 /**
- * Respuestas ya enviadas (o fallidas) desde el panel. Cada una va en su propio bloque,
- * con fondo, filete lateral y cabecera «Respuesta de ROWE», para que nunca se confunda
- * con el mensaje del cliente ni con el resto de la ficha.
+ * Conversación de un mensaje, en orden cronológico, con tres tipos de bloque que no se
+ * pueden confundir:
+ *  a) Formulario inicial: ancho completo, borde discontinuo, sin fondo.
+ *  b) Respuesta de ROWE: a la derecha, fondo gris, filete claro y cabecera con el punto REC.
+ *  c) Respuesta del cliente por email: a la izquierda, fondo cálido, filete y cabecera con ✉.
  */
-function ReplyHistory({ replies }: { replies: LeadRow["replies"] }) {
+function Conversation({ lead, unseen }: { lead: LeadRow; unseen: Set<number> }) {
+  const items: ThreadItem[] = [
+    { kind: "form" as const, at: lead.created_at },
+    ...lead.replies.map((reply) => ({ kind: "rowe" as const, at: reply.created_at, reply })),
+    ...lead.inbound.map((msg) => ({ kind: "client" as const, at: msg.received_at, msg })),
+  ].sort((a, b) => (a.kind === "form" ? -1 : b.kind === "form" ? 1 : a.at.localeCompare(b.at)));
+
   return (
-    <div className="flex flex-col gap-2.5">
-      <span className={`${mono} text-[9px] text-muted`}>Respuestas desde el panel · {replies.length}</span>
-      <ol className="flex flex-col gap-2.5">
-        {replies.map((r) => {
-          const sent = r.status === "sent";
-          return (
-            <li
-              key={r.id}
-              data-reply
-              className={`overflow-hidden rounded-md border border-l-2 border-line-soft bg-surface-2 ${sent ? "border-l-bone" : "border-l-rec"}`}
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-soft bg-surface-3 px-3.5 py-2.5">
-                <span className={`flex items-center gap-2 ${mono} text-[10px] text-bone`}>
-                  <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-rec" />
-                  Respuesta de ROWE
-                </span>
-                <StatusDot tone={sent ? "half" : "alert"} label={`${sent ? "Enviada" : "No enviada"} · ${when(r.created_at)}`} />
-              </div>
-              <div className="flex flex-col gap-2 px-3.5 py-3">
-                <span className="text-[12px] text-muted">
-                  {r.sent_by_name} · desde {r.from_email}
-                </span>
-                <span className="text-[15px] font-medium">{r.subject}</span>
-                <details className="group/reply">
-                  <summary className={`flex min-h-8 w-fit cursor-pointer select-none list-none items-center gap-2 rounded-full border border-line px-3 ${mono} text-[10px] text-muted transition-colors hover:border-bone hover:text-bone [&::-webkit-details-marker]:hidden`}>
-                    <span className="group-open/reply:hidden">Ver texto</span>
-                    <span className="hidden group-open/reply:inline">Ocultar texto</span>
-                    <span aria-hidden="true" className="transition-transform group-open/reply:rotate-180">↓</span>
-                  </summary>
-                  <div className="mt-3 rounded border border-line-soft bg-surface px-4 py-3.5">
-                    <p className="max-w-[62ch] whitespace-pre-wrap text-[14px] leading-relaxed text-bone">{r.body}</p>
-                  </div>
-                </details>
-                {!sent && r.error && <span className="text-[12px] text-rec">{r.error}</span>}
-              </div>
+    <section aria-label="Conversación" className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className={`${mono} text-[9px] text-muted`}>Conversación · {items.length}</span>
+        <span className="flex flex-wrap gap-3">
+          {(Object.keys(KIND) as (keyof typeof KIND)[]).map((k) => (
+            <span key={k} className={`flex items-center gap-1.5 ${mono} text-[9px] text-muted`}>
+              {KIND[k].mark}
+              {KIND[k].label}
+            </span>
+          ))}
+        </span>
+      </div>
+      <ol className="flex flex-col gap-3">
+        {items.map((it) =>
+          it.kind === "form" ? (
+            <li key="form" data-thread="form" className="flex flex-col gap-2.5 rounded-md border border-dashed border-line-strong px-4 py-3.5">
+              <ThreadHeader mark={KIND.form.mark} title={lead.origin === "configurador" ? `Configurador de presupuesto${lead.quote ? ` · ${lead.quote.number}` : ""}` : KIND.form.label} meta={when(lead.created_at)} />
+              <p className="max-w-[62ch] whitespace-pre-wrap text-[15px] leading-relaxed">{lead.message || "Sin mensaje. Esta solicitud llegó sin texto adicional."}</p>
             </li>
-          );
-        })}
+          ) : it.kind === "rowe" ? (
+            <RoweReply key={`r${it.reply.id}`} reply={it.reply} />
+          ) : (
+            <ClientReply key={`c${it.msg.id}`} msg={it.msg} isNew={unseen.has(it.msg.id)} />
+          ),
+        )}
       </ol>
+    </section>
+  );
+}
+
+function ThreadHeader({ mark, title, meta }: { mark: ReactNode; title: string; meta: ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <span className={`flex items-center gap-2 ${mono} text-[10px] text-bone`}>
+        {mark}
+        {title}
+      </span>
+      <span className="font-mono text-[10px] text-muted">{meta}</span>
     </div>
+  );
+}
+
+/** b) Lo que respondió ROWE desde el panel. */
+function RoweReply({ reply: r }: { reply: LeadRow["replies"][number] }) {
+  const sent = r.status === "sent";
+  return (
+    <li data-thread="rowe" data-reply className={`ml-auto w-full overflow-hidden rounded-md border border-l-2 border-line-soft bg-surface-2 min-[1100px]:w-[90%] ${sent ? "border-l-bone" : "border-l-rec"}`}>
+      <div className="border-b border-line-soft bg-surface-3 px-3.5 py-2.5">
+        <ThreadHeader mark={KIND.rowe.mark} title={KIND.rowe.label} meta={<StatusDot tone={sent ? "half" : "alert"} label={`${sent ? "Enviada" : "No enviada"} · ${when(r.created_at)}`} />} />
+      </div>
+      <div className="flex flex-col gap-2 px-3.5 py-3">
+        <span className="text-[12px] text-muted">
+          {r.sent_by_name} · desde {r.from_email}
+        </span>
+        <span className="text-[15px] font-medium">{r.subject}</span>
+        <details className="group/reply">
+          <summary className={`flex min-h-8 w-fit cursor-pointer select-none list-none items-center gap-2 rounded-full border border-line px-3 ${mono} text-[10px] text-muted transition-colors hover:border-bone hover:text-bone [&::-webkit-details-marker]:hidden`}>
+            <span className="group-open/reply:hidden">Ver texto</span>
+            <span className="hidden group-open/reply:inline">Ocultar texto</span>
+            <span aria-hidden="true" className="transition-transform group-open/reply:rotate-180">↓</span>
+          </summary>
+          <div className="mt-3 rounded border border-line-soft bg-surface px-4 py-3.5">
+            <p className="max-w-[62ch] whitespace-pre-wrap text-[14px] leading-relaxed text-bone">{r.body}</p>
+          </div>
+        </details>
+        {!sent && r.error && <span className="text-[12px] text-rec">{r.error}</span>}
+      </div>
+    </li>
+  );
+}
+
+/** c) Lo que contestó el cliente por email (leído del buzón de ROWE). */
+function ClientReply({ msg: m, isNew }: { msg: LeadRow["inbound"][number]; isNew: boolean }) {
+  const quoted = m.full_text.trim() !== m.body.trim();
+  return (
+    <li data-thread="client" className="mr-auto w-full overflow-hidden rounded-md border border-l-2 border-line-strong border-l-muted bg-ph-2 min-[1100px]:w-[90%]">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-soft bg-ph px-3.5 py-2.5">
+        <span className={`flex items-center gap-2 ${mono} text-[10px] text-bone`}>
+          {KIND.client.mark}
+          {KIND.client.label} · email
+          {isNew && <span className="rounded-full bg-rec px-1.5 py-px text-[9px] text-ink">Nueva</span>}
+        </span>
+        <span className="font-mono text-[10px] text-muted">{when(m.received_at)}</span>
+      </div>
+      <div className="flex flex-col gap-2 px-3.5 py-3">
+        <span className="text-[12px] text-muted">
+          {m.from_name ? `${m.from_name} · ` : ""}
+          {m.from_email}
+          {m.matched_by === "sender" && " · asociada por remitente"}
+        </span>
+        {m.subject && <span className="text-[15px] font-medium">{m.subject}</span>}
+        <p className="max-w-[62ch] whitespace-pre-wrap text-[15px] leading-relaxed text-bone">{m.body}</p>
+        {m.attachments > 0 && <span className="text-[12px] text-muted">📎 {m.attachments === 1 ? "1 adjunto" : `${m.attachments} adjuntos`} · ábrelos en Gmail</span>}
+        {quoted && (
+          <details className="group/full">
+            <summary className={`flex min-h-8 w-fit cursor-pointer select-none list-none items-center gap-2 rounded-full border border-line px-3 ${mono} text-[10px] text-muted transition-colors hover:border-bone hover:text-bone [&::-webkit-details-marker]:hidden`}>
+              <span className="group-open/full:hidden">Ver email completo</span>
+              <span className="hidden group-open/full:inline">Ocultar email completo</span>
+              <span aria-hidden="true" className="transition-transform group-open/full:rotate-180">↓</span>
+            </summary>
+            <p className="mt-3 max-w-[62ch] whitespace-pre-wrap border-l border-line pl-3 text-[13px] leading-relaxed text-muted">{m.full_text}</p>
+          </details>
+        )}
+      </div>
+    </li>
+  );
+}
+
+/** Lee ya el buzón de ROWE (el panel también lo hace solo cada minuto). */
+function CheckMailButton() {
+  const { toast } = useFeedback();
+  const [busy, start] = useTransition();
+  const run = () =>
+    start(async () => {
+      const res = await checkInbox();
+      if (!res.ok) return toast(res.error, "error");
+      const n = res.data?.imported ?? 0;
+      toast(n ? `${n === 1 ? "1 respuesta nueva" : `${n} respuestas nuevas`} por email` : "Correo al día · sin respuestas nuevas");
+    });
+  return (
+    <AButton size="sm" onClick={run} loading={busy}>
+      Comprobar correo
+    </AButton>
   );
 }

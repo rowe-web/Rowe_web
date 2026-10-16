@@ -33,11 +33,19 @@ export default async function MensajesPage({ searchParams }: PageProps<"/admin/m
   const repliesBy = new Map<string, LeadRow["replies"]>();
   for (const r of replies ?? []) repliesBy.set(r.lead_id, [...(repliesBy.get(r.lead_id) ?? []), r]);
 
+  // Respuestas de los clientes por email (leídas del buzón de ROWE)
+  const { data: inbound } = ids.length
+    ? await supabase.from("lead_inbound").select("id, lead_id, received_at, from_email, from_name, subject, body, full_text, attachments, matched_by, seen_at").in("lead_id", ids).order("received_at", { ascending: true })
+    : { data: [] };
+  const inboundBy = new Map<string, LeadRow["inbound"]>();
+  for (const r of inbound ?? []) inboundBy.set(r.lead_id, [...(inboundBy.get(r.lead_id) ?? []), r]);
+
   const rows: LeadRow[] = (leads ?? []).map((l) => ({
     ...l,
     quote: (Array.isArray(l.quotes) ? l.quotes[0] : l.quotes) as LeadRow["quote"],
     mail: mailBy.get(l.id) ?? null,
     replies: repliesBy.get(l.id) ?? [],
+    inbound: inboundBy.get(l.id) ?? [],
   }));
 
   const site = await loadSite();

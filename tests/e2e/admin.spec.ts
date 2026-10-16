@@ -237,6 +237,50 @@ test("mensajes: cambia el estado y guarda las notas solas", async ({ page }) => 
   await expect(reply).toHaveCSS("border-left-width", "2px");
 });
 
+test("tiempo real: avisos abajo a la derecha (mensaje nuevo y respuesta por email) y conversación con 3 tipos", async ({ page }) => {
+  const { data: lead, error } = await db
+    .from("leads")
+    .insert({ origin: "formulario", need: "Web", sector: "", budget_label: "", message: "Mensaje inicial E2E", name: "Cliente Hilo E2E", company: "", email: email("hilo"), phone: "", privacy_accepted_at: new Date().toISOString(), source: {} })
+    .select("id")
+    .single();
+  if (error) throw error;
+  await db.from("lead_replies").insert({ lead_id: lead.id, to_email: email("hilo"), from_email: process.env.SMTP_USER, sent_by_name: "QA", subject: "Tu proyecto con ROWE", body: "Respuesta de ROWE E2E", status: "sent", message_id: `<e2e-${run}@gmail.com>` });
+  await login(page, "admin", `/admin/mensajes?lead=${lead.id}`);
+  await expect(page.locator("[data-thread='form']")).toContainText("Mensaje inicial E2E");
+  await expect(page.locator("[data-thread='rowe']")).toContainText("Respuesta de ROWE");
+  // Que la suscripción esté lista antes de crear filas
+  await page.waitForTimeout(2500);
+
+  // Un cliente responde por email (lo que guarda la lectura del buzón)
+  await db.from("lead_inbound").insert({
+    lead_id: lead.id, received_at: new Date().toISOString(), from_email: email("hilo"), from_name: "Cliente Hilo E2E",
+    subject: "Re: Tu proyecto con ROWE", body: "Respuesta del cliente E2E", full_text: "Respuesta del cliente E2E\n\n> cita", message_id: `<cliente-${run}@mail>`, in_reply_to: `<e2e-${run}@gmail.com>`, matched_by: "thread",
+  });
+  const replyAlert = page.locator("[data-live-alert]").filter({ hasText: "Respuesta por email" });
+  await expect(replyAlert).toBeVisible({ timeout: 15000 });
+  await expect(replyAlert).toContainText("Cliente Hilo E2E ha respondido");
+  const box = await replyAlert.boundingBox();
+  const vp = page.viewportSize()!;
+  expect(box!.x + box!.width).toBeGreaterThan(vp.width - 40); // esquina inferior derecha
+  expect(box!.y + box!.height).toBeGreaterThan(vp.height - 200);
+  // La conversación se actualiza sola, en orden: formulario → ROWE → cliente
+  await expect(page.locator("[data-thread='client']")).toContainText("Respuesta del cliente E2E", { timeout: 10000 });
+  expect(await page.locator("[data-thread]").evaluateAll((els) => els.map((e) => e.getAttribute("data-thread")))).toEqual(["form", "rowe", "client"]);
+  await expect(page.locator("[data-thread='client']")).toContainText("Nueva");
+
+  // Mensaje nuevo desde la web
+  await db.from("leads").insert({ origin: "configurador", need: "Audiovisual", sector: "", budget_label: "", message: "", name: "Lead Tiempo Real E2E", company: "QA", email: email("rt"), phone: "", privacy_accepted_at: new Date().toISOString(), source: {} });
+  const leadAlert = page.locator("[data-live-alert]").filter({ hasText: "Lead Tiempo Real E2E" });
+  await expect(leadAlert).toBeVisible({ timeout: 15000 });
+  await expect(leadAlert).toContainText("Nuevo presupuesto");
+  await leadAlert.getByRole("link", { name: /Ver mensaje/ }).click();
+  await expect(page).toHaveURL(/lead=/);
+  await expect(page.locator("[data-thread='form']")).toContainText("Configurador");
+
+  // Al abrir el mensaje, sus respuestas pasan a vistas
+  await waitFor(async () => (await db.from("lead_inbound").select("seen_at").eq("lead_id", lead.id).single()).data?.seen_at);
+});
+
 test("medios: sube con progreso, guarda el texto alternativo y borra del almacenamiento", async ({ page }) => {
   await login(page, "editor", "/admin/medios");
   const png = tinyPng();
