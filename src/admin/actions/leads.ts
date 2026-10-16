@@ -4,7 +4,7 @@ import { refresh } from "next/cache";
 import { z } from "zod";
 import { action, ActionError, check, requireRole } from "@/admin/auth";
 import { processOutbox } from "@/lib/email/outbox";
-import { replyEmail } from "@/lib/email/templates";
+import { buildReplyMail, REPLY_LEAD_COLUMNS, type ReplyLeadRow } from "@/lib/email/reply";
 import { EmailNotConfiguredError, mailSender, sendMail } from "@/lib/email/transport";
 import { adminClient } from "@/lib/supabase/admin";
 import { createSupabaseServer } from "@/lib/supabase/server";
@@ -60,14 +60,14 @@ export async function replyToLead(leadId: string, subject: string, body: string)
 
     // El destinatario sale de la base de datos (con los permisos de quien responde), no del navegador
     const supabase = await createSupabaseServer();
-    const lead = check(await supabase.from("leads").select("id, email, status").eq("id", id.parse(leadId)).single());
+    const lead = check(await supabase.from("leads").select(REPLY_LEAD_COLUMNS).eq("id", id.parse(leadId)).single()) as (ReplyLeadRow & { id: string; status: string }) | null;
     if (!lead) throw new ActionError("No se ha encontrado el mensaje.");
 
     const db = adminClient();
     const base = { lead_id: lead.id, sent_by: me.id, sent_by_name: me.name || me.email, from_email: from, to_email: lead.email, subject: input.data.subject, body: input.data.body };
     let messageId: string;
     try {
-      messageId = (await sendMail(await replyEmail({ to: lead.email, subject: input.data.subject, body: input.data.body, from }))).id;
+      messageId = (await sendMail(await buildReplyMail(lead, input.data.subject, input.data.body, from))).id;
     } catch (e) {
       const msg = e instanceof EmailNotConfiguredError ? e.message : e instanceof Error ? e.message.slice(0, 300) : "error desconocido";
       await db.from("lead_replies").insert({ ...base, status: "failed", error: msg });

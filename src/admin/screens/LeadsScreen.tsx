@@ -452,28 +452,51 @@ function ReplyBox({ lead, from, onClose, onSent }: { lead: LeadRow; from: string
   );
 }
 
-/** Respuestas ya enviadas (o fallidas) desde el panel para este mensaje. */
+/**
+ * Respuestas ya enviadas (o fallidas) desde el panel. Cada una va en su propio bloque,
+ * con fondo, filete lateral y cabecera «Respuesta de ROWE», para que nunca se confunda
+ * con el mensaje del cliente ni con el resto de la ficha.
+ */
 function ReplyHistory({ replies }: { replies: LeadRow["replies"] }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2.5">
       <span className={`${mono} text-[9px] text-muted`}>Respuestas desde el panel · {replies.length}</span>
-      <ol className="flex flex-col border-t border-line-soft">
-        {replies.map((r) => (
-          <li key={r.id} className="flex flex-col gap-1.5 border-b border-line-soft py-3">
-            <span className="flex flex-wrap items-center justify-between gap-2">
-              <StatusDot tone={r.status === "sent" ? "half" : "alert"} label={`${r.status === "sent" ? "Enviada" : "No enviada"} · ${when(r.created_at)}`} />
-              <span className="text-[12px] text-muted">
-                {r.sent_by_name} · desde {r.from_email}
-              </span>
-            </span>
-            <span className="text-[14px] font-medium">{r.subject}</span>
-            <details className="text-[14px] text-muted">
-              <summary className="cursor-pointer select-none">Ver texto</summary>
-              <p className="mt-2 max-w-[62ch] whitespace-pre-wrap leading-relaxed text-bone">{r.body}</p>
-            </details>
-            {r.status === "failed" && r.error && <span className="text-[12px] text-rec">{r.error}</span>}
-          </li>
-        ))}
+      <ol className="flex flex-col gap-2.5">
+        {replies.map((r) => {
+          const sent = r.status === "sent";
+          return (
+            <li
+              key={r.id}
+              data-reply
+              className={`overflow-hidden rounded-md border border-l-2 border-line-soft bg-surface-2 ${sent ? "border-l-bone" : "border-l-rec"}`}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-soft bg-surface-3 px-3.5 py-2.5">
+                <span className={`flex items-center gap-2 ${mono} text-[10px] text-bone`}>
+                  <span aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-rec" />
+                  Respuesta de ROWE
+                </span>
+                <StatusDot tone={sent ? "half" : "alert"} label={`${sent ? "Enviada" : "No enviada"} · ${when(r.created_at)}`} />
+              </div>
+              <div className="flex flex-col gap-2 px-3.5 py-3">
+                <span className="text-[12px] text-muted">
+                  {r.sent_by_name} · desde {r.from_email}
+                </span>
+                <span className="text-[15px] font-medium">{r.subject}</span>
+                <details className="group/reply">
+                  <summary className={`flex min-h-8 w-fit cursor-pointer select-none list-none items-center gap-2 rounded-full border border-line px-3 ${mono} text-[10px] text-muted transition-colors hover:border-bone hover:text-bone [&::-webkit-details-marker]:hidden`}>
+                    <span className="group-open/reply:hidden">Ver texto</span>
+                    <span className="hidden group-open/reply:inline">Ocultar texto</span>
+                    <span aria-hidden="true" className="transition-transform group-open/reply:rotate-180">↓</span>
+                  </summary>
+                  <div className="mt-3 rounded border border-line-soft bg-surface px-4 py-3.5">
+                    <p className="max-w-[62ch] whitespace-pre-wrap text-[14px] leading-relaxed text-bone">{r.body}</p>
+                  </div>
+                </details>
+                {!sent && r.error && <span className="text-[12px] text-rec">{r.error}</span>}
+              </div>
+            </li>
+          );
+        })}
       </ol>
     </div>
   );

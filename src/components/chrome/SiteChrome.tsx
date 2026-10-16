@@ -146,19 +146,35 @@ export function SiteChrome({ nav, contact, brand, hablemosSettings, cookies, amb
   }, [menuOpen, closeMenu, ambientUrl, brand.ambient_on, brand.ambient_off]);
 
   // --- Título de la pestaña --------------------------------------------------------
+  // Al cambiar de pestaña o de ventana se muestra el texto de Ajustes → Marca; al volver,
+  // el título real. Se guarda el título una sola vez por salida: aunque lleguen varios
+  // eventos seguidos (blur + visibilitychange) nunca se toma el de pausa por el «original».
   useEffect(() => {
-    if (!brand.tab_away_title) return;
-    let original = document.title;
-    const onVis = () => {
-      if (document.hidden) {
-        original = document.title;
-        document.title = brand.tab_away_title;
-      } else {
-        document.title = original;
-      }
+    const away = brand.tab_away_title;
+    if (!away) return;
+    let original: string | null = null;
+    const leave = () => {
+      if (original !== null) return;
+      original = document.title;
+      document.title = away;
     };
+    const back = () => {
+      if (original === null) return;
+      document.title = original;
+      original = null;
+    };
+    const onVis = () => (document.hidden ? leave() : document.hasFocus() && back());
+    // Un clic dentro de un vídeo o mapa incrustado (iframe) también quita el foco: no es salir
+    const onBlur = () => window.setTimeout(() => document.activeElement?.tagName !== "IFRAME" && !document.hasFocus() && leave(), 0);
     document.addEventListener("visibilitychange", onVis);
-    return () => document.removeEventListener("visibilitychange", onVis);
+    window.addEventListener("blur", onBlur);
+    window.addEventListener("focus", back);
+    return () => {
+      back();
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("blur", onBlur);
+      window.removeEventListener("focus", back);
+    };
   }, [brand.tab_away_title]);
 
   return (

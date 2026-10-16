@@ -402,6 +402,20 @@ describe("páginas internas y direcciones de proyectos (Fase 5)", () => {
     expect(scenes.web.view_mobile).toBe("Móvil");
   });
 
+  it("pestaña en segundo plano: cualquier texto antiguo pasa a «ROWE en pausa — vuelve pronto»", async () => {
+    for (const old of ["● REC en pausa — vuelve pronto", "● ROWE en pausa — vuelve pronto"]) {
+      await db.query("update public.site_settings set value = jsonb_set(value, '{tab_away_title}', to_jsonb($1::text)) where key = 'brand'", [old]);
+      await seedContent(db, { log: () => {} });
+      const [{ t }] = await db.query<{ t: string }>("select value->>'tab_away_title' as t from public.site_settings where key = 'brand'");
+      expect(t).toBe("ROWE en pausa — vuelve pronto");
+    }
+    // Un texto propio no se toca
+    await db.query("update public.site_settings set value = jsonb_set(value, '{tab_away_title}', '\"Vuelve, te esperamos\"') where key = 'brand'");
+    await seedContent(db, { log: () => {} });
+    const [{ t }] = await db.query<{ t: string }>("select value->>'tab_away_title' as t from public.site_settings where key = 'brand'");
+    expect(t).toBe("Vuelve, te esperamos");
+  });
+
   it("menú: añade el resumen de cada sección sin pisar uno editado", async () => {
     await db.exec(`
       update public.site_settings set value = jsonb_set(value, '{items}', (

@@ -32,6 +32,8 @@ const nextConfig: NextConfig = {
     "/api/quote/pdf": ["./src/assets/**/*"],
     "/api/leads": ["./src/assets/brand/**/*"],
     "/api/cron/email-retry": ["./src/assets/brand/**/*"],
+    // Respuestas a mensajes e invitaciones desde el panel (acciones del servidor)
+    "/admin/**": ["./src/assets/brand/**/*"],
   },
   reactStrictMode: true,
   images: {

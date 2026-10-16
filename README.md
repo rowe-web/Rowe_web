@@ -117,7 +117,9 @@ La cuenta que envía es `rowe.web.contacto@gmail.com` (ya configurada en `.env.l
 2. Ve a <https://myaccount.google.com/apppasswords>, crea una contraseña de aplicación llamada «ROWE web» y copia las 16 letras (sin espacios).
 3. En `.env.local`: `EMAIL_PROVIDER=smtp`, `SMTP_USER=` esa cuenta y `SMTP_PASSWORD=` esas 16 letras. Reinicia `npm run dev`.
 
-**Responder desde el panel:** en Mensajes, el botón **Responder** abre un formulario (asunto + texto) que envía la respuesta desde esa misma cuenta, no desde el correo personal de quien responde. El borrador se guarda mientras escribes; cada respuesta (enviada o fallida) queda en el historial del mensaje (tabla `lead_replies`) y el mensaje pasa de «Nuevo» a «Contactado». Sin el envío configurado, el botón vuelve a abrir el programa de correo.
+**Responder desde el panel:** en Mensajes, el botón **Responder** abre un formulario (asunto + texto) que envía la respuesta desde esa misma cuenta, no desde el correo personal de quien responde. El borrador se guarda mientras escribes; cada respuesta (enviada o fallida) queda en el historial del mensaje (tabla `lead_replies`) y el mensaje pasa de «Nuevo» a «Contactado».
+
+El email al cliente tiene la estética de la web (fondo negro, logotipo, titular en serif, rótulos monoespaciados) e incluye el resumen de su solicitud: servicio, presupuesto, nº de presupuesto, lo que eligió y su mensaje. Para llegar a la bandeja de entrada: sale autenticado desde Gmail (SPF y DKIM de Google), con nombre «ROWE», versión de texto, HTML de tablas sin scripts, pocos enlaces y una línea que explica por qué se recibe. Con dominio propio (Fase 6) conviene pasar a `EMAIL_PROVIDER=resend` con SPF, DKIM y DMARC del dominio. Sin el envío configurado, el botón vuelve a abrir el programa de correo.
 
 Limitaciones: unos 500 destinatarios al día, el remitente es una dirección @gmail.com y Google puede bloquear el envío si detecta un uso anómalo (el lead nunca se pierde: queda en la cola).
 
@@ -136,6 +138,7 @@ Limitaciones: unos 500 destinatarios al día, el remitente es una dirección @gm
 | `npm run test:e2e` | Pruebas en navegador real: scroll, navegación, configurador, formulario, leads, PDF, cookies y panel (construye y arranca la web de producción; crea y borra sus propios usuarios y datos de prueba en Supabase) |
 | `npm run db:migrate` | Aplica migraciones nuevas |
 | `npm run db:seed` | Carga el contenido que falte y asegura el admin |
+| `npm run db:publish -- "nota"` | Publica el borrador como versión nueva (igual que «Publicar» del panel) y avisa a la web para que deje de servir la anterior (`POST /api/revalidate` con `CRON_SECRET`) |
 | `npm run db:backup` | Copia de seguridad de la base de datos (`-- --media`: también los archivos) |
 | `npm run db:seed -- --reset-content` | Vuelve a cargar TODO el contenido del diseño (pide confirmación; no toca mensajes ni usuarios) |
 | `npm run brand` | Regenera favicon, iconos e imagen para compartir desde los logos de `design/assets` |

@@ -189,6 +189,24 @@ test("logo: desde otra página lleva al inicio, arriba del todo", async ({ page 
   expect(errors).toEqual([]);
 });
 
+test("pestaña en segundo plano: «ROWE en pausa — vuelve pronto» y al volver, el título real", async ({ page }) => {
+  await open(page);
+  const real = await page.title();
+  const setHidden = (hidden: boolean) =>
+    page.evaluate((hidden) => {
+      Object.defineProperty(document, "hidden", { value: hidden, configurable: true });
+      Object.defineProperty(document, "visibilityState", { value: hidden ? "hidden" : "visible", configurable: true });
+      document.dispatchEvent(new Event("visibilitychange"));
+    }, hidden);
+  await setHidden(true);
+  expect(await page.title()).toBe("ROWE en pausa — vuelve pronto");
+  // Un segundo aviso de salida no toma el título de pausa por el original
+  await setHidden(true);
+  await setHidden(false);
+  expect(await page.title()).toBe(real);
+  expect(real).not.toMatch(/en pausa/);
+});
+
 test("REC ↔ </>: en la cabecera, en Hablemos y en el pie", async ({ page }) => {
   await open(page);
   for (const sel of ["[data-site-header]", "#hablemos", "[data-site-footer]"]) {

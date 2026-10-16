@@ -225,6 +225,16 @@ test("mensajes: cambia el estado y guarda las notas solas", async ({ page }) => 
   await expect(page.locator("[data-reply-box]")).toHaveCount(0);
   await page.getByRole("button", { name: "Responder", exact: true }).click();
   await expect(page.locator("[data-reply-box]").getByLabel("Respuesta")).not.toHaveValue(/Borrador E2E/);
+
+  // Historial: cada respuesta de ROWE en su propio bloque, con el texto desplegable
+  await db.from("lead_replies").insert({ lead_id: lead.id, to_email: email("lead"), from_email: process.env.SMTP_USER, sent_by_name: "QA", subject: "Tu proyecto con ROWE", body: "Texto enviado E2E", status: "sent" });
+  await page.reload();
+  const reply = page.locator("[data-reply]").first();
+  await expect(reply).toContainText("Respuesta de ROWE");
+  await expect(reply.getByText("Texto enviado E2E")).toBeHidden();
+  await reply.getByText("Ver texto").click();
+  await expect(reply.getByText("Texto enviado E2E")).toBeVisible();
+  await expect(reply).toHaveCSS("border-left-width", "2px");
 });
 
 test("medios: sube con progreso, guarda el texto alternativo y borra del almacenamiento", async ({ page }) => {

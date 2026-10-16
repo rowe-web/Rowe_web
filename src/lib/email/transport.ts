@@ -8,7 +8,9 @@ export interface Mail {
   html: string;
   text: string;
   replyTo?: string;
-  attachments?: { filename: string; path?: string; content?: Buffer; cid?: string }[];
+  /** Cabeceras extra (p. ej. Auto-Submitted en los avisos automáticos). */
+  headers?: Record<string, string>;
+  attachments?: { filename: string; path?: string; content?: Buffer; cid?: string; contentDisposition?: "inline" | "attachment" }[];
 }
 
 export class EmailNotConfiguredError extends Error {
@@ -56,6 +58,7 @@ export async function sendMail(mail: Mail): Promise<{ id: string }> {
       subject: mail.subject,
       html: mail.html,
       text: mail.text,
+      headers: mail.headers,
       attachments: mail.attachments,
     });
     return { id: info.messageId };
@@ -70,6 +73,7 @@ export async function sendMail(mail: Mail): Promise<{ id: string }> {
         from: env.EMAIL_FROM,
         to: mail.to,
         reply_to: mail.replyTo,
+        headers: mail.headers,
         subject: mail.subject,
         html: mail.html,
         text: mail.text,

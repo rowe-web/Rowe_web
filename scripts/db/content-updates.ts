@@ -130,7 +130,7 @@ export async function applyContentUpdates(db: Db, log: (msg: string) => void): P
   // --- Título de la pestaña al salir --------------------------------------------
   done(
     await updateJson(db, "site_settings", "value", "key", "brand", (v) =>
-      swap(v, "tab_away_title", "● REC en pausa — vuelve pronto", "● ROWE en pausa — vuelve pronto"),
+      ["● REC en pausa — vuelve pronto", "● ROWE en pausa — vuelve pronto"].some((old) => swap(v, "tab_away_title", old, "ROWE en pausa — vuelve pronto")),
     ),
     "Pestaña en segundo plano: «ROWE en pausa»",
   );

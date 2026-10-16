@@ -165,7 +165,7 @@ export const settings: SeedSetting[] = [
       city: "[Ciudad, Provincia]",
       legend: ["RO — Rodaje", "WE — Web"],
       credits: "Dirección: ROWE · Web: ROWE · Audiovisual: ROWE",
-      tab_away_title: "● ROWE en pausa — vuelve pronto",
+      tab_away_title: "ROWE en pausa — vuelve pronto",
       ambient_on: "Sonido ambiente · On",
       ambient_off: "Sonido ambiente · Off",
       ambient_audio_media_id: null,
