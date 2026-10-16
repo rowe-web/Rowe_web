@@ -42,7 +42,7 @@ export function Preloader({ label, meta, steps = [], progress = 0, preview = fal
       role="status"
       aria-live="polite"
       aria-label="Cargando"
-      className={`${preview ? "relative h-[900px]" : "fixed inset-0 h-screen-safe"} z-[500] overflow-hidden`}
+      className={`${preview ? "relative h-[900px]" : "fixed inset-0 h-screen-safe"} z-[500] overflow-hidden bg-black`}
     >
       {/* Mitades del letterbox que se abren al salir */}
       <div data-preloader-top className="absolute inset-x-0 top-0 h-1/2 origin-top bg-black" />

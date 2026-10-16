@@ -305,7 +305,7 @@ function LeadDetail({
       </dl>
 
       {/* Contacto arriba del todo: siempre a mano aunque la conversación sea larga */}
-      <div data-lead-contact className="grid gap-px overflow-hidden rounded-md border border-line-soft bg-line-soft min-[1100px]:grid-cols-[minmax(0,1.25fr)_minmax(0,1.25fr)_minmax(0,0.8fr)]">
+      <div data-lead-contact className="grid gap-px overflow-hidden rounded-md border border-line-soft bg-line-soft min-[1100px]:grid-cols-[minmax(0,1fr)_auto_auto]">
         <div className="flex min-w-0 flex-col gap-1.5 bg-surface p-3.5">
           <span className={`${mono} text-[9px] text-muted`}>Email</span>
           <span className="flex min-w-0 items-center justify-between gap-3">
@@ -319,17 +319,21 @@ function LeadDetail({
         </div>
         <div className="flex min-w-0 flex-col gap-1.5 bg-surface p-3.5">
           <span className={`${mono} text-[9px] text-muted`}>Teléfono</span>
-          <span className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-            {lead.phone ? (
-              <a href={`tel:${lead.phone.replace(/[^d+]/g, "")}`} className="whitespace-nowrap text-[14px] underline-offset-4 hover:underline">
+          {/* El número completo abre WhatsApp; el icono discreto llama */}
+          <span className="flex min-w-0 items-center gap-3">
+            {lead.phone && wa ? (
+              <a href={wa} target="_blank" rel="noopener noreferrer" data-lead-phone title="Abrir en WhatsApp" className="flex min-h-8 items-center gap-1.5 whitespace-nowrap text-[14px] tabular-nums underline-offset-4 hover:underline">
                 {lead.phone}
+                <ArrowUpRight className="h-3 w-3 flex-none text-muted" strokeWidth={2} />
               </a>
             ) : (
-              <span className="text-[14px] text-muted">Sin teléfono</span>
+              <span className="text-[14px] text-muted">{lead.phone || "Sin teléfono"}</span>
             )}
-            {wa && (
-              <a href={wa} target="_blank" rel="noopener noreferrer" className={`flex min-h-8 flex-none items-center gap-1.5 rounded-full border border-line px-2.5 ${mono} text-[10px] text-bone hover:border-bone`}>
-                WhatsApp <ArrowUpRight className="h-3 w-3" strokeWidth={2} />
+            {lead.phone && (
+              <a href={`tel:${lead.phone.replace(/[^\d+]/g, "")}`} aria-label={`Llamar al ${lead.phone}`} title="Llamar" className="ml-auto flex h-8 w-8 flex-none items-center justify-center rounded-full border border-line text-muted hover:border-bone hover:text-bone">
+                <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={1.6} aria-hidden="true">
+                  <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" strokeLinejoin="round" />
+                </svg>
               </a>
             )}
           </span>
@@ -555,7 +559,9 @@ function Conversation({ lead, unseen }: { lead: LeadRow; unseen: Set<number> }) 
           it.kind === "form" ? (
             <li key="form" data-thread="form" className="flex flex-col gap-2.5 rounded-md border border-dashed border-line-strong px-4 py-3.5">
               <ThreadHeader mark={KIND.form.mark} title={lead.origin === "configurador" ? `Configurador de presupuesto${lead.quote ? ` · ${lead.quote.number}` : ""}` : KIND.form.label} meta={when(lead.created_at)} />
-              <p className="max-w-[62ch] whitespace-pre-wrap text-[15px] leading-relaxed">{lead.message || "Sin mensaje. Esta solicitud llegó sin texto adicional."}</p>
+              <Fold>
+                <p className="max-w-[62ch] whitespace-pre-wrap text-[14px] leading-relaxed text-bone">{lead.message || "Sin mensaje. Esta solicitud llegó sin texto adicional."}</p>
+              </Fold>
             </li>
           ) : it.kind === "rowe" ? (
             <RoweReply key={`r${it.reply.id}`} reply={it.reply} />
@@ -580,6 +586,20 @@ function ThreadHeader({ mark, title, meta }: { mark: ReactNode; title: string; m
   );
 }
 
+/** Texto de un mensaje del hilo: replegado por defecto tras «Ver texto» (los tres tipos igual). */
+function Fold({ children }: { children: ReactNode }) {
+  return (
+    <details data-fold className="group/fold">
+      <summary className={`flex min-h-8 w-fit cursor-pointer select-none list-none items-center gap-2 rounded-full border border-line px-3 ${mono} text-[10px] text-muted transition-colors hover:border-bone hover:text-bone [&::-webkit-details-marker]:hidden`}>
+        <span className="group-open/fold:hidden">Ver texto</span>
+        <span className="hidden group-open/fold:inline">Ocultar texto</span>
+        <span aria-hidden="true" className="transition-transform group-open/fold:rotate-180">↓</span>
+      </summary>
+      <div className="mt-3 rounded border border-line-soft bg-surface px-4 py-3.5">{children}</div>
+    </details>
+  );
+}
+
 /** b) Lo que respondió ROWE desde el panel. */
 function RoweReply({ reply: r }: { reply: LeadRow["replies"][number] }) {
   const sent = r.status === "sent";
@@ -593,16 +613,9 @@ function RoweReply({ reply: r }: { reply: LeadRow["replies"][number] }) {
           {r.sent_by_name} · desde {r.from_email}
         </span>
         <span className="text-[15px] font-medium">{r.subject}</span>
-        <details className="group/reply">
-          <summary className={`flex min-h-8 w-fit cursor-pointer select-none list-none items-center gap-2 rounded-full border border-line px-3 ${mono} text-[10px] text-muted transition-colors hover:border-bone hover:text-bone [&::-webkit-details-marker]:hidden`}>
-            <span className="group-open/reply:hidden">Ver texto</span>
-            <span className="hidden group-open/reply:inline">Ocultar texto</span>
-            <span aria-hidden="true" className="transition-transform group-open/reply:rotate-180">↓</span>
-          </summary>
-          <div className="mt-3 rounded border border-line-soft bg-surface px-4 py-3.5">
-            <p className="max-w-[62ch] whitespace-pre-wrap text-[14px] leading-relaxed text-bone">{r.body}</p>
-          </div>
-        </details>
+        <Fold>
+          <p className="max-w-[62ch] whitespace-pre-wrap text-[14px] leading-relaxed text-bone">{r.body}</p>
+        </Fold>
         {!sent && r.error && <span className="text-[12px] text-rec">{r.error}</span>}
       </div>
     </li>
@@ -629,18 +642,16 @@ function ClientReply({ msg: m, isNew }: { msg: LeadRow["inbound"][number]; isNew
           {m.matched_by === "sender" && " · asociada por remitente"}
         </span>
         {m.subject && <span className="text-[15px] font-medium">{m.subject}</span>}
-        <p className="max-w-[62ch] whitespace-pre-wrap text-[15px] leading-relaxed text-bone">{m.body}</p>
         {m.attachments > 0 && <span className="text-[12px] text-muted">📎 {m.attachments === 1 ? "1 adjunto" : `${m.attachments} adjuntos`} · ábrelos en Gmail</span>}
-        {quoted && (
-          <details className="group/full">
-            <summary className={`flex min-h-8 w-fit cursor-pointer select-none list-none items-center gap-2 rounded-full border border-line px-3 ${mono} text-[10px] text-muted transition-colors hover:border-bone hover:text-bone [&::-webkit-details-marker]:hidden`}>
-              <span className="group-open/full:hidden">Ver email completo</span>
-              <span className="hidden group-open/full:inline">Ocultar email completo</span>
-              <span aria-hidden="true" className="transition-transform group-open/full:rotate-180">↓</span>
-            </summary>
-            <p className="mt-3 max-w-[62ch] whitespace-pre-wrap border-l border-line pl-3 text-[13px] leading-relaxed text-muted">{m.full_text}</p>
-          </details>
-        )}
+        <Fold>
+          <p className="max-w-[62ch] whitespace-pre-wrap text-[14px] leading-relaxed text-bone">{m.body}</p>
+          {quoted && (
+            <div className="mt-4 flex flex-col gap-2 border-t border-line-soft pt-3">
+              <span className={`${mono} text-[9px] text-muted`}>Email completo · firma y texto citado</span>
+              <p className="max-w-[62ch] whitespace-pre-wrap border-l border-line pl-3 text-[13px] leading-relaxed text-muted">{m.full_text}</p>
+            </div>
+          )}
+        </Fold>
       </div>
     </li>
   );

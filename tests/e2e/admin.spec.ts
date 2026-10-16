@@ -240,7 +240,7 @@ test("mensajes: cambia el estado y guarda las notas solas", async ({ page }) => 
 test("tiempo real: avisos abajo a la derecha (mensaje nuevo y respuesta por email) y conversación con 3 tipos", async ({ page }) => {
   const { data: lead, error } = await db
     .from("leads")
-    .insert({ origin: "formulario", need: "Web", sector: "", budget_label: "", message: "Mensaje inicial E2E", name: "Cliente Hilo E2E", company: "", email: email("hilo"), phone: "", privacy_accepted_at: new Date().toISOString(), source: {} })
+    .insert({ origin: "formulario", need: "Web", sector: "", budget_label: "", message: "Mensaje inicial E2E", name: "Cliente Hilo E2E", company: "", email: email("hilo"), phone: "+34 656 180 539", privacy_accepted_at: new Date().toISOString(), source: {} })
     .select("id")
     .single();
   if (error) throw error;
@@ -251,6 +251,17 @@ test("tiempo real: avisos abajo a la derecha (mensaje nuevo y respuesta por emai
   const contact = page.locator("[data-lead-contact]");
   await expect(contact).toContainText(email("hilo"));
   await expect(contact).toContainText("Enviado");
+  // Teléfono completo (sin «…»): al pulsarlo abre WhatsApp; el icono de al lado llama
+  const phone = contact.locator("[data-lead-phone]");
+  await expect(phone).toHaveText("+34 656 180 539");
+  await expect(phone).toHaveAttribute("href", "https://wa.me/34656180539");
+  expect(await phone.evaluate((el) => el.scrollWidth <= el.clientWidth + 1 && el.getBoundingClientRect().right <= el.closest("[data-lead-contact] > div")!.getBoundingClientRect().right)).toBe(true);
+  await expect(contact.getByRole("link", { name: /Llamar/ })).toHaveAttribute("href", "tel:+34656180539");
+  // Los mensajes del hilo salen plegados: «Ver texto» los despliega
+  const form = page.locator("[data-thread='form']");
+  await expect(form.getByText("Mensaje inicial E2E")).toBeHidden();
+  await form.getByText("Ver texto").click();
+  await expect(form.getByText("Mensaje inicial E2E")).toBeVisible();
   expect(await page.evaluate(() => {
     const c = document.querySelector("[data-lead-contact]")!;
     const t = document.querySelector("[data-thread='form']")!;
@@ -276,6 +287,11 @@ test("tiempo real: avisos abajo a la derecha (mensaje nuevo y respuesta por emai
   await expect(page.locator("[data-thread='client']")).toContainText("Respuesta del cliente E2E", { timeout: 10000 });
   expect(await page.locator("[data-thread]").evaluateAll((els) => els.map((e) => e.getAttribute("data-thread")))).toEqual(["form", "rowe", "client"]);
   await expect(page.locator("[data-thread='client']")).toContainText("Nueva");
+  const client = page.locator("[data-thread='client']");
+  await expect(client.getByText("Respuesta del cliente E2E", { exact: true })).toBeHidden();
+  await client.getByText("Ver texto").click();
+  await expect(client.getByText("Respuesta del cliente E2E", { exact: true })).toBeVisible();
+  await expect(client.getByText("> cita")).toBeVisible();
 
   // Mensaje nuevo desde la web
   await db.from("leads").insert({ origin: "configurador", need: "Audiovisual", sector: "", budget_label: "", message: "", name: "Lead Tiempo Real E2E", company: "QA", email: email("rt"), phone: "", privacy_accepted_at: new Date().toISOString(), source: {} });

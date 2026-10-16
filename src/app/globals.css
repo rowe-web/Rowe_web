@@ -328,8 +328,14 @@ html.has-cursor .cursor-halo {
 
 /* Preloader: red de seguridad sin JavaScript. Si los scripts no llegan a cargar (red lenta,
    bloqueo del navegador…), el preloader se retira solo a los 8 s y deja ver la web. Con
-   JavaScript (lo normal) ya se ha ido antes y este CSS no llega a actuar. */
+   JavaScript (lo normal) ya se ha ido antes y este CSS no llega a actuar.
+   La animación crea un contexto de apilamiento propio en este contenedor, así que la capa
+   (fija, a pantalla completa y por encima de la web) tiene que ser el propio contenedor:
+   si no, la cabecera y el vídeo del inicio se pintarían por encima del negro. */
 .rowe-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
   animation: preloader-failsafe 0.6s ease 8s forwards;
 }
 @keyframes preloader-failsafe {

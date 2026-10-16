@@ -46,6 +46,39 @@ test("preloader: «/» y «>» del cierre separados", async ({ page }, info) => 
   expect(gap).toBeGreaterThan(2);
 });
 
+test("preloader: capa negra opaca por encima de toda la web mientras cuenta", async ({ page }) => {
+  // En cuanto la web está pintada debajo, se mira qué elemento queda arriba en cada punto
+  await page.addInitScript(() => {
+    localStorage.setItem("rowe-consent", "denied");
+    const w = window as unknown as { __cover?: { hits: boolean[]; bg: string } };
+    const probe = () => {
+      const pre = document.querySelector(".rowe-preloader");
+      const header = document.querySelector("[data-site-header]");
+      if (!pre || !header || !document.querySelector("#hero")) return requestAnimationFrame(probe);
+      const pts: [number, number][] = [];
+      for (const fx of [0.06, 0.3, 0.5, 0.7, 0.94]) for (const fy of [0.04, 0.3, 0.5, 0.75, 0.95]) pts.push([innerWidth * fx, innerHeight * fy]);
+      for (const el of header.querySelectorAll("a, button")) {
+        const r = el.getBoundingClientRect();
+        if (r.width) pts.push([r.left + r.width / 2, r.top + r.height / 2]);
+      }
+      w.__cover = {
+        hits: pts.map(([x, y]) => pre.contains(document.elementFromPoint(x, y))),
+        bg: getComputedStyle(pre.querySelector("[data-preloader]")!).backgroundColor,
+      };
+    };
+    requestAnimationFrame(probe);
+  });
+  await page.goto("/", { waitUntil: "commit" });
+  const cover = await page.waitForFunction(() => (window as unknown as { __cover?: unknown }).__cover);
+  const { hits, bg } = (await cover.jsonValue()) as { hits: boolean[]; bg: string };
+  expect(hits.length).toBeGreaterThan(25);
+  expect(hits.every(Boolean)).toBe(true);
+  expect(bg).toBe("rgb(0, 0, 0)");
+  // Y al terminar se retira y deja la web limpia
+  await expect(page.locator(".rowe-preloader")).toHaveCount(0, { timeout: 8000 });
+  await expect(page.locator("#hero h1")).toBeVisible();
+});
+
 const posY = (page: Page) => page.evaluate(() => window.scrollY);
 const stopped = (page: Page) => page.evaluate(() => (window as unknown as { __rowe: { lenis: { isStopped: boolean } } }).__rowe.lenis.isStopped);
 

@@ -102,6 +102,8 @@ export function PreloaderGate({ label, meta, steps = [] }: { label: string; meta
         .to(el.querySelector("[data-preloader-content]"), { autoAlpha: 0, duration: 0.35 * k }, fast ? ">" : "+=0.15")
         // La película empieza mientras se abre el letterbox
         .add(() => markReady(), "<0.1")
+        // Fondo negro opaco hasta aquí; ahora solo quedan las dos mitades que se abren
+        .set(el.querySelector("[data-preloader]"), { backgroundColor: "transparent" }, "<")
         .to(el.querySelector("[data-preloader-top]"), { scaleY: 0, duration: 1.1 * k, ease: EASE.cut }, "<")
         .to(el.querySelector("[data-preloader-bottom]"), { scaleY: 0, duration: 1.1 * k, ease: EASE.cut }, "<");
     };
