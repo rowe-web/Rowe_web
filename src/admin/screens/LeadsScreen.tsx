@@ -7,6 +7,7 @@ import { useFeedback } from "@/admin/ui/feedback";
 import { AButton, Card, EmptyState, Field, PageTitle, Segmented, StatusDot, TextArea, TextInput } from "@/admin/ui/kit";
 import { mono } from "@/admin/ui/styles";
 import { whatsappHref } from "@/lib/content/settings";
+import { spamHints } from "@/lib/email/spam";
 
 type Status = keyof typeof LEAD_STATUS;
 
@@ -413,6 +414,7 @@ function ReplyBox({ lead, from, onClose, onSent }: { lead: LeadRow; from: string
     return { subject: DEFAULT_SUBJECT, body: `Hola${first ? ` ${first}` : ""}:\n\n\n\nUn saludo,\nEl equipo de ROWE` };
   });
 
+  const hints = spamHints(draft.subject, draft.body);
   const update = (patch: Partial<typeof draft>) => {
     const next = { ...draft, ...patch };
     setDraft(next);
@@ -459,6 +461,17 @@ function ReplyBox({ lead, from, onClose, onSent }: { lead: LeadRow; from: string
       <Field label="Respuesta" count={draft.body.length} max={10000}>
         <TextArea rows={9} value={draft.body} maxLength={10000} onChange={(e) => update({ body: e.target.value })} />
       </Field>
+      {/* Lo que suele mandar un email a spam: se avisa mientras se escribe (se puede enviar igual) */}
+      {hints.length > 0 && (
+        <ul data-spam-hints className="flex flex-col gap-1.5 rounded border border-line-soft bg-surface-3 px-3.5 py-3">
+          <li className={`${mono} text-[9px] text-muted`}>Para que no acabe en spam</li>
+          {hints.map((h) => (
+            <li key={h} className="text-[13px] leading-snug text-bone">
+              · {h}
+            </li>
+          ))}
+        </ul>
+      )}
       <div className="flex flex-wrap items-center gap-2.5">
         <AButton variant="primary" onClick={send} loading={busy} disabled={!draft.subject.trim() || !draft.body.trim()}>
           Enviar respuesta

@@ -1,4 +1,5 @@
 import "server-only";
+import { randomUUID } from "node:crypto";
 import nodemailer, { type Transporter } from "nodemailer";
 import { serverEnv } from "@/lib/env.server";
 
@@ -51,14 +52,23 @@ export async function sendMail(mail: Mail): Promise<{ id: string }> {
       secure: env.SMTP_PORT === 465,
       auth: { user: env.SMTP_USER, pass: env.SMTP_PASSWORD },
     });
+    // Remitente = la cuenta autenticada, siempre (si no coinciden, Gmail lo reescribe y el
+    // email pierde credibilidad), con nombre «ROWE». Respuestas, a la misma cuenta salvo que el
+    // email diga otra cosa (los avisos internos responden al cliente).
     const info = await smtp.sendMail({
-      from: env.EMAIL_FROM || `ROWE <${env.SMTP_USER}>`,
+      from: { name: "ROWE", address: env.SMTP_USER },
+      sender: env.SMTP_USER,
       to: mail.to,
-      replyTo: mail.replyTo,
+      replyTo: mail.replyTo || env.SMTP_USER,
       subject: mail.subject,
       html: mail.html,
       text: mail.text,
-      headers: mail.headers,
+      textEncoding: "quoted-printable",
+      headers: {
+        // Identificador único: los clientes de correo no agrupan ni recortan emails parecidos
+        "X-Entity-Ref-ID": randomUUID(),
+        ...mail.headers,
+      },
       attachments: mail.attachments,
     });
     return { id: info.messageId };
@@ -73,7 +83,7 @@ export async function sendMail(mail: Mail): Promise<{ id: string }> {
         from: env.EMAIL_FROM,
         to: mail.to,
         reply_to: mail.replyTo,
-        headers: mail.headers,
+        headers: { "X-Entity-Ref-ID": randomUUID(), ...mail.headers },
         subject: mail.subject,
         html: mail.html,
         text: mail.text,

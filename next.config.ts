@@ -36,6 +36,9 @@ const nextConfig: NextConfig = {
     "/admin/**": ["./src/assets/brand/**/*"],
   },
   reactStrictMode: true,
+  // Desarrollo: abrir la web desde el móvil con la IP del ordenador en la red local
+  // (http://192.168.x.x:3000). Sin esto, Next bloquea sus scripts y la página no arranca.
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "172.*.*.*", "*.local"],
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: host ? [{ protocol: "https", hostname: host, pathname: "/storage/v1/object/public/**" }] : [],

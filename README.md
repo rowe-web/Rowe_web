@@ -68,6 +68,8 @@ npm run dev
 
 Abre <http://localhost:3000>. La portada debe decir «Base de datos conectada · versión publicada 1 · 11 escenas…».
 
+**Desde el móvil (misma wifi):** abre `http://IP-del-ordenador:3000` (la IP la muestra `npm run dev` en «Network», p. ej. `192.168.1.41`). Las direcciones de red local ya están permitidas en `next.config.ts` (`allowedDevOrigins`); sin eso, Next bloquea sus scripts en desarrollo y la intro se quedaba fija. La intro en móvil es más corta y se salta al tocar o deslizar; y si el JavaScript no cargara, se retira sola a los 8 s.
+
 ## Panel de administración (`/admin`)
 
 Entra en `/admin` con tu email y contraseña. Todo lo que ves en la web se edita aquí: textos y escenas, proyectos, precios del configurador, medios, ajustes, páginas legales y menú.
@@ -119,7 +121,7 @@ La cuenta que envía es `rowe.web.contacto@gmail.com` (ya configurada en `.env.l
 
 **Responder desde el panel:** en Mensajes, el botón **Responder** abre un formulario (asunto + texto) que envía la respuesta desde esa misma cuenta, no desde el correo personal de quien responde. El borrador se guarda mientras escribes; cada respuesta (enviada o fallida) queda en el historial del mensaje (tabla `lead_replies`) y el mensaje pasa de «Nuevo» a «Contactado».
 
-El email al cliente tiene la estética de la web (fondo negro, logotipo, titular en serif, rótulos monoespaciados) e incluye el resumen de su solicitud: servicio, presupuesto, nº de presupuesto, lo que eligió y su mensaje. Para llegar a la bandeja de entrada: sale autenticado desde Gmail (SPF y DKIM de Google), con nombre «ROWE», versión de texto, HTML de tablas sin scripts, pocos enlaces y una línea que explica por qué se recibe. Con dominio propio (Fase 6) conviene pasar a `EMAIL_PROVIDER=resend` con SPF, DKIM y DMARC del dominio. Sin el envío configurado, el botón vuelve a abrir el programa de correo.
+El email al cliente tiene la estética de la web en versión clara de máximo contraste (texto #111 sobre blanco, logotipo negro sobre su propio fondo blanco para que no se pierda si el cliente de correo invierte colores; en modo oscuro de Apple Mail/iOS cambia a la paleta oscura de la web) e incluye el resumen de su solicitud: servicio, presupuesto, nº de presupuesto, lo que eligió y su mensaje. Nunca muestra datos de relleno («[+34 600 000 000]», «[Ciudad, Provincia]»): pon los reales en Ajustes → Contacto y Marca. Para llegar a la bandeja de entrada: el remitente es siempre la cuenta autenticada con nombre «ROWE» y Reply-To a la misma cuenta, cabecera `X-Entity-Ref-ID` única, sale autenticado desde Gmail (SPF y DKIM de Google), versión de texto, HTML de tablas sin scripts, pocos enlaces y una línea que explica por qué se recibe. Al escribir, el panel avisa de lo que suele llevar a spam (mayúsculas, «!!», «gratis», demasiados enlaces…). Con dominio propio (Fase 6) conviene pasar a `EMAIL_PROVIDER=resend` con SPF, DKIM y DMARC del dominio. Sin el envío configurado, el botón vuelve a abrir el programa de correo.
 
 Limitaciones: unos 500 destinatarios al día, el remitente es una dirección @gmail.com y Google puede bloquear el envío si detecta un uso anómalo (el lead nunca se pierde: queda en la cola).
 

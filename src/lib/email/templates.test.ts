@@ -49,3 +49,21 @@ describe("email de respuesta al cliente", () => {
     expect(mail.html).toContain("&lt;img src=x");
   });
 });
+
+describe("email de respuesta · datos reales, contraste y modo oscuro", () => {
+  it("nunca muestra datos de relleno ni enlaza a un número inventado", async () => {
+    const mail = await replyEmail({ ...base, contact: { ...base.contact, phone: "[+34 600 000 000]", whatsapp: "[+34 600 000 000]", city: "[Ciudad, Provincia]" } });
+    expect(mail.html).not.toMatch(/\[\+34|\[Ciudad|wa\.me|tel:/);
+    expect(mail.text).not.toMatch(/\[\+34|\[Ciudad|wa\.me/);
+    expect(mail.html).toContain("mailto:rowe.web.contacto@gmail.com");
+  });
+
+  it("texto oscuro sobre fondo claro, con paleta propia para el modo oscuro", async () => {
+    const mail = await replyEmail(base);
+    expect(mail.html).toContain("color:#111111");
+    expect(mail.html).toMatch(/<meta name="color-scheme" content="light dark">/);
+    expect(mail.html).toMatch(/@media \(prefers-color-scheme: dark\)/);
+    // El logotipo va sobre su propio fondo blanco (no se pierde si el cliente invierte colores)
+    expect(mail.attachments?.[0]?.content?.length).toBeGreaterThan(1000);
+  });
+});

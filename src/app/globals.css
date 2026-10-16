@@ -326,6 +326,20 @@ html.has-cursor .cursor-halo {
   to { opacity: 1; transform: none; }
 }
 
+/* Preloader: red de seguridad sin JavaScript. Si los scripts no llegan a cargar (red lenta,
+   bloqueo del navegador…), el preloader se retira solo a los 8 s y deja ver la web. Con
+   JavaScript (lo normal) ya se ha ido antes y este CSS no llega a actuar. */
+.rowe-preloader {
+  animation: preloader-failsafe 0.6s ease 8s forwards;
+}
+@keyframes preloader-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
 /* Preloader: solo en la primera visita de la sesión (el script en línea marca html.intro-seen) */
 html.intro-seen .rowe-preloader,
 html.reduced .rowe-preloader {

@@ -117,82 +117,93 @@ export interface ReplyContact {
   tagline: string;
 }
 
-// Paleta de la web (globals.css) en valores fijos: los clientes de correo no leen variables CSS
-const INK = "#0A0A0A";
-const PANEL = "#121212";
-const BONE = "#EDEAE4";
-const MUTED = "#8A8780";
-const LINE = "#262524";
+/** «[+34 600 000 000]», «[Ciudad, Provincia]»…: datos de relleno que nunca salen en un email. */
+export function realValue(v: string | null | undefined): string {
+  const t = (v ?? "").trim();
+  return !t || /^\[.*\]$/.test(t) ? "" : t;
+}
+
+// Paleta clara (máximo contraste) con el lenguaje de la web; en modo oscuro (Apple Mail, iOS)
+// se cambia por la paleta de la web con @media. Gmail y Outlook, que invierten los colores por
+// su cuenta, reciben un diseño claro y legible que aguanta la inversión: el logotipo va sobre
+// su propio fondo blanco (las imágenes no se invierten) y no hay texto claro sobre fondo claro.
+const PAPER = "#EDEAE4";
+const CARD = "#FFFFFF";
+const INK = "#111111";
+const SOFT = "#555555";
+const LINE = "#E3DFD8";
 const REC = "#FF3B1F";
 const SERIF = "Georgia,'Times New Roman',serif";
 const MONO = "'Courier New',Courier,monospace";
 const SANS = "Helvetica,Arial,sans-serif";
-
-const LABEL = `font:10px/1.5 ${MONO};letter-spacing:.14em;text-transform:uppercase;color:${MUTED}`;
+const LABEL = `font:10px/1.5 ${MONO};letter-spacing:.14em;text-transform:uppercase;color:${SOFT}`;
 
 /**
  * Respuesta a un mensaje, escrita en el panel y enviada desde la cuenta de ROWE.
- * Mismo lenguaje que la web: fondo negro, logotipo blanco, titular en serif, rótulos
- * monoespaciados y el punto REC como único color. Incluye el resumen de lo que pidió.
+ * Mismo lenguaje que la web (titular en serif, rótulos monoespaciados, punto REC) en una
+ * versión clara de máximo contraste, con modo oscuro. Incluye el resumen de lo que pidió.
  *
- * Pensada para llegar a la bandeja de entrada: HTML de tablas con estilos en línea (sin
- * scripts, formularios ni CSS externo), versión de texto equivalente, texto real (no una
- * imagen), pocos enlaces y todos a la propia marca, y una línea que explica por qué se
- * recibe. El logotipo va como imagen alojada en la web cuando hay dominio https; antes,
- * incrustado en el propio email (nunca un enlace a localhost).
+ * Pensada para llegar a la bandeja de entrada: estructura de tablas con estilos en línea
+ * (sin scripts, formularios ni CSS externo), versión de texto equivalente, texto real (no una
+ * imagen), pocos enlaces y todos válidos (nunca a localhost ni a un número de relleno) y una
+ * línea que explica por qué se recibe.
  */
 export async function replyEmail(p: { to: string; subject: string; body: string; from: string; lead: ReplyLeadSummary; contact: ReplyContact }): Promise<Mail> {
   const hosted = absoluteUrl("/").startsWith("https://");
-  const logoSrc = hosted ? absoluteUrl("/brand/rowe-logo-blanco.png") : "cid:rowe-logo";
+  const logoSrc = hosted ? absoluteUrl("/brand/rowe-logo-email.png") : "cid:rowe-logo";
   const received = new Date(p.lead.createdAt).toLocaleDateString("es-ES", { timeZone: "Europe/Madrid", day: "numeric", month: "long", year: "numeric" });
   const preheader = p.body.replace(/\s+/g, " ").trim().slice(0, 110);
-  const wa = p.contact.whatsapp.replace(/[^\d]/g, "");
+  const tagline = realValue(p.contact.tagline) || "Web & Audiovisual";
+  const city = realValue(p.contact.city);
+  const phone = realValue(p.contact.phone);
+  const wa = realValue(p.contact.whatsapp).replace(/[^\d]/g, "");
+  const contactEmail = realValue(p.contact.email) || p.from;
 
   const rows: [string, string][] = [
     ["Servicio", p.lead.need],
-    ["Presupuesto", p.lead.budget || "Sin indicar"],
+    ["Presupuesto", realValue(p.lead.budget) || "Sin indicar"],
     ...(p.lead.quoteNumber ? ([["Nº de presupuesto", p.lead.quoteNumber]] as [string, string][]) : []),
     ["Solicitud", `Recibida el ${received}`],
   ];
 
   const summary = `
-<tr><td style="padding:34px 40px 0" class="px">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${LINE};border-radius:4px" bgcolor="${PANEL}">
-    <tr><td style="padding:18px 22px 6px;${LABEL}"><span style="color:${REC}">&#9679;</span>&nbsp; Tu solicitud</td></tr>
+<tr><td class="px" style="padding:30px 40px 0">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="panel" bgcolor="#F7F5F1" style="background:#F7F5F1;border:1px solid ${LINE};border-radius:4px">
+    <tr><td class="label" style="padding:18px 22px 6px;${LABEL}"><span style="color:${REC}">&#9679;</span>&nbsp; Tu solicitud</td></tr>
     <tr><td style="padding:4px 22px 6px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 ${rows
   .map(
     ([k, v]) =>
-      `        <tr><td style="padding:10px 0;border-top:1px solid ${LINE};${LABEL};width:140px;vertical-align:top">${esc(k)}</td><td style="padding:10px 0;border-top:1px solid ${LINE};font:15px/1.5 ${SANS};color:${BONE}">${esc(v)}</td></tr>`,
+      `        <tr><td class="label line" style="padding:10px 12px 10px 0;border-top:1px solid ${LINE};${LABEL};width:130px;vertical-align:top">${esc(k)}</td><td class="ink line" style="padding:10px 0;border-top:1px solid ${LINE};font:15px/1.5 ${SANS};color:${INK}">${esc(v)}</td></tr>`,
   )
   .join("\n")}
       </table>
     </td></tr>
 ${
   p.lead.items.length
-    ? `    <tr><td style="padding:8px 22px 4px;${LABEL}">Lo que elegiste</td></tr>
-    <tr><td style="padding:2px 22px 10px">${p.lead.items
+    ? `    <tr><td class="label" style="padding:10px 22px 6px;${LABEL}">Lo que elegiste</td></tr>
+    <tr><td style="padding:2px 22px 12px">${p.lead.items
         .map(
           (i) =>
-            `<span style="display:inline-block;margin:0 6px 8px 0;padding:6px 11px;border:1px solid ${LINE};border-radius:999px;font:12px/1.3 ${MONO};letter-spacing:.04em;color:${BONE}">${esc(i)}</span>`,
+            `<span class="chip ink" style="display:inline-block;margin:0 6px 8px 0;padding:6px 11px;border:1px solid #CFCAC1;border-radius:999px;background:${CARD};font:12px/1.3 ${MONO};letter-spacing:.04em;color:${INK}">${esc(i)}</span>`,
         )
         .join("")}</td></tr>`
     : ""
 }
 ${
   p.lead.message
-    ? `    <tr><td style="padding:8px 22px 4px;${LABEL}">Tu mensaje</td></tr>
-    <tr><td style="padding:2px 22px 20px"><div style="border-left:2px solid ${LINE};padding:2px 0 2px 14px;font:italic 15px/1.6 ${SERIF};color:${MUTED};white-space:pre-wrap">${esc(p.lead.message)}</div></td></tr>`
+    ? `    <tr><td class="label" style="padding:8px 22px 6px;${LABEL}">Tu mensaje</td></tr>
+    <tr><td style="padding:2px 22px 20px"><div class="quote" style="border-left:2px solid #CFCAC1;padding:2px 0 2px 14px;font:italic 15px/1.6 ${SERIF};color:#333333;white-space:pre-wrap">${esc(p.lead.message)}</div></td></tr>`
     : `    <tr><td style="padding:0 0 12px"></td></tr>`
 }
   </table>
 </td></tr>`;
 
   const contactBits = [
-    p.contact.email ? `<a href="mailto:${esc(p.contact.email)}" style="color:${BONE};text-decoration:none">${esc(p.contact.email)}</a>` : "",
-    p.contact.phone ? esc(p.contact.phone) : "",
-    wa ? `<a href="https://wa.me/${wa}" style="color:${BONE};text-decoration:none">WhatsApp</a>` : "",
+    `<a href="mailto:${esc(contactEmail)}" class="ink" style="color:${INK};text-decoration:underline">${esc(contactEmail)}</a>`,
+    phone ? `<a href="tel:${esc(phone.replace(/[^\d+]/g, ""))}" class="ink" style="color:${INK};text-decoration:none">${esc(phone)}</a>` : "",
+    wa ? `<a href="https://wa.me/${wa}" class="ink" style="color:${INK};text-decoration:underline">WhatsApp</a>` : "",
   ].filter(Boolean);
 
   const html = `<!doctype html>
@@ -200,41 +211,54 @@ ${
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="dark light">
-<meta name="supported-color-schemes" content="dark light">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
 <title>${esc(p.subject)}</title>
 <style>
-  @media (max-width:620px){ .px{padding-left:22px!important;padding-right:22px!important} .h1{font-size:34px!important} }
+  :root { color-scheme: light dark; supported-color-schemes: light dark; }
+  @media (max-width:620px) { .px { padding-left:22px !important; padding-right:22px !important; } .h1 { font-size:32px !important; } }
+  /* Modo oscuro (Apple Mail, iOS, Outlook para Mac): la paleta de la web */
+  @media (prefers-color-scheme: dark) {
+    body, .page { background:#0A0A0A !important; }
+    .card { background:#121212 !important; border-color:#2A2928 !important; }
+    .panel { background:#181817 !important; border-color:#2A2928 !important; }
+    .chip { background:#121212 !important; border-color:#3A3937 !important; }
+    .ink, .h1 { color:#EDEAE4 !important; }
+    .label, .soft { color:#A8A49C !important; }
+    .line { border-color:#2A2928 !important; }
+    .quote { color:#C9C5BD !important; border-color:#3A3937 !important; }
+  }
 </style>
 </head>
-<body style="margin:0;padding:0;background:${INK};color:${BONE}" bgcolor="${INK}">
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:${INK}">${esc(preheader)}</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${INK}" style="background:${INK}">
+<body class="page" style="margin:0;padding:0;background:${PAPER};color:${INK}" bgcolor="${PAPER}">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all">${esc(preheader)}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="page" bgcolor="${PAPER}" style="background:${PAPER}">
 <tr><td align="center" style="padding:28px 12px 36px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:${INK};border:1px solid ${LINE}" bgcolor="${INK}">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="card" bgcolor="${CARD}" style="max-width:640px;background:${CARD};border:1px solid #D9D5CE">
 
-<tr><td style="padding:22px 40px;border-bottom:1px solid ${LINE}" class="px">
+<tr><td class="px line" style="padding:20px 40px;border-bottom:1px solid ${LINE}">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-    <td style="vertical-align:middle"><img src="${logoSrc}" alt="ROWE" width="97" height="24" style="display:block;width:97px;height:24px;border:0;outline:none"></td>
-    <td align="right" style="vertical-align:middle;${LABEL}"><span style="color:${REC}">&#9679;</span>&nbsp; Rec &middot; ${esc(p.contact.tagline || "Web & Audiovisual")}</td>
+    <td style="vertical-align:middle"><img src="${logoSrc}" alt="ROWE" width="124" height="47" style="display:block;width:124px;height:47px;border:0;outline:none;text-decoration:none"></td>
+    <td align="right" class="label" style="vertical-align:middle;${LABEL}"><span style="color:${REC}">&#9679;</span>&nbsp; ${esc(tagline)}</td>
   </tr></table>
 </td></tr>
 
-<tr><td style="padding:40px 40px 6px;${LABEL}" class="px">Para ${esc(p.lead.name)}</td></tr>
-<tr><td style="padding:6px 40px 0;font:400 42px/1.05 ${SERIF};color:${BONE}" class="px h1">${esc(p.subject)}</td></tr>
+<tr><td class="px label" style="padding:36px 40px 6px;${LABEL}">Para ${esc(p.lead.name)}</td></tr>
+<tr><td class="px h1 ink" style="padding:6px 40px 0;font:400 40px/1.08 ${SERIF};color:${INK}">${esc(p.subject)}</td></tr>
 
-<tr><td style="padding:28px 40px 0;font:16px/1.7 ${SANS};color:${BONE};white-space:pre-wrap" class="px">${esc(p.body)}</td></tr>
+<tr><td class="px ink" style="padding:26px 40px 0;font:16px/1.7 ${SANS};color:${INK};white-space:pre-wrap">${esc(p.body)}</td></tr>
 ${summary}
 
-<tr><td style="padding:34px 40px 30px" class="px">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid ${LINE}"><tr>
-    <td style="padding-top:18px;font:14px/1.7 ${SANS};color:${MUTED}">Responde a este email o escríbenos:<br>${contactBits.join(` <span style="color:${LINE}">&middot;</span> `)}</td>
+<tr><td class="px" style="padding:30px 40px 28px">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="line" style="border-top:1px solid ${LINE}"><tr>
+    <td class="soft" style="padding-top:18px;font:14px/1.8 ${SANS};color:${SOFT}">Responde a este email o escríbenos:<br>${contactBits.join(` <span class="soft" style="color:#999999">&middot;</span> `)}</td>
   </tr></table>
 </td></tr>
 
-<tr><td style="padding:16px 40px 22px;border-top:1px solid ${LINE};${LABEL}" class="px">ROWE &middot; ${esc(p.contact.tagline || "Web & Audiovisual")}${p.contact.city ? ` &middot; ${esc(p.contact.city)}` : ""}</td></tr>
+<tr><td class="px label line" style="padding:16px 40px 20px;border-top:1px solid ${LINE};${LABEL}">ROWE &middot; ${esc(tagline)}${city ? ` &middot; ${esc(city)}` : ""}</td></tr>
 </table>
-<p style="max-width:640px;margin:14px auto 0;font:11px/1.6 ${SANS};color:${MUTED};text-align:center">Recibes este email porque nos escribiste desde la web de ROWE.</p>
+<p class="soft" style="max-width:640px;margin:14px auto 0;font:12px/1.6 ${SANS};color:${SOFT};text-align:center">Recibes este email porque nos escribiste desde la web de ROWE.</p>
 </td></tr>
 </table>
 </body>
@@ -243,18 +267,21 @@ ${summary}
   const text = [
     p.body,
     "",
-    "— Tu solicitud —",
+    "----------------------------------------",
+    "TU SOLICITUD",
     ...rows.map(([k, v]) => `${k}: ${v}`),
     ...(p.lead.items.length ? [`Lo que elegiste: ${p.lead.items.join(" · ")}`] : []),
     ...(p.lead.message ? ["", "Tu mensaje:", p.lead.message] : []),
+    "----------------------------------------",
     "",
-    `ROWE · ${p.contact.tagline || "Web & Audiovisual"}`,
-    [p.contact.email, p.contact.phone, wa ? `WhatsApp: https://wa.me/${wa}` : ""].filter(Boolean).join(" · "),
+    "Responde a este email o escríbenos:",
+    [contactEmail, phone, wa ? `WhatsApp: https://wa.me/${wa}` : ""].filter(Boolean).join(" · "),
     "",
+    `ROWE · ${tagline}${city ? ` · ${city}` : ""}`,
     "Recibes este email porque nos escribiste desde la web de ROWE.",
   ].join("\n");
 
-  const logo = hosted ? null : await readFile(path.join(process.cwd(), "src/assets/brand/rowe-logo-blanco.png")).catch(() => null);
+  const logo = hosted ? null : await readFile(path.join(process.cwd(), "src/assets/brand/rowe-logo-email.png")).catch(() => null);
   return {
     to: [p.to],
     replyTo: p.from || undefined,

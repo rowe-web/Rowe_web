@@ -189,6 +189,35 @@ test("logo: desde otra página lleva al inicio, arriba del todo", async ({ page 
   expect(errors).toEqual([]);
 });
 
+test("preloader en móvil: se salta al tocar, libera el scroll y tiene red de seguridad sin JavaScript", async ({ page }, info) => {
+  test.skip(info.project.name !== "movil");
+  errors.length = 0;
+  page.on("pageerror", (e) => errors.push(String(e)));
+  await page.addInitScript(() => localStorage.setItem("rowe-consent", "denied"));
+  // Tocar en cuanto la página esté viva (la intro en móvil dura poco: no se espera a nada más)
+  await page.addInitScript(() => {
+    const iv = setInterval(() => {
+      if ((window as unknown as { __roweMotion?: unknown }).__roweMotion) {
+        clearInterval(iv);
+        (window as unknown as { __readyAt: number }).__readyAt = performance.now();
+      }
+    }, 20);
+  });
+  await page.goto("/", { waitUntil: "commit" });
+  const pre = page.locator(".rowe-preloader");
+  await expect(pre).toBeAttached();
+  await page.waitForFunction(() => (window as unknown as { __readyAt?: number }).__readyAt);
+  // Red de seguridad CSS: aunque no cargara el JavaScript, se retiraría sola
+  expect(await pre.evaluate((el) => getComputedStyle(el).animationName)).toMatch(/preloader-failsafe/);
+  const t0 = Date.now();
+  await page.touchscreen.tap(195, 420);
+  await expect(pre).toHaveCount(0, { timeout: 1600 });
+  expect(Date.now() - t0).toBeLessThan(1600);
+  expect(await page.evaluate(() => document.documentElement.classList.contains("scroll-locked"))).toBe(false);
+  await expect(page.locator("#hero h1")).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test("pestaña en segundo plano: «ROWE en pausa — vuelve pronto» y al volver, el título real", async ({ page }) => {
   await open(page);
   const real = await page.title();
