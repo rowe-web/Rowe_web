@@ -35,17 +35,15 @@ describe("mensaje SMTP (lo que ven los filtros de spam)", () => {
     expect(head).toMatch(/^X-Priority: 3 \(Normal\)$/m);
     expect(head).toMatch(/^Importance: Normal$/m);
     expect(head).toMatch(/^MIME-Version: 1\.0$/m);
-    // Nada de cabeceras raras ni un remitente distinto
-    expect(head).not.toMatch(/X-Entity-Ref-ID|^Sender:/im);
+    // Nada de cabeceras raras, remitente distinto ni firma de la librería de envío
+    expect(head).not.toMatch(/X-Entity-Ref-ID|^Sender:|^X-Mailer:/im);
+    expect(msg).not.toMatch(/nodemailer|NmP/i);
   });
 
-  it("texto plano y HTML juntos (multipart/alternative), con el texto primero", async () => {
+  it("texto plano y HTML juntos (multipart/alternative, texto primero) y nada más: sin adjuntos ni imágenes", async () => {
     const msg = await raw(await reply());
-    expect(msg).toMatch(/Content-Type: multipart\/alternative/);
-    const plain = msg.indexOf("Content-Type: text/plain; charset=utf-8");
-    const html = msg.indexOf("Content-Type: text/html; charset=utf-8");
-    expect(plain).toBeGreaterThan(0);
-    expect(html).toBeGreaterThan(plain);
+    const types = [...msg.matchAll(/^Content-Type: ([\w/-]+)/gm)].map((m) => m[1]);
+    expect(types).toEqual(["multipart/alternative", "text/plain", "text/html"]);
   });
 
   it("dos envíos nunca comparten Message-ID", async () => {

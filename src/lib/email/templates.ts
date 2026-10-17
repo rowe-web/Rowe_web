@@ -126,7 +126,7 @@ export function realValue(v: string | null | undefined): string {
 // Paleta clara (máximo contraste) con el lenguaje de la web, solo con estilos en línea: sin
 // clases, sin bloque <style> ni texto oculto (lo que los filtros de Gmail/Outlook miran con lupa).
 // En modo oscuro, Gmail y Outlook invierten los colores por su cuenta y el diseño lo aguanta:
-// el logotipo va sobre su propio fondo blanco y no hay texto claro sobre fondo claro.
+// no hay texto claro sobre fondo claro.
 const PAPER = "#EDEAE4";
 const CARD = "#FFFFFF";
 const INK = "#111111";
@@ -150,7 +150,11 @@ const LABEL = `font:10px/1.5 ${MONO};letter-spacing:.14em;text-transform:upperca
  */
 export async function replyEmail(p: { to: string; subject: string; body: string; from: string; lead: ReplyLeadSummary; contact: ReplyContact }): Promise<Mail> {
   const hosted = absoluteUrl("/").startsWith("https://");
-  const logoSrc = hosted ? absoluteUrl("/brand/rowe-logo-email.png") : "cid:rowe-logo";
+  // Logotipo: con dominio propio, la imagen servida desde la web; sin él, un rótulo de texto (nunca
+  // una imagen adjunta, que en el correo de un remitente nuevo pesa en contra en los filtros de spam).
+  const wordmark = hosted
+    ? `<img src="${absoluteUrl("/brand/rowe-logo-email.png")}" alt="ROWE" width="124" height="47" style="display:block;width:124px;height:47px;border:0">`
+    : `<span style="font:400 26px/1 ${SERIF};letter-spacing:.08em;color:${INK}">ROWE</span><span style="font:26px/1 ${SANS};color:${REC}">&nbsp;&#8226;</span>`;
   const received = new Date(p.lead.createdAt).toLocaleDateString("es-ES", { timeZone: "Europe/Madrid", day: "numeric", month: "long", year: "numeric" });
   const tagline = realValue(p.contact.tagline) || "Web & Audiovisual";
   const city = realValue(p.contact.city);
@@ -220,7 +224,7 @@ ${
 
 <tr><td style="padding:20px 28px;border-bottom:1px solid ${LINE}">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-    <td style="vertical-align:middle"><img src="${logoSrc}" alt="ROWE" width="124" height="47" style="display:block;width:124px;height:47px;border:0;outline:none;text-decoration:none"></td>
+    <td style="vertical-align:middle">${wordmark}</td>
     <td align="right" style="vertical-align:middle;${LABEL}"><span style="color:${REC}">&#9679;</span>&nbsp; ${esc(tagline)}</td>
   </tr></table>
 </td></tr>
@@ -262,13 +266,11 @@ ${summary}
     "Recibes este email porque nos escribiste desde la web de ROWE.",
   ].join("\n");
 
-  const logo = hosted ? null : await readFile(path.join(process.cwd(), "src/assets/brand/rowe-logo-email.png")).catch(() => null);
   return {
     to: [p.to],
     replyTo: p.from || undefined,
     subject: p.subject,
     html,
     text,
-    attachments: logo ? [{ filename: "rowe.png", content: logo, cid: "rowe-logo", contentDisposition: "inline" }] : undefined,
   };
 }

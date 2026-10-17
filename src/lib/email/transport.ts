@@ -54,6 +54,9 @@ export function smtpMessage(mail: Mail, account: string) {
     text: mail.text,
     html: mail.html,
     textEncoding: "quoted-printable" as const,
+    // Sin firma de la librería: ni X-Mailer ni el prefijo «NmP» en los separadores MIME
+    xMailer: false as const,
+    boundaryPrefix: "--_rowe",
     headers: { "X-Priority": "3 (Normal)", Importance: "Normal", ...mail.headers },
     attachments: mail.attachments,
   };

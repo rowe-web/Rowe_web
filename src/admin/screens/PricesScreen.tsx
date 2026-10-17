@@ -7,6 +7,7 @@ import { publishSite } from "@/admin/actions/publish";
 import { clearBackup, readBackup, useUndoable } from "@/admin/editor";
 import { useFeedback } from "@/admin/ui/feedback";
 import { AButton, Card, Field, PageTitle, Segmented, Switch, TextArea, TextInput } from "@/admin/ui/kit";
+import { Select } from "@/admin/ui/Select";
 import { mono } from "@/admin/ui/styles";
 import { computeQuote, isAvailable, normalizeSelection, type Config, type EngineSettings, type Selection } from "@/features/configurator/engine";
 import { range } from "@/features/configurator/format";
@@ -696,16 +697,16 @@ function Simulation({ state, engine }: { state: State; engine: EngineSettings })
             <div key={sec.key} className="flex flex-col gap-1.5">
               <span className="text-[12px] text-muted">{sec.title}</span>
               {groups.map((g) => (
-                <select key={g} aria-label={g} value={String(sel[g] ?? "")} onChange={(e) => put(g, e.target.value)} className="rowe-select">
-                  {!opts.some((o) => o.set_key === g && o.is_default) && <option value="">—</option>}
-                  {opts
-                    .filter((o) => o.set_key === g)
-                    .map((o) => (
-                      <option key={o.key} value={o.key} disabled={!isAvailable(config, o, sel)}>
-                        {o.label}
-                      </option>
-                    ))}
-                </select>
+                <Select
+                  key={g}
+                  label={sec.title}
+                  value={String(sel[g] ?? "")}
+                  onChange={(v) => put(g, v)}
+                  options={[
+                    ...(opts.some((o) => o.set_key === g && o.is_default) ? [] : [{ value: "", label: "—" }]),
+                    ...opts.filter((o) => o.set_key === g).map((o) => ({ value: o.key, label: o.label, disabled: !isAvailable(config, o, sel) })),
+                  ]}
+                />
               ))}
               {singles.map((o) =>
                 o.control === "stepper" ? (

@@ -337,17 +337,41 @@ test("precios: un mínimo mayor que el máximo se marca y no se guarda", async (
   expect((await db.from("config_options").select("price_min, price_max").eq("key", "seo").single()).data).toEqual(before);
   await expect(page.getByText("Simulación en vivo")).toBeVisible();
 
-  // Simulación: desplegables oscuros de ROWE (no los del sistema) y la barra de scroll separada
-  const select = page.locator("[data-sim-scroll] select").first();
-  const look = await select.evaluate((el) => {
-    const s = getComputedStyle(el);
-    return { appearance: s.appearance, bg: s.backgroundColor, color: s.color };
-  });
-  expect(look.appearance).not.toBe("auto");
-  expect(look.bg).toBe("rgb(17, 17, 17)");
-  expect(look.color).toBe("rgb(237, 234, 228)");
-  const gap = await page.locator("[data-sim-scroll]").evaluate((box) => {
-    const sel = box.querySelector("select")!.getBoundingClientRect();
+  // Simulación: desplegables propios de ROWE (ningún <select> nativo), oscuros cerrados y abiertos
+  const sim = page.locator("[data-sim-scroll]");
+  await expect(sim.locator("select")).toHaveCount(0);
+  const trigger = sim.getByRole("button", { name: "¿Qué necesitas?" });
+  const css = (el: Element, props: string[]) => props.map((p) => getComputedStyle(el).getPropertyValue(p));
+  expect(await trigger.evaluate(css, ["background-color", "border-top-color", "color"])).toEqual(["rgb(17, 17, 17)", "rgb(51, 51, 51)", "rgb(237, 234, 228)"]);
+  await trigger.click();
+  const listbox = page.getByRole("listbox", { name: "¿Qué necesitas?" });
+  await expect(listbox).toBeVisible();
+  expect(await listbox.evaluate(css, ["background-color", "border-top-color"])).toEqual(["rgb(17, 17, 17)", "rgb(51, 51, 51)"]);
+  const web = listbox.getByRole("option", { name: "Web nueva" });
+  await web.hover();
+  expect(await web.evaluate(css, ["background-color"])).toEqual(["rgb(34, 34, 34)"]);
+  // Todas las opciones con texto claro y legible
+  for (const color of await listbox.getByRole("option").evaluateAll((els) => els.map((e) => getComputedStyle(e).color))) {
+    const [r, g, b] = color.match(/\d+/g)!.map(Number);
+    expect((r + g + b) / 3).toBeGreaterThan(110);
+  }
+  await web.click();
+  await expect(listbox).toBeHidden();
+  await expect(trigger).toHaveText("Web nueva");
+  await expect(page.getByText("Pago único").or(page.getByText(/\/mes/)).first()).toBeVisible();
+  // Con teclado: abrir, bajar, elegir y Esc para cerrar
+  await trigger.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(listbox).toBeVisible();
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await expect(trigger).toHaveText("Rediseño");
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("Escape");
+  await expect(listbox).toBeHidden();
+  await expect(trigger).toBeFocused();
+  const gap = await sim.evaluate((box) => {
+    const sel = box.querySelector("[data-select]")!.getBoundingClientRect();
     // Borde derecho del área de contenido (sin la barra de scroll) menos el borde del desplegable
     const inner = box.getBoundingClientRect().left + box.clientWidth;
     return inner - sel.right;

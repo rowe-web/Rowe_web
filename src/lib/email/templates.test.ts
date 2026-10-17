@@ -34,13 +34,13 @@ describe("email de respuesta al cliente", () => {
     const mail = await replyEmail(base);
     expect(mail.to).toEqual(["cliente@example.com"]);
     expect(mail.replyTo).toBe("rowe.web.contacto@gmail.com");
-    expect(mail.html).toContain('alt="ROWE"');
+    expect(mail.html).toContain(">ROWE</span>");
     expect(mail.html).toMatch(/<html lang="es"/);
     expect(mail.html).not.toMatch(/<script|<form|localhost/i);
     expect(mail.text.length).toBeGreaterThan(100);
-    // Sin dominio https todavía: el logotipo va incrustado (no un enlace a localhost)
-    expect(mail.html).toContain("cid:rowe-logo");
-    expect(mail.attachments?.[0]).toMatchObject({ cid: "rowe-logo", contentDisposition: "inline" });
+    // Sin dominio https todavía: rótulo de texto, ni imagen adjunta ni enlace a localhost
+    expect(mail.html).not.toMatch(/<img|cid:/);
+    expect(mail.attachments).toBeUndefined();
   });
 
   it("escapa lo que escribe el cliente", async () => {
@@ -62,7 +62,7 @@ describe("email de respuesta · datos reales, contraste y modo oscuro", () => {
     const mail = await replyEmail(base);
     expect(mail.html).toContain("color:#111111");
     expect(mail.html).not.toMatch(/ class=|<style|@media|display:none|opacity:0|mso-hide/);
-    // El logotipo va sobre su propio fondo blanco (no se pierde si el cliente invierte colores)
-    expect(mail.attachments?.[0]?.content?.length).toBeGreaterThan(1000);
+    // Sin URLs externas: solo el email de contacto (y teléfono/WhatsApp cuando sean reales)
+    expect(mail.html.match(/(?:https?:|mailto:|tel:|cid:)[^"]*/g)).toEqual(["mailto:rowe.web.contacto@gmail.com", "tel:+34600000000", "https://wa.me/34600000000"]);
   });
 });
