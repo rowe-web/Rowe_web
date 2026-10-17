@@ -7,6 +7,7 @@ import { useFeedback } from "@/admin/ui/feedback";
 import { AButton, Card, EmptyState, Field, PageTitle, Segmented, StatusDot, TextArea, TextInput } from "@/admin/ui/kit";
 import { mono } from "@/admin/ui/styles";
 import { whatsappHref } from "@/lib/content/settings";
+import { stripQuoted } from "@/lib/email/inbound";
 import { spamHints } from "@/lib/email/spam";
 import { ArrowUpRight } from "@/components/ui/ArrowUpRight";
 
@@ -28,6 +29,7 @@ export interface LeadRow {
   company: string;
   email: string;
   phone: string;
+  city: string;
   status: Status;
   notes: string;
   quote_id: string | null;
@@ -305,7 +307,7 @@ function LeadDetail({
       </dl>
 
       {/* Contacto arriba del todo: siempre a mano aunque la conversación sea larga */}
-      <div data-lead-contact className="grid gap-px overflow-hidden rounded-md border border-line-soft bg-line-soft min-[1100px]:grid-cols-[minmax(0,1fr)_auto_auto]">
+      <div data-lead-contact className="grid gap-px overflow-hidden rounded-md border border-line-soft bg-line-soft min-[1100px]:grid-cols-[minmax(0,1fr)_auto]">
         <div className="flex min-w-0 flex-col gap-1.5 bg-surface p-3.5">
           <span className={`${mono} text-[9px] text-muted`}>Email</span>
           <span className="flex min-w-0 items-center justify-between gap-3">
@@ -337,6 +339,21 @@ function LeadDetail({
               </a>
             )}
           </span>
+        </div>
+        {/* Dónde está: clave para valorar la logística de un rodaje */}
+        <div data-lead-city className="flex min-w-0 flex-col gap-1.5 bg-surface p-3.5">
+          <span className={`${mono} text-[9px] text-muted`}>Ubicación</span>
+          {lead.city ? (
+            <span className="flex min-w-0 items-center gap-1.5 text-[14px]">
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 flex-none text-muted" fill="none" stroke="currentColor" strokeWidth={1.6} aria-hidden="true">
+                <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" strokeLinejoin="round" />
+                <circle cx="12" cy="10" r="2.2" />
+              </svg>
+              <span className="min-w-0 [overflow-wrap:anywhere]">{lead.city}</span>
+            </span>
+          ) : (
+            <span className="text-[14px] text-muted">Sin indicar</span>
+          )}
         </div>
         <div className="flex min-w-0 flex-col gap-1.5 bg-surface p-3.5">
           <span className={`${mono} text-[9px] text-muted`}>Enviado</span>
@@ -625,7 +642,10 @@ function RoweReply({ reply: r }: { reply: LeadRow["replies"][number] }) {
 
 /** c) Lo que contestó el cliente por email (leído del buzón de ROWE). */
 function ClientReply({ msg: m, isNew }: { msg: LeadRow["inbound"][number]; isNew: boolean }) {
-  const quoted = m.full_text.trim() !== m.body.trim();
+  // Solo el mensaje nuevo (sin la cita del email anterior ni la firma). Se recalcula aquí para que
+  // las respuestas guardadas antes de mejorar la limpieza también se vean limpias.
+  const text = stripQuoted(m.full_text || m.body, { sender: m.from_name });
+  const quoted = m.full_text.trim() !== text.trim();
   return (
     <li data-thread="client" className="mr-auto w-full min-w-0 max-w-full overflow-hidden [overflow-wrap:anywhere] rounded-md border border-l-2 border-line-strong border-l-muted bg-ph-2 min-[1100px]:w-[90%]">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-soft bg-ph px-3.5 py-2.5">
@@ -645,12 +665,16 @@ function ClientReply({ msg: m, isNew }: { msg: LeadRow["inbound"][number]; isNew
         {m.subject && <span className="text-[15px] font-medium">{m.subject}</span>}
         {m.attachments > 0 && <span className="text-[12px] text-muted">📎 {m.attachments === 1 ? "1 adjunto" : `${m.attachments} adjuntos`} · ábrelos en Gmail</span>}
         <Fold>
-          <p className="max-w-[62ch] whitespace-pre-wrap text-[14px] leading-relaxed text-bone">{m.body}</p>
+          <p data-client-text className="max-w-[62ch] whitespace-pre-wrap text-[14px] leading-relaxed text-bone">{text}</p>
           {quoted && (
-            <div className="mt-4 flex flex-col gap-2 border-t border-line-soft pt-3">
-              <span className={`${mono} text-[9px] text-muted`}>Email completo · firma y texto citado</span>
-              <p className="max-w-[62ch] whitespace-pre-wrap border-l border-line pl-3 text-[13px] leading-relaxed text-muted">{m.full_text}</p>
-            </div>
+            <details data-full-email className="group/full mt-4 border-t border-line-soft pt-3">
+              <summary className={`flex min-h-8 w-fit cursor-pointer select-none list-none items-center gap-1.5 ${mono} text-[9px] text-muted transition-colors hover:text-bone [&::-webkit-details-marker]:hidden`}>
+                <span className="group-open/full:hidden">Ver email completo</span>
+                <span className="hidden group-open/full:inline">Ocultar email completo</span>
+                <span aria-hidden="true" className="transition-transform group-open/full:rotate-180">↓</span>
+              </summary>
+              <p className="mt-2 max-w-[62ch] whitespace-pre-wrap border-l border-line pl-3 text-[13px] leading-relaxed text-muted">{m.full_text}</p>
+            </details>
           )}
         </Fold>
       </div>

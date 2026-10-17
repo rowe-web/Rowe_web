@@ -10,6 +10,8 @@ export interface NewLeadPayload {
   company: string;
   email: string;
   phone: string;
+  /** Opcional (los avisos encolados antes de existir el campo no lo traen). */
+  city?: string;
   need: string;
   sector: string;
   budget: string;
@@ -33,6 +35,7 @@ export async function newLeadEmail(p: NewLeadPayload, to: string[]): Promise<Mai
     ["Email", p.email],
     ["Teléfono", p.phone || "—"],
     ["Empresa", p.company || "—"],
+    ["Ubicación", p.city || "—"],
   ];
   const panel = absoluteUrl(`/admin/mensajes?lead=${p.leadId}`);
   const when = new Date(p.createdAt).toLocaleString("es-ES", { timeZone: "Europe/Madrid", dateStyle: "medium", timeStyle: "short" });

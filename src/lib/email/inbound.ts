@@ -30,10 +30,10 @@ const QUOTE_HEADERS = [
 
 /**
  * Texto nuevo de una respuesta: corta en la cita del email anterior (líneas «> …» o la
- * cabecera «El … escribió:») y quita espacios sobrantes. Si no queda nada, devuelve el
- * texto completo recortado (mejor de más que vacío).
+ * cabecera «El … escribió:») y en la firma, y quita espacios sobrantes. Si no queda nada,
+ * devuelve el texto completo recortado (mejor de más que vacío).
  */
-export function stripQuoted(text: string): string {
+export function stripQuoted(text: string, { sender = "" }: { sender?: string } = {}): string {
   const lines = text.replace(/\r\n?/g, "\n").split("\n");
   const out: string[] = [];
   for (let i = 0; i < lines.length; i++) {
@@ -45,8 +45,30 @@ export function stripQuoted(text: string): string {
     if (QUOTE_HEADERS.some((re) => re.test(t)) || /^El\s.+\sescribió:\s*$/i.test(joined) || /^On\s.+\swrote:\s*$/i.test(joined)) break;
     out.push(line);
   }
-  const body = out.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+  const body = out.slice(0, signatureStart(out, sender)).join("\n").replace(/\n{3,}/g, "\n\n").trim();
   return body || text.trim();
+}
+
+const fold = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+const CONTACT = /[^\s@]+@[^\s@]+\.[a-z]{2,}|https?:\/\/|www\.|\+?\d[\d\s]{7,}\d/i;
+
+/**
+ * Dónde empieza la firma (o lines.length si no hay):
+ *  - el separador estándar «-- » o los pies automáticos («Libre de virus…»), o
+ *  - un bloque tras una línea en blanco que empieza por el nombre de quien escribe o es una
+ *    línea con «|» (p. ej. «Lucía Pérez | Directora»), y que trae datos de contacto (email,
+ *    web o teléfono). Una despedida sola («Lucía») no se toca: es parte del mensaje.
+ */
+function signatureStart(lines: string[], sender: string): number {
+  const name = fold(sender);
+  for (let i = 1; i < lines.length; i++) {
+    const t = lines[i].trim();
+    if (/^--\s*$/.test(t) || /^(Libre de virus|Virus-free)\b/i.test(t)) return i;
+    if (lines[i - 1].trim() !== "" || !t) continue;
+    const byName = name.length >= 3 && fold(t).startsWith(name);
+    if ((byName || /\s\|\s/.test(t)) && CONTACT.test(lines.slice(i).join("\n"))) return i;
+  }
+  return lines.length;
 }
 
 export interface LeadCandidate {

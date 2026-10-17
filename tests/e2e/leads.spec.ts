@@ -79,19 +79,24 @@ test("formulario «Hablemos»: 5 tomas → «Grabado» → lead guardado aunque 
   await expect(form.getByText("Revisa el email")).toBeVisible();
   await form.getByLabel("Nombre *").fill("Prueba E2E");
   await form.getByLabel("Email *").fill(testEmail("form"));
+  // Ubicación / ciudad (opcional): para valorar la logística de un rodaje
+  const city = form.getByLabel("Ubicación / Ciudad");
+  await expect(city).toHaveAttribute("placeholder", "ej. Madrid, Barcelona...");
+  await city.fill("Valencia");
   await form.getByRole("checkbox").click();
   await form.getByRole("button", { name: "Enviar solicitud" }).click();
   await expect(form.getByText("Grabado.")).toBeVisible({ timeout: 15000 });
 
   const lead = await waitFor(async () => (await db.from("leads").select("*").eq("email", testEmail("form")).maybeSingle()).data);
-  expect(lead).toMatchObject({ origin: "formulario", need: "Web", sector: "Salud", budget_label: "1.000 – 2.500 €", status: "nuevo" });
+  expect(lead).toMatchObject({ origin: "formulario", need: "Web", sector: "Salud", budget_label: "1.000 – 2.500 €", city: "Valencia", status: "nuevo" });
   expect(lead.ip_hash).toMatch(/^[0-9a-f]{32}$/);
   // El aviso por email queda registrado (fallido si no hay email configurado, enviado si lo hay)
   const mail = await waitFor(async () => {
-    const { data } = await db.from("email_outbox").select("status, attempts, last_error").eq("lead_id", lead.id).maybeSingle();
+    const { data } = await db.from("email_outbox").select("status, attempts, last_error, payload").eq("lead_id", lead.id).maybeSingle();
     return data && data.attempts > 0 ? data : null;
   });
   expect(["sent", "failed"]).toContain(mail.status);
+  expect(mail.payload).toMatchObject({ city: "Valencia" }); // va en el aviso por email
   if (mail.status === "failed") expect(mail.last_error).toBeTruthy();
 });
 

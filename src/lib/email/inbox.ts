@@ -93,7 +93,7 @@ export async function syncInbox({ minInterval = 20 }: { minInterval?: number } =
               from_email: from,
               from_name: (mail.from?.value?.[0]?.name || "").slice(0, 160),
               subject: (mail.subject || "").slice(0, 300),
-              body: stripQuoted(full).slice(0, 20_000),
+              body: stripQuoted(full, { sender: mail.from?.value?.[0]?.name || "" }).slice(0, 20_000),
               full_text: full,
               attachments: mail.attachments?.length ?? 0,
               message_id: messageId,

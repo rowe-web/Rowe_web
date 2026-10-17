@@ -41,6 +41,7 @@ export function HablemosForm({ settings, contact, variant = "section" }: Props) 
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
   const [privacy, setPrivacy] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<Field, true>>>({});
   const [status, setStatus] = useState<Status>("idle");
@@ -106,6 +107,7 @@ export function HablemosForm({ settings, contact, variant = "section" }: Props) 
           company,
           email,
           phone,
+          city,
           privacy,
           selection: budget === CFG ? prefill?.selection : undefined,
           website: trap.current?.value ?? "",
@@ -287,6 +289,7 @@ export function HablemosForm({ settings, contact, variant = "section" }: Props) 
                     <TextField id="company" label={settings.fields.company} placeholder={settings.fields.company_placeholder} value={company} autoComplete="organization" onChange={setCompany} variant={variant} />
                     <TextField id="email" type="email" label={settings.fields.email} placeholder={settings.fields.email_placeholder} value={email} autoComplete="email" error={errors.email ? settings.errors.email : ""} onChange={(v) => { setEmail(v); setErrors((e) => ({ ...e, email: undefined })); }} variant={variant} />
                     <TextField id="phone" type="tel" label={settings.fields.phone} placeholder={settings.fields.phone_placeholder} value={phone} autoComplete="tel" onChange={setPhone} variant={variant} />
+                    <TextField id="city" label={settings.fields.city} placeholder={settings.fields.city_placeholder} value={city} autoComplete="address-level2" onChange={setCity} variant={variant} />
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <button

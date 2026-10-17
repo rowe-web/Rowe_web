@@ -104,6 +104,16 @@ export async function applyContentUpdates(db: Db, log: (msg: string) => void): P
     "Escena 10: titular mixto",
   );
   done(
+    await updateJson(db, "site_settings", "value", "key", "hablemos", (v) => {
+      const fields = v.fields as Obj | undefined;
+      if (!fields || typeof fields !== "object") return false;
+      const a = add(fields, "city", "Ubicación / Ciudad");
+      const b = add(fields, "city_placeholder", "ej. Madrid, Barcelona...");
+      return a || b;
+    }),
+    "Hablemos: campo «Ubicación / Ciudad»",
+  );
+  done(
     await updateJson(db, "site_settings", "value", "key", "navigation", (v) => {
       let changed = swap(v, "footer_title", OLD_HABLEMOS, NEW_HABLEMOS);
       for (const it of (Array.isArray(v.items) ? v.items : []) as Obj[]) {

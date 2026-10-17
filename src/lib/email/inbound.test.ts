@@ -14,6 +14,22 @@ describe("respuestas de clientes · texto nuevo", () => {
     expect(stripQuoted("Ok\n\nEnviado desde mi iPhone")).toBe("Ok");
   });
 
+  it("quita la firma: con el nombre de quien escribe, con «|» o con el separador «--»", () => {
+    const sig = "Lucía Pérez | Directora - Clínica Sol\n\nlucia@clinicasol.es | Correo\n\n◐ Web\n<https://clinicasol.es/>";
+    const quote = "\n\n\n\nEl sáb, 17 oct 2026 a las 18:10, ROWE (<rowe@example.com>)\nescribió:\n\n> Hola Lucía\n> ● Tu solicitud";
+    expect(stripQuoted(`¡Muchas gracias!\n\n${sig}${quote}`, { sender: "Lucía Pérez" })).toBe("¡Muchas gracias!");
+    expect(stripQuoted(`¡Muchas gracias!\n\n${sig}${quote}`)).toBe("¡Muchas gracias!");
+    expect(stripQuoted("Vale, hablamos.\n\nLucia Perez\n+34 600 111 222", { sender: "Lucía Pérez" })).toBe("Vale, hablamos.");
+    expect(stripQuoted("Vale.\n-- \nLucía · Clínica Sol")).toBe("Vale.");
+    expect(stripQuoted("Vale.\n\nLibre de virus.www.avast.com")).toBe("Vale.");
+  });
+
+  it("no confunde una despedida o un mensaje normal con una firma", () => {
+    expect(stripQuoted("Perfecto, el lunes.\n\nLucía", { sender: "Lucía" })).toBe("Perfecto, el lunes.\n\nLucía");
+    expect(stripQuoted("Os paso la web: https://clinicasol.es\n\nGracias")).toBe("Os paso la web: https://clinicasol.es\n\nGracias");
+    expect(stripQuoted("Hola,\n\nLucía me dijo que os escribiera.\n\nUn saludo", { sender: "Lucía" })).toBe("Hola,\n\nLucía me dijo que os escribiera.\n\nUn saludo");
+  });
+
   it("si todo es cita, devuelve el texto completo (nunca vacío)", () => {
     expect(stripQuoted("> solo cita")).toBe("> solo cita");
   });

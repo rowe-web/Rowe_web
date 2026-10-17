@@ -15,7 +15,7 @@ export default async function MensajesPage({ searchParams }: PageProps<"/admin/m
   const supabase = await createSupabaseServer();
   const { data: leads, error } = await supabase
     .from("leads")
-    .select("id, created_at, origin, need, sector, budget_label, message, name, company, email, phone, status, notes, quote_id, source, quotes(number, items)")
+    .select("id, created_at, origin, need, sector, budget_label, message, name, company, email, phone, city, status, notes, quote_id, source, quotes(number, items)")
     .order("created_at", { ascending: false })
     .limit(500);
 

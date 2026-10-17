@@ -37,7 +37,7 @@ const LABELS: Record<string, string> = {
   prefill_label: "Rótulo «viene del configurador»", prefill_overlay_label: "Rótulo «tu configuración»", prefill_edit: "Texto «editar»",
   budget_from_configurator: "Etiqueta del rango del configurador", message_placeholder: "Ejemplo del mensaje", message_max: "Máximo de caracteres",
   optional: "Texto «opcional»", hint: "Pista", name: "Nombre", name_placeholder: "Ejemplo del nombre", company: "Empresa",
-  company_placeholder: "Ejemplo de empresa", email: "Email", email_placeholder: "Ejemplo de email", phone_placeholder: "Ejemplo de teléfono",
+  company_placeholder: "Ejemplo de empresa", email: "Email", email_placeholder: "Ejemplo de email", phone_placeholder: "Ejemplo de teléfono", city_placeholder: "Ejemplo de ciudad",
   privacy: "Texto de privacidad", privacy_link: "Enlace a la privacidad", send_title: "Titular de error de envío", send_body: "Texto de error de envío",
   monitor_label: "Rótulo del monitor", rec_label: "Texto «Rec»", standby_label: "Texto «Standby»", empty_text: "Texto sin selección",
   once_text: "Texto «pago único»", level_label: "Rótulo del nivel", levels: "Niveles", below: "Hasta (€, vacío = resto)", vu_bars: "Barras del medidor",

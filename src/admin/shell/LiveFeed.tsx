@@ -50,12 +50,15 @@ export function LiveFeed() {
           });
           router.refresh();
         })
-        .on("postgres_changes", { event: "INSERT", schema: "public", table: "lead_inbound" }, ({ new: row }) => {
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "lead_inbound" }, async ({ new: row }) => {
           const r = row as Partial<{ lead_id: string; from_name: string; from_email: string; body: string }>;
-          const who = r.from_name || r.from_email;
+          // Quién es: el nombre y la empresa que dejó en la web («Lucía · Clínica Sol»); si no se
+          // pudiera leer su ficha, el nombre del remitente del email
+          const { data: lead } = r.lead_id ? await sb.from("leads").select("name, company").eq("id", r.lead_id).maybeSingle() : { data: null };
+          const who = lead?.name ? `${lead.name}${lead.company ? ` · ${lead.company}` : ""}` : r.from_name || r.from_email;
           alert({
             kicker: "Respuesta por email",
-            title: who ? `${who} ha respondido` : "Un cliente ha respondido",
+            title: who || "Un cliente ha respondido",
             body: r.body || undefined,
             href: r.lead_id ? `/admin/mensajes?lead=${r.lead_id}` : "/admin/mensajes",
             cta: "Ver conversación",

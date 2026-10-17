@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
-const { replyEmail } = await import("./templates");
+const { newLeadEmail, replyEmail } = await import("./templates");
 
 const base = {
   to: "cliente@example.com",
@@ -19,6 +19,18 @@ const base = {
   },
   contact: { email: "rowe.web.contacto@gmail.com", phone: "+34 600 000 000", whatsapp: "+34 600 000 000", city: "Madrid", tagline: "Web & Audiovisual" },
 };
+
+describe("aviso de mensaje nuevo (al equipo)", () => {
+  const lead = { leadId: "x", name: "Lucía", company: "Clínica Sol", email: "lucia@example.com", phone: "", need: "Audiovisual", sector: "Salud", budget: "Sin indicar", items: "", message: "", origin: "formulario" as const, quoteNumber: null, createdAt: "2026-10-16T08:36:03.190Z" };
+  it("incluye la ubicación del cliente (o «—» si no la dio)", async () => {
+    const mail = await newLeadEmail({ ...lead, city: "Valencia" }, ["equipo@example.com"]);
+    const cell = (html: string) => html.slice(html.indexOf(">Ubicación</td>")).match(/<td[^>]*>([^<]*)<\/td>/)?.[1];
+    expect(cell(mail.html)).toBe("Valencia");
+    expect(mail.text).toContain("Valencia");
+    const none = await newLeadEmail(lead, ["equipo@example.com"]);
+    expect(cell(none.html)).toBe("—");
+  });
+});
 
 describe("email de respuesta al cliente", () => {
   it("resume la solicitud (servicio, presupuesto, funciones) en HTML y en texto", async () => {

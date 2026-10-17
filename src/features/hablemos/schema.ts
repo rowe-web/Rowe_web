@@ -16,6 +16,8 @@ export const leadSchema = z.object({
   company: z.string().trim().max(160).default(""),
   email: z.string().trim().toLowerCase().max(254).regex(EMAIL_RE, "email"),
   phone: z.string().trim().max(40).default(""),
+  /** Ubicación / ciudad: para valorar la logística de los rodajes. */
+  city: z.string().trim().max(120).default(""),
   privacy: z.literal(true, { error: "privacy" }),
   /** Selección del configurador (solo si budget === "cfg"). */
   selection: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),

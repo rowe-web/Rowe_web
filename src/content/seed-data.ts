@@ -277,6 +277,8 @@ export const settings: SeedSetting[] = [
         email_placeholder: "tu@negocio.es",
         phone: "Teléfono",
         phone_placeholder: "[+34 600 000 000]",
+        city: "Ubicación / Ciudad",
+        city_placeholder: "ej. Madrid, Barcelona...",
         privacy: "He leído y acepto la política de privacidad.",
         privacy_link: "Leer la política de privacidad",
       },

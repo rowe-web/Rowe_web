@@ -76,7 +76,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={{ toast, alert, confirm }}>
       {children}
-      <div role="status" aria-live="polite" className="pointer-events-none fixed bottom-5 right-4 z-[90] flex max-w-[calc(100%-32px)] flex-col items-end gap-2 max-[819px]:bottom-[84px]">
+      <div role="status" aria-live="polite" className="pointer-events-none fixed bottom-6 right-4 z-[90] flex max-w-[calc(100%-32px)] flex-col items-end gap-2 max-[819px]:bottom-[84px] min-[820px]:right-8">
         {/* Avisos en tiempo real: esquina inferior derecha, encima de los toasts */}
         {alerts.map((a) => (
           <div key={a.id} data-live-alert className="toast-in pointer-events-auto flex w-[min(360px,calc(100vw-32px))] flex-col gap-2 rounded-lg border border-line-strong border-l-2 border-l-rec bg-surface p-4 shadow-[0_18px_40px_rgb(0_0_0/0.45)]">

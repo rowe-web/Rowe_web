@@ -19,7 +19,7 @@ export interface HablemosSettings {
   message_placeholder: string;
   message_max: number;
   optional: string;
-  fields: Record<"name" | "name_placeholder" | "company" | "company_placeholder" | "email" | "email_placeholder" | "phone" | "phone_placeholder" | "privacy" | "privacy_link", string>;
+  fields: Record<"name" | "name_placeholder" | "company" | "company_placeholder" | "email" | "email_placeholder" | "phone" | "phone_placeholder" | "city" | "city_placeholder" | "privacy" | "privacy_link", string>;
   errors: Record<"name" | "email" | "privacy" | "send_title" | "send_body", string>;
   next: string;
   back: string;
