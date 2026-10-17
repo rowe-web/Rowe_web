@@ -13,7 +13,7 @@ import { useHablemos } from "./store";
 import styles from "./HablemosForm.module.css";
 
 type Status = "idle" | "loading" | "error" | "success";
-type Field = "name" | "email" | "privacy";
+type Field = "name" | "email" | "city" | "privacy";
 
 interface Props {
   settings: HablemosSettings;
@@ -86,7 +86,7 @@ export function HablemosForm({ settings, contact, variant = "section" }: Props) 
   const success = status === "success";
 
   const submit = async () => {
-    const e = fieldErrors({ name, email, privacy });
+    const e = fieldErrors({ name, email, city, privacy });
     setErrors(e);
     if (Object.keys(e).length) return;
     setStatus("loading");
@@ -289,7 +289,7 @@ export function HablemosForm({ settings, contact, variant = "section" }: Props) 
                     <TextField id="company" label={settings.fields.company} placeholder={settings.fields.company_placeholder} value={company} autoComplete="organization" onChange={setCompany} variant={variant} />
                     <TextField id="email" type="email" label={settings.fields.email} placeholder={settings.fields.email_placeholder} value={email} autoComplete="email" error={errors.email ? settings.errors.email : ""} onChange={(v) => { setEmail(v); setErrors((e) => ({ ...e, email: undefined })); }} variant={variant} />
                     <TextField id="phone" type="tel" label={settings.fields.phone} placeholder={settings.fields.phone_placeholder} value={phone} autoComplete="tel" onChange={setPhone} variant={variant} />
-                    <TextField id="city" label={settings.fields.city} placeholder={settings.fields.city_placeholder} value={city} autoComplete="address-level2" onChange={setCity} variant={variant} />
+                    <TextField id="city" label={settings.fields.city} placeholder={settings.fields.city_placeholder} value={city} autoComplete="address-level2" error={errors.city ? settings.errors.city : ""} onChange={(v) => { setCity(v); setErrors((e) => ({ ...e, city: undefined })); }} variant={variant} />
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <button

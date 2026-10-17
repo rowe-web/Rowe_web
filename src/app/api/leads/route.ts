@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
   const parsed = leadSchema.safeParse(body);
   if (!parsed.success) {
-    const fields = [...new Set(parsed.error.issues.map((i) => String(i.path[0])).filter((f) => ["name", "email", "privacy"].includes(f)))];
+    const fields = [...new Set(parsed.error.issues.map((i) => String(i.path[0])).filter((f) => ["name", "email", "city", "privacy"].includes(f)))];
     return json({ message: "Revisa los datos del formulario", fields }, 400);
   }
   const lead = parsed.data;

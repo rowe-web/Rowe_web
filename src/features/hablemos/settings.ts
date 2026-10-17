@@ -1,3 +1,4 @@
+import { settings as seedSettings } from "@/content/seed-data";
 import type { SiteSnapshot } from "@/lib/content/types";
 
 /** Textos del formulario «Hablemos» (ajuste «hablemos», editable desde el panel). */
@@ -20,7 +21,7 @@ export interface HablemosSettings {
   message_max: number;
   optional: string;
   fields: Record<"name" | "name_placeholder" | "company" | "company_placeholder" | "email" | "email_placeholder" | "phone" | "phone_placeholder" | "city" | "city_placeholder" | "privacy" | "privacy_link", string>;
-  errors: Record<"name" | "email" | "privacy" | "send_title" | "send_body", string>;
+  errors: Record<"name" | "email" | "city" | "privacy" | "send_title" | "send_body", string>;
   next: string;
   back: string;
   submit: string;
@@ -34,6 +35,13 @@ export interface HablemosSettings {
   copied: string;
 }
 
+const DEFAULTS = seedSettings.find((s) => s.key === "hablemos")!.value as unknown as HablemosSettings;
+
+/**
+ * Textos publicados. Un campo o error que aún no esté en la versión publicada (p. ej. uno
+ * recién añadido) usa el texto inicial, para que ningún campo se quede sin etiqueta.
+ */
 export function getHablemosSettings(site: SiteSnapshot): HablemosSettings {
-  return site.settings.hablemos as unknown as HablemosSettings;
+  const s = site.settings.hablemos as unknown as HablemosSettings;
+  return { ...s, fields: { ...DEFAULTS.fields, ...s.fields }, errors: { ...DEFAULTS.errors, ...s.errors } };
 }

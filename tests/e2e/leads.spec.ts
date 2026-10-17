@@ -58,6 +58,7 @@ const baseLead = (tag: string) => ({
   company: "ROWE QA",
   email: testEmail(tag),
   phone: "",
+  city: "Madrid",
   privacy: true,
   website: "",
   elapsed: 9000,
@@ -79,9 +80,10 @@ test("formulario «Hablemos»: 5 tomas → «Grabado» → lead guardado aunque 
   await expect(form.getByText("Revisa el email")).toBeVisible();
   await form.getByLabel("Nombre *").fill("Prueba E2E");
   await form.getByLabel("Email *").fill(testEmail("form"));
-  // Ubicación / ciudad (opcional): para valorar la logística de un rodaje
-  const city = form.getByLabel("Ubicación / Ciudad");
-  await expect(city).toHaveAttribute("placeholder", "ej. Madrid, Barcelona...");
+  // Ubicación / ciudad (obligatoria): para valorar la logística de un rodaje
+  await expect(form.getByText("Indícanos tu ciudad")).toBeVisible();
+  const city = form.getByLabel("Ubicación / Ciudad *");
+  await expect(city).toHaveAttribute("placeholder", "Ej. Madrid, Barcelona...");
   await city.fill("Valencia");
   await form.getByRole("checkbox").click();
   await form.getByRole("button", { name: "Enviar solicitud" }).click();
@@ -120,6 +122,7 @@ test("configurador → «Enviar y hablemos» → overlay precargado → lead con
   await overlay.getByRole("button", { name: /Siguiente/ }).click();
   await overlay.getByLabel("Nombre *").fill("Prueba Configurador");
   await overlay.getByLabel("Email *").fill(testEmail("cfg"));
+  await overlay.getByLabel("Ubicación / Ciudad *").fill("Madrid");
   await overlay.getByRole("checkbox").click();
   await page.waitForTimeout(2600);
   await overlay.getByRole("button", { name: "Enviar solicitud" }).click();
@@ -152,9 +155,9 @@ test("anti-spam: campo trampa y envíos demasiado rápidos no se guardan", async
 });
 
 test("validación en servidor: devuelve los campos con error", async ({ request }) => {
-  const res = await post(request, { ...baseLead("invalid"), email: "no-es-email", privacy: false }, "10.0.0.4");
+  const res = await post(request, { ...baseLead("invalid"), email: "no-es-email", city: " ", privacy: false }, "10.0.0.4");
   expect(res.status()).toBe(400);
-  expect((await res.json()).fields.sort()).toEqual(["email", "privacy"]);
+  expect((await res.json()).fields.sort()).toEqual(["city", "email", "privacy"]);
   const bad = await post(request, { ...baseLead("badopt"), need: "Algo inventado" }, "10.0.0.4");
   expect(bad.status()).toBe(400);
 });

@@ -107,11 +107,13 @@ export async function applyContentUpdates(db: Db, log: (msg: string) => void): P
     await updateJson(db, "site_settings", "value", "key", "hablemos", (v) => {
       const fields = v.fields as Obj | undefined;
       if (!fields || typeof fields !== "object") return false;
-      const a = add(fields, "city", "Ubicación / Ciudad");
-      const b = add(fields, "city_placeholder", "ej. Madrid, Barcelona...");
-      return a || b;
+      const a = add(fields, "city", "Ubicación / Ciudad *") || swap(fields, "city", "Ubicación / Ciudad", "Ubicación / Ciudad *");
+      const b = add(fields, "city_placeholder", "Ej. Madrid, Barcelona...") || swap(fields, "city_placeholder", "ej. Madrid, Barcelona...", "Ej. Madrid, Barcelona...");
+      const errors = v.errors as Obj | undefined;
+      const c = !!errors && typeof errors === "object" && add(errors, "city", "Indícanos tu ciudad para valorar el desplazamiento.");
+      return a || b || c;
     }),
-    "Hablemos: campo «Ubicación / Ciudad»",
+    "Hablemos: campo «Ubicación / Ciudad *» (obligatorio)",
   );
   done(
     await updateJson(db, "site_settings", "value", "key", "navigation", (v) => {

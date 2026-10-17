@@ -17,7 +17,7 @@ export const leadSchema = z.object({
   email: z.string().trim().toLowerCase().max(254).regex(EMAIL_RE, "email"),
   phone: z.string().trim().max(40).default(""),
   /** Ubicación / ciudad: para valorar la logística de los rodajes. */
-  city: z.string().trim().max(120).default(""),
+  city: z.string().trim().min(1, "city").max(120),
   privacy: z.literal(true, { error: "privacy" }),
   /** Selección del configurador (solo si budget === "cfg"). */
   selection: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
@@ -37,11 +37,12 @@ export const leadSchema = z.object({
 export type LeadInput = z.input<typeof leadSchema>;
 export type Lead = z.output<typeof leadSchema>;
 
-/** Errores de campo para la interfaz: { name: true, email: true, privacy: true } */
-export function fieldErrors(input: { name?: string; email?: string; privacy?: boolean }): Partial<Record<"name" | "email" | "privacy", true>> {
-  const e: Partial<Record<"name" | "email" | "privacy", true>> = {};
+/** Errores de campo para la interfaz: { name: true, email: true, city: true, privacy: true } */
+export function fieldErrors(input: { name?: string; email?: string; city?: string; privacy?: boolean }): Partial<Record<"name" | "email" | "city" | "privacy", true>> {
+  const e: Partial<Record<"name" | "email" | "city" | "privacy", true>> = {};
   if (!input.name?.trim()) e.name = true;
   if (!EMAIL_RE.test((input.email ?? "").trim())) e.email = true;
+  if (!input.city?.trim()) e.city = true;
   if (input.privacy !== true) e.privacy = true;
   return e;
 }
