@@ -22,6 +22,26 @@ interface MotionApi {
 
 const MotionContext = createContext<MotionApi | null>(null);
 
+/**
+ * Recalcula todos los disparadores en el orden de la página. ScrollTrigger los calcula en el
+ * orden en que se crearon, y un pin solo desplaza lo que va DEBAJO de él. Al cruzar un
+ * breakpoint, gsap.matchMedia rehace los pins de arriba (Estudio, Ecosistema…) después de
+ * disparadores que están más abajo: sin reordenar, esos quedarían calculados sin el espacio del
+ * pin (miles de px antes de tiempo) y sus animaciones parecerían congeladas.
+ */
+function refreshTriggers() {
+  ScrollTrigger.sort((a: ScrollTrigger, b: ScrollTrigger) => {
+    const pa = a.vars.refreshPriority ?? 0;
+    const pb = b.vars.refreshPriority ?? 0;
+    if (pa !== pb) return pb - pa;
+    const ta = a.trigger;
+    const tb = b.trigger;
+    if (!ta || !tb || ta === tb) return 0;
+    return ta.compareDocumentPosition(tb) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+  });
+  ScrollTrigger.refresh();
+}
+
 /** Igual que useMotion, pero devuelve null fuera del proveedor (guía de estilo, panel). */
 export function useMotionOptional(): MotionApi | null {
   return useContext(MotionContext);
@@ -87,7 +107,7 @@ export function MotionProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(refreshTimer);
       refreshTimer = window.setTimeout(() => {
         lenis.resize();
-        ScrollTrigger.refresh();
+        refreshTriggers();
       }, 150);
     };
     document.fonts?.ready.then(scheduleRefresh);
@@ -135,13 +155,46 @@ export function MotionProvider({ children }: { children: ReactNode }) {
         ScrollTrigger.update();
       }
     };
+    // Cuando la ventana deja de cambiar: se espera a que la maquetación se asiente (escenas
+    // rehechas, textos recolocados) y se recalculan TODOS los disparadores una última vez.
+    // El refresco automático de ScrollTrigger llega a mitad del cambio y deja los puntos de
+    // activación desfasados: las animaciones parecerían congeladas o saltarían tarde.
+    // Se hace aunque la persona ya esté moviéndose (entonces no se recoloca, solo se recalcula).
+    let resized = false;
+    let finalizing = false;
+    let stableFrame = 0;
+    const whenStable = (done: () => void) => {
+      let h = -1;
+      let same = 0;
+      let frames = 0;
+      const check = () => {
+        const now = document.documentElement.scrollHeight;
+        same = now === h ? same + 1 : 0;
+        h = now;
+        if (same >= 3 || ++frames > 60) done();
+        else stableFrame = requestAnimationFrame(check);
+      };
+      stableFrame = requestAnimationFrame(check);
+    };
     const settle = () => {
       window.clearTimeout(settleTimer);
-      settleTimer = window.setTimeout(() => {
-        restore();
-        anchor = null;
-        remember();
-      }, 500);
+      cancelAnimationFrame(stableFrame);
+      settleTimer = window.setTimeout(
+        () =>
+          whenStable(() => {
+            if (resized) {
+              resized = false;
+              finalizing = true;
+              lenis.resize();
+              refreshTriggers();
+              finalizing = false;
+            }
+            restore();
+            anchor = null;
+            remember();
+          }),
+        400,
+      );
     };
     const remember = () => {
       window.clearTimeout(idleTimer);
@@ -155,15 +208,30 @@ export function MotionProvider({ children }: { children: ReactNode }) {
       const prev = size;
       size = { w: window.innerWidth, h: window.innerHeight };
       // La barra del navegador del móvil al hacer scroll (solo cambia un poco el alto): no es un cambio de pantalla
-      if (!anchor && prev.w === size.w && Math.abs(prev.h - size.h) < 160) return;
+      if (!anchor && !resized && prev.w === size.w && Math.abs(prev.h - size.h) < 160) return;
+      resized = true;
       anchor ??= last ?? capture();
       settle();
     };
     const onRefreshed = () => {
-      if (!anchor) return;
+      if (!anchor || finalizing) return;
       restore();
       settle();
     };
+    // Cambiar a un monitor con otra densidad de píxeles puede no cambiar el tamaño en CSS
+    let dpr: MediaQueryList | null = null;
+    const watchDpr = () => {
+      dpr?.removeEventListener("change", onDpr);
+      dpr = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+      dpr.addEventListener("change", onDpr);
+    };
+    const onDpr = () => {
+      watchDpr();
+      resized = true;
+      anchor ??= last ?? capture();
+      settle();
+    };
+    watchDpr();
     // Si la persona se mueve mientras tanto, manda ella
     const dropAnchor = () => {
       anchor = null;
@@ -190,6 +258,8 @@ export function MotionProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(refreshTimer);
       window.clearTimeout(settleTimer);
       window.clearTimeout(idleTimer);
+      cancelAnimationFrame(stableFrame);
+      dpr?.removeEventListener("change", onDpr);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", remember);
       ScrollTrigger.removeEventListener("refresh", onRefreshed);
@@ -274,7 +344,7 @@ export function MotionProvider({ children }: { children: ReactNode }) {
 
   const refresh = useCallback(() => {
     lenisRef.current?.resize();
-    ScrollTrigger.refresh();
+    refreshTriggers();
   }, []);
 
   // --- Cambio de ruta: arriba del todo (o al ancla), timecodes y refresco ---------

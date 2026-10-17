@@ -134,6 +134,84 @@ test("redimensionar o cambiar de pantalla: la web sigue donde estaba, con el con
   expect(errors).toEqual([]);
 });
 
+test("tras redimensionar o cambiar de pantalla, las animaciones siguen respondiendo al scroll (sin recargar)", async ({ page, browser }, info) => {
+  test.skip(info.project.name !== "escritorio");
+  test.setTimeout(120_000);
+  type Live = { __rowe: { ScrollTrigger: { getAll: () => { trigger?: Element; start: number; end: number; pin?: Element; vars: { scrub?: unknown } }[] } } };
+  /** Disparadores ligados al scroll (scrub) o con pin: dónde empiezan y acaban */
+  const triggers = (p: Page) =>
+    p.evaluate(() =>
+      (window as unknown as Live).__rowe.ScrollTrigger.getAll()
+        .filter((t) => t.vars.scrub || t.pin)
+        .map((t) => `${t.trigger?.closest("[data-scene]")?.getAttribute("data-scene")}:${Math.round(t.start)}-${Math.round(t.end)}`)
+        .sort(),
+    );
+  const near = (a: string[], b: string[]) =>
+    a.length === b.length &&
+    a.every((x, i) => {
+      const [ka, ra] = x.split(":");
+      const [kb, rb] = b[i].split(":");
+      const [sa, ea] = ra.split("-").map(Number);
+      const [sb, eb] = rb.split("-").map(Number);
+      return ka === kb && Math.abs(sa - sb) <= 3 && Math.abs(ea - eb) <= 3;
+    });
+  const webY = () => page.locator("[data-web-scroll]").first().evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42);
+  const headX = () => page.locator("[data-proceso-head]").evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m41);
+
+  await open(page);
+  await page.evaluate(() => ((window as unknown as { __sinRecarga?: number }).__sinRecarga = 1));
+  await jump(page, 3000);
+  await page.waitForTimeout(800);
+  // Ida y vuelta pasando por móvil (las escenas se rehacen dos veces) y otra pantalla más grande
+  for (const [i, route] of [
+    [{ width: 700, height: 800 }, { width: 1440, height: 900 }],
+    [{ width: 1920, height: 1080 }],
+  ].entries()) {
+    for (const size of route) {
+      await page.setViewportSize(size);
+      await page.waitForTimeout(150);
+    }
+    await page.waitForTimeout(1500);
+    const size = route[route.length - 1];
+    const fresh = await browser.newPage({ viewport: size });
+    await fresh.addInitScript(() => sessionStorage.setItem("rowe:intro", "1"));
+    await fresh.goto("/", { waitUntil: "networkidle" });
+    await fresh.waitForFunction(() => (window as unknown as { __rowe?: unknown }).__rowe);
+    await fresh.waitForTimeout(1500);
+    // Mismos puntos de activación que una carga limpia de ese tamaño
+    const [mine, clean] = [await triggers(page), await triggers(fresh)];
+    expect(near(mine, clean), `ruta ${i}: ${JSON.stringify({ mine, clean })}`).toBe(true);
+    await fresh.close();
+  }
+
+  // Y responden: la página del visor (Escena 03) avanza al bajar y vuelve al subir
+  await page.locator("[data-web-stage]").scrollIntoViewIfNeeded();
+  await page.waitForTimeout(800);
+  await page.mouse.move(700, 450);
+  const y0 = await webY();
+  await page.mouse.wheel(0, 500);
+  await page.waitForTimeout(1200);
+  const y1 = await webY();
+  expect(y1).toBeLessThan(y0 - 20);
+  await page.mouse.wheel(0, -500);
+  await page.waitForTimeout(1200);
+  expect(Math.abs((await webY()) - y0)).toBeLessThan(8);
+  // …y el cabezal de la línea de tiempo (Escena 06) también
+  await page.locator("[data-proceso-timeline]").evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await page.waitForTimeout(1000);
+  const x0 = await headX();
+  await page.mouse.wheel(0, 300);
+  await page.waitForTimeout(1200);
+  expect(await headX()).toBeGreaterThan(x0 + 20);
+  await page.mouse.wheel(0, -300);
+  await page.waitForTimeout(1200);
+  expect(Math.abs((await headX()) - x0)).toBeLessThan(8);
+  // Sin recargar ni volver a la intro
+  await expect(page.locator(".rowe-preloader")).toBeHidden();
+  expect(await page.evaluate(() => (window as unknown as { __sinRecarga?: number }).__sinRecarga)).toBe(1);
+  expect(errors).toEqual([]);
+});
+
 const posY = (page: Page) => page.evaluate(() => window.scrollY);
 const stopped = (page: Page) => page.evaluate(() => (window as unknown as { __rowe: { lenis: { isStopped: boolean } } }).__rowe.lenis.isStopped);
 

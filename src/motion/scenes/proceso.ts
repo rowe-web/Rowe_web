@@ -59,6 +59,8 @@ export const procesoSetup: SceneSetup = ({ root, mm }) => {
 
   if (!timeline || !head) return;
 
+  // Opacidad con la que llega del HTML (oculto hasta que arranca el movimiento)
+  const headOpacity = head.style.opacity;
   mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
     const update = (p: number) => {
       head.style.transform = `translate3d(${p * timeline.clientWidth}px, 0, 0)`;
@@ -76,7 +78,9 @@ export const procesoSetup: SceneSetup = ({ root, mm }) => {
     });
     return () => {
       st.kill();
-      gsap.set(head, { clearProps: "transform,opacity" });
+      // Como al cargar: sin desplazar y con su opacidad inicial
+      gsap.set(head, { clearProps: "transform" });
+      head.style.opacity = headOpacity;
       items.forEach((it) => it.removeAttribute("data-off"));
     };
   });

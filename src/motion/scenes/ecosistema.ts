@@ -40,13 +40,19 @@ export const ecosistemaSetup: SceneSetup = ({ root, mm }) => {
   let points: { x: number; y: number }[] = [];
   const measure = () => {
     const box = signal?.offsetParent as HTMLElement | null;
-    if (!box) return;
+    // Diagrama oculto (móvil): sin puntos, para no mover la señal con medidas de otro tamaño
+    if (!box) {
+      points = [];
+      return;
+    }
     const b = box.getBoundingClientRect();
     points = nodes.map((nd) => {
       const r = nd.getBoundingClientRect();
       return { x: r.left + r.width / 2 - b.left, y: r.top + r.height / 2 - b.top };
     });
   };
+  // Posición inicial de la señal (la pone el HTML): se recupera al salir de escritorio
+  const signalHome = signal ? { left: signal.style.left, top: signal.style.top } : null;
   const moveSignal = (t: number) => {
     if (!signal || points.length < 2) return;
     const f = gsap.utils.clamp(0, n - 1, t * (n - 1));
@@ -85,6 +91,7 @@ export const ecosistemaSetup: SceneSetup = ({ root, mm }) => {
     return () => {
       st.kill();
       reset();
+      if (signal && signalHome) Object.assign(signal.style, { ...signalHome, transform: "" });
     };
   });
 
@@ -143,6 +150,7 @@ export const ecosistemaSetup: SceneSetup = ({ root, mm }) => {
         },
       },
     );
+    measure();
     render();
     return () => {
       tween.scrollTrigger?.kill();
