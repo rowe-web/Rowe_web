@@ -686,7 +686,8 @@ function Simulation({ state, engine }: { state: State; engine: EngineSettings })
   return (
     <Card className="flex flex-col gap-4">
       <span className={`${mono} text-muted`}>Simulación en vivo</span>
-      <div className="flex max-h-[42vh] flex-col gap-3 overflow-y-auto pr-1">
+      {/* Hueco a la derecha para la barra de scroll: nunca pegada a los desplegables */}
+      <div data-sim-scroll className="-mx-1 flex max-h-[42vh] flex-col gap-3 overflow-y-auto py-1 pl-1 pr-4 [scrollbar-color:var(--color-line-strong)_transparent] [scrollbar-gutter:stable] [scrollbar-width:thin]">
         {[...visibleSections].sort(byPos).map((sec) => {
           const opts = config.options.filter((o) => o.section_key === sec.key).sort(byPos);
           const groups = Array.from(new Set(opts.filter((o) => o.set_key).map((o) => o.set_key!)));
@@ -695,7 +696,7 @@ function Simulation({ state, engine }: { state: State; engine: EngineSettings })
             <div key={sec.key} className="flex flex-col gap-1.5">
               <span className="text-[12px] text-muted">{sec.title}</span>
               {groups.map((g) => (
-                <select key={g} aria-label={g} value={String(sel[g] ?? "")} onChange={(e) => put(g, e.target.value)} className="h-9 rounded-md border border-line bg-surface-2 px-2 text-[13px] text-bone">
+                <select key={g} aria-label={g} value={String(sel[g] ?? "")} onChange={(e) => put(g, e.target.value)} className="rowe-select">
                   {!opts.some((o) => o.set_key === g && o.is_default) && <option value="">—</option>}
                   {opts
                     .filter((o) => o.set_key === g)

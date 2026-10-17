@@ -336,6 +336,23 @@ test("precios: un mínimo mayor que el máximo se marca y no se guarda", async (
   await toast(page, /mínimo no puede ser mayor/);
   expect((await db.from("config_options").select("price_min, price_max").eq("key", "seo").single()).data).toEqual(before);
   await expect(page.getByText("Simulación en vivo")).toBeVisible();
+
+  // Simulación: desplegables oscuros de ROWE (no los del sistema) y la barra de scroll separada
+  const select = page.locator("[data-sim-scroll] select").first();
+  const look = await select.evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { appearance: s.appearance, bg: s.backgroundColor, color: s.color };
+  });
+  expect(look.appearance).not.toBe("auto");
+  expect(look.bg).toBe("rgb(17, 17, 17)");
+  expect(look.color).toBe("rgb(237, 234, 228)");
+  const gap = await page.locator("[data-sim-scroll]").evaluate((box) => {
+    const sel = box.querySelector("select")!.getBoundingClientRect();
+    // Borde derecho del área de contenido (sin la barra de scroll) menos el borde del desplegable
+    const inner = box.getBoundingClientRect().left + box.clientWidth;
+    return inner - sel.right;
+  });
+  expect(gap).toBeGreaterThanOrEqual(12);
 });
 
 test("usuarios: invita con enlace copiable y el rol queda guardado", async ({ page }) => {

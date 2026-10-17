@@ -99,6 +99,81 @@ export function MotionProvider({ children }: { children: ReactNode }) {
     document.addEventListener("load", onMediaLoad, true);
     document.addEventListener("loadedmetadata", onMediaLoad, true);
 
+    // Redimensionar, cambiar de monitor o girar el móvil: la web se queda donde estaba.
+    // Al cruzar un breakpoint, gsap.matchMedia rehace las escenas (pins incluidos) y
+    // ScrollTrigger pierde la posición por el camino (la deja en 0). Antes del cambio se
+    // apunta en qué escena se estaba y cuánto se había avanzado dentro de ella; después de
+    // cada refresco se vuelve ahí. Nada se recarga: el estado (configurador, formularios…) sigue.
+    // El punto se apunta cuando el scroll se para (el cambio de breakpoint puede llegar antes
+    // que el evento «resize», con la posición ya perdida).
+    // Se guarda la escena (no su «pin-spacer», que se rehace) y se mide su bloque cada vez.
+    type Anchor = { scene: HTMLElement; f: number } | { y: number };
+    let anchor: Anchor | null = null;
+    let last: Anchor | null = null;
+    let settleTimer = 0;
+    let idleTimer = 0;
+    const blockOf = (el: HTMLElement) => (el.parentElement?.classList.contains("pin-spacer") ? el.parentElement : el);
+    const capture = (): Anchor => {
+      for (const scene of document.querySelectorAll<HTMLElement>("main [data-scene], main > section, main > div > section")) {
+        const r = blockOf(scene).getBoundingClientRect();
+        if (r.top <= 1 && r.bottom > 1 && r.height > 0) return { scene, f: -r.top / r.height };
+      }
+      return { y: window.scrollY };
+    };
+    const restore = () => {
+      if (!anchor) return;
+      const a = anchor;
+      let target = "y" in a ? a.y : null;
+      if ("scene" in a && a.scene.isConnected) {
+        const box = blockOf(a.scene);
+        target = Math.round(box.getBoundingClientRect().top + window.scrollY + a.f * box.offsetHeight);
+      }
+      if (target == null) return;
+      if (Math.abs(window.scrollY - target) > 2) {
+        lenis.scrollTo(target, { immediate: true, force: true });
+        window.scrollTo(0, target);
+        ScrollTrigger.update();
+      }
+    };
+    const settle = () => {
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(() => {
+        restore();
+        anchor = null;
+        remember();
+      }, 500);
+    };
+    const remember = () => {
+      window.clearTimeout(idleTimer);
+      idleTimer = window.setTimeout(() => {
+        if (!anchor && !(ScrollTrigger as unknown as { isRefreshing?: boolean }).isRefreshing) last = capture();
+      }, 160);
+    };
+    remember();
+    let size = { w: window.innerWidth, h: window.innerHeight };
+    const onResize = () => {
+      const prev = size;
+      size = { w: window.innerWidth, h: window.innerHeight };
+      // La barra del navegador del móvil al hacer scroll (solo cambia un poco el alto): no es un cambio de pantalla
+      if (!anchor && prev.w === size.w && Math.abs(prev.h - size.h) < 160) return;
+      anchor ??= last ?? capture();
+      settle();
+    };
+    const onRefreshed = () => {
+      if (!anchor) return;
+      restore();
+      settle();
+    };
+    // Si la persona se mueve mientras tanto, manda ella
+    const dropAnchor = () => {
+      anchor = null;
+    };
+    window.addEventListener("resize", onResize);
+    window.addEventListener("scroll", remember, { passive: true });
+    ScrollTrigger.addEventListener("refresh", onRefreshed);
+    const USER_SCROLL = ["wheel", "touchstart", "keydown"] as const;
+    USER_SCROLL.forEach((ev) => window.addEventListener(ev, dropAnchor, { passive: true }));
+
     // Marca para el script de seguridad: el movimiento ha arrancado.
     (window as unknown as { __roweMotion?: boolean }).__roweMotion = true;
     // Solo en desarrollo/pruebas: acceso para los tests de scroll (detectar fugas de ScrollTriggers)
@@ -113,6 +188,12 @@ export function MotionProvider({ children }: { children: ReactNode }) {
       lenis.destroy();
       lenisRef.current = null;
       window.clearTimeout(refreshTimer);
+      window.clearTimeout(settleTimer);
+      window.clearTimeout(idleTimer);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("scroll", remember);
+      ScrollTrigger.removeEventListener("refresh", onRefreshed);
+      USER_SCROLL.forEach((ev) => window.removeEventListener(ev, dropAnchor));
       window.removeEventListener("load", scheduleRefresh);
       document.removeEventListener("load", onMediaLoad, true);
       document.removeEventListener("loadedmetadata", onMediaLoad, true);

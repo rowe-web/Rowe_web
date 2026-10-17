@@ -79,6 +79,61 @@ test("preloader: capa negra opaca por encima de toda la web mientras cuenta", as
   await expect(page.locator("#hero h1")).toBeVisible();
 });
 
+test("redimensionar o cambiar de pantalla: la web sigue donde estaba, con el configurador intacto", async ({ page }, info) => {
+  test.skip(info.project.name !== "escritorio");
+  await open(page);
+  await page.evaluate(() => ((window as unknown as { __sinRecarga?: number }).__sinRecarga = 1));
+  const sceneAtTop = () =>
+    page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>("[data-scene]")]
+        .find((s) => {
+          const box = s.parentElement?.classList.contains("pin-spacer") ? s.parentElement : s;
+          const r = box.getBoundingClientRect();
+          return r.top <= 1 && r.bottom > 1;
+        })
+        ?.getAttribute("data-scene"),
+    );
+  const sizes = [
+    { width: 1000, height: 800 }, // tablet
+    { width: 700, height: 800 }, // móvil
+    { width: 1440, height: 900 }, // vuelta a escritorio
+    { width: 1440, height: 520 }, // otra altura (otro monitor)
+    { width: 1440, height: 900 },
+  ];
+
+  // 1) A mitad de una escena con pin
+  await page.evaluate(() => (window as unknown as { __rowe: RoweDebug }).__rowe.lenis.scrollTo(2500, { immediate: true }));
+  await page.waitForTimeout(800);
+  const scene = await sceneAtTop();
+  expect(scene).toBeTruthy();
+  for (const size of sizes) {
+    await page.setViewportSize(size);
+    await page.waitForTimeout(1200);
+    expect(await sceneAtTop(), `${size.width}×${size.height}`).toBe(scene);
+  }
+
+  // 2) En el configurador, con opciones elegidas
+  await page.locator("#presupuesto").scrollIntoViewIfNeeded();
+  await page.evaluate(() => (window as unknown as { __rowe: RoweDebug }).__rowe.lenis.scrollTo("#rw-cfg", { immediate: true, offset: -100 }));
+  await page.waitForTimeout(800);
+  const cfg = page.locator("#rw-cfg");
+  await cfg.getByRole("radio", { name: /Solo contenido/ }).click();
+  await cfg.getByRole("radiogroup", { name: "Reels al mes" }).getByRole("radio", { name: "8" }).click();
+  await expect(page.locator("#rw-monitor")).toContainText("+ 480 – 640 €/mes");
+  for (const size of sizes) {
+    await page.setViewportSize(size);
+    await page.waitForTimeout(1200);
+    await expect(cfg, `${size.width}×${size.height}`).toBeInViewport();
+    await expect(cfg.getByRole("radio", { name: /Solo contenido/ })).toHaveAttribute("aria-checked", "true");
+    await expect(cfg.getByRole("radiogroup", { name: "Reels al mes" }).getByRole("radio", { name: "8" })).toHaveAttribute("aria-checked", "true");
+  }
+  await expect(page.locator("#rw-monitor")).toContainText("+ 480 – 640 €/mes");
+  // Nunca vuelve a salir la intro ni se recarga (la marca puesta al principio sigue ahí)
+  await expect(page.locator(".rowe-preloader")).toBeHidden();
+  expect(await page.evaluate(() => (window as unknown as { __sinRecarga?: number }).__sinRecarga)).toBe(1);
+  expect(errors).toEqual([]);
+});
+
 const posY = (page: Page) => page.evaluate(() => window.scrollY);
 const stopped = (page: Page) => page.evaluate(() => (window as unknown as { __rowe: { lenis: { isStopped: boolean } } }).__rowe.lenis.isStopped);
 

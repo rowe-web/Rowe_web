@@ -34,6 +34,32 @@ export function mailSender(): string {
 }
 
 /**
+ * El mensaje SMTP tal y como sale, con cabeceras RFC 5322 limpias y nada fuera de lo común:
+ *  - From = la cuenta autenticada, siempre (si no coinciden, Gmail lo reescribe y el email
+ *    pierde credibilidad), con nombre «ROWE»; Reply-To coherente (la misma cuenta salvo que el
+ *    email diga otra cosa: los avisos internos responden al cliente).
+ *  - Message-ID único del dominio de la cuenta, Date y prioridad normal explícitos.
+ *  - multipart/alternative: versión de texto plano SIEMPRE junto a la HTML.
+ */
+export function smtpMessage(mail: Mail, account: string) {
+  if (!mail.text.trim()) throw new Error("Falta la versión de texto plano del email");
+  const domain = account.split("@")[1] || "localhost";
+  return {
+    from: { name: "ROWE", address: account },
+    to: mail.to,
+    replyTo: mail.replyTo || account,
+    subject: mail.subject,
+    messageId: `<${randomUUID()}@${domain}>`,
+    date: new Date(),
+    text: mail.text,
+    html: mail.html,
+    textEncoding: "quoted-printable" as const,
+    headers: { "X-Priority": "3 (Normal)", Importance: "Normal", ...mail.headers },
+    attachments: mail.attachments,
+  };
+}
+
+/**
  * Envía un email con el proveedor configurado:
  *  - smtp:   Gmail con contraseña de aplicación (sin dominio propio).
  *  - resend: API de Resend (cuando haya dominio verificado).
@@ -52,38 +78,21 @@ export async function sendMail(mail: Mail): Promise<{ id: string }> {
       secure: env.SMTP_PORT === 465,
       auth: { user: env.SMTP_USER, pass: env.SMTP_PASSWORD },
     });
-    // Remitente = la cuenta autenticada, siempre (si no coinciden, Gmail lo reescribe y el
-    // email pierde credibilidad), con nombre «ROWE». Respuestas, a la misma cuenta salvo que el
-    // email diga otra cosa (los avisos internos responden al cliente).
-    const info = await smtp.sendMail({
-      from: { name: "ROWE", address: env.SMTP_USER },
-      sender: env.SMTP_USER,
-      to: mail.to,
-      replyTo: mail.replyTo || env.SMTP_USER,
-      subject: mail.subject,
-      html: mail.html,
-      text: mail.text,
-      textEncoding: "quoted-printable",
-      headers: {
-        // Identificador único: los clientes de correo no agrupan ni recortan emails parecidos
-        "X-Entity-Ref-ID": randomUUID(),
-        ...mail.headers,
-      },
-      attachments: mail.attachments,
-    });
+    const info = await smtp.sendMail(smtpMessage(mail, env.SMTP_USER));
     return { id: info.messageId };
   }
 
   if (env.EMAIL_PROVIDER === "resend") {
     if (!env.RESEND_API_KEY || !env.EMAIL_FROM) throw new EmailNotConfiguredError();
+    if (!mail.text.trim()) throw new Error("Falta la versión de texto plano del email");
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, "content-type": "application/json" },
       body: JSON.stringify({
         from: env.EMAIL_FROM,
         to: mail.to,
-        reply_to: mail.replyTo,
-        headers: { "X-Entity-Ref-ID": randomUUID(), ...mail.headers },
+        reply_to: mail.replyTo || mailSender(),
+        headers: mail.headers,
         subject: mail.subject,
         html: mail.html,
         text: mail.text,

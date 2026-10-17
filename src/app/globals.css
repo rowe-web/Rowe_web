@@ -317,6 +317,83 @@ html.has-cursor .cursor-halo {
   background: radial-gradient(560px circle at var(--mx, 50%) var(--my, 30%), rgb(237 234 228 / 0.045), transparent 62%);
 }
 
+/* Desplegable oscuro del panel (simulación de precios): nunca el gris/azul del sistema.
+   En Chrome/Edge recientes también la lista que se abre es la de ROWE (appearance: base-select);
+   en el resto, el control cerrado es el nuestro y las opciones van en oscuro. */
+.rowe-select {
+  appearance: none;
+  width: 100%;
+  min-height: 38px;
+  padding: 0 36px 0 12px;
+  border: 1px solid var(--color-line-input);
+  border-radius: 6px;
+  background-color: #111111;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%238a8780' stroke-width='1.4'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  color: var(--color-bone);
+  color-scheme: dark;
+  font-size: 13px;
+  line-height: 1.3;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.rowe-select:hover {
+  border-color: var(--color-line-bright);
+}
+.rowe-select:focus-visible {
+  outline: 1px solid var(--color-bone);
+  outline-offset: 2px;
+}
+.rowe-select option {
+  background-color: #111111;
+  color: var(--color-bone);
+}
+.rowe-select option:disabled {
+  color: var(--color-muted);
+}
+@supports (appearance: base-select) {
+  .rowe-select,
+  .rowe-select::picker(select) {
+    appearance: base-select;
+  }
+  .rowe-select {
+    display: flex;
+    align-items: center;
+  }
+  .rowe-select::picker-icon {
+    display: none;
+  }
+  .rowe-select::picker(select) {
+    margin-top: 4px;
+    padding: 4px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 8px;
+    background: #111111;
+    box-shadow: 0 16px 40px rgb(0 0 0 / 0.5);
+  }
+  .rowe-select option {
+    padding: 9px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  .rowe-select option:hover,
+  .rowe-select option:focus-visible {
+    background-color: #1f1f1f;
+    outline: none;
+  }
+  .rowe-select option:checked {
+    background-color: #181818;
+  }
+  .rowe-select option::checkmark {
+    color: var(--color-rec);
+  }
+}
+
 /* Aviso (toast) del diseño */
 .toast-in {
   animation: toast-in 0.5s var(--ease-out) both;

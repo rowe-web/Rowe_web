@@ -58,11 +58,10 @@ describe("email de respuesta · datos reales, contraste y modo oscuro", () => {
     expect(mail.html).toContain("mailto:rowe.web.contacto@gmail.com");
   });
 
-  it("texto oscuro sobre fondo claro, con paleta propia para el modo oscuro", async () => {
+  it("texto oscuro sobre fondo claro, HTML limpio: solo estilos en línea, sin clases, CSS ni texto oculto", async () => {
     const mail = await replyEmail(base);
     expect(mail.html).toContain("color:#111111");
-    expect(mail.html).toMatch(/<meta name="color-scheme" content="light dark">/);
-    expect(mail.html).toMatch(/@media \(prefers-color-scheme: dark\)/);
+    expect(mail.html).not.toMatch(/ class=|<style|@media|display:none|opacity:0|mso-hide/);
     // El logotipo va sobre su propio fondo blanco (no se pierde si el cliente invierte colores)
     expect(mail.attachments?.[0]?.content?.length).toBeGreaterThan(1000);
   });
