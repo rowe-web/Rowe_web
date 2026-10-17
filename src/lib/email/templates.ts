@@ -137,6 +137,8 @@ const SERIF = "Georgia,'Times New Roman',serif";
 const MONO = "'Courier New',Courier,monospace";
 const SANS = "Helvetica,Arial,sans-serif";
 const LABEL = `font:10px/1.5 ${MONO};letter-spacing:.14em;text-transform:uppercase;color:${SOFT}`;
+// Rótulos del resumen «Tu solicitud»: casi negros y en semi-negrita, nítidos sobre el fondo claro
+const SUMMARY_LABEL = `font:600 10px/1.5 ${MONO};letter-spacing:.14em;text-transform:uppercase;color:#222222`;
 
 /**
  * Respuesta a un mensaje, escrita en el panel y enviada desde la cuenta de ROWE.
@@ -172,31 +174,31 @@ export async function replyEmail(p: { to: string; subject: string; body: string;
   const summary = `
 <tr><td style="padding:30px 28px 0">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#F7F5F1" style="background:#F7F5F1;border:1px solid ${LINE};border-radius:4px">
-    <tr><td style="padding:18px 22px 6px;${LABEL}"><span style="color:${REC}">&#9679;</span>&nbsp; Tu solicitud</td></tr>
+    <tr><td style="padding:18px 22px 6px;${SUMMARY_LABEL}"><span style="color:${REC}">&#9679;</span>&nbsp; Tu solicitud</td></tr>
     <tr><td style="padding:4px 22px 6px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 ${rows
   .map(
     ([k, v]) =>
-      `        <tr><td style="padding:10px 12px 10px 0;border-top:1px solid ${LINE};${LABEL};width:130px;vertical-align:top">${esc(k)}</td><td style="padding:10px 0;border-top:1px solid ${LINE};font:15px/1.5 ${SANS};color:${INK}">${esc(v)}</td></tr>`,
+      `        <tr><td style="padding:10px 12px 10px 0;border-top:1px solid ${LINE};${SUMMARY_LABEL};width:130px;vertical-align:top">${esc(k)}</td><td style="padding:10px 0;border-top:1px solid ${LINE};font:15px/1.5 ${SANS};color:${INK}">${esc(v)}</td></tr>`,
   )
   .join("\n")}
       </table>
     </td></tr>
 ${
   p.lead.items.length
-    ? `    <tr><td style="padding:10px 22px 6px;${LABEL}">Lo que elegiste</td></tr>
+    ? `    <tr><td style="padding:10px 22px 6px;${SUMMARY_LABEL}">Lo que elegiste</td></tr>
     <tr><td style="padding:2px 22px 12px">${p.lead.items
         .map(
           (i) =>
-            `<span style="display:inline-block;margin:0 6px 8px 0;padding:6px 11px;border:1px solid #CFCAC1;border-radius:999px;background:${CARD};font:12px/1.3 ${MONO};letter-spacing:.04em;color:${INK}">${esc(i)}</span>`,
+            `<span style="display:inline-block;margin:0 6px 8px 0;padding:6px 11px;border:1px solid #CFCAC1;border-radius:999px;background:${CARD};font:600 12px/1.3 ${MONO};letter-spacing:.04em;color:#1a1a1a">${esc(i)}</span>`,
         )
         .join("")}</td></tr>`
     : ""
 }
 ${
   p.lead.message
-    ? `    <tr><td style="padding:8px 22px 6px;${LABEL}">Tu mensaje</td></tr>
+    ? `    <tr><td style="padding:8px 22px 6px;${SUMMARY_LABEL}">Tu mensaje</td></tr>
     <tr><td style="padding:2px 22px 20px"><div style="border-left:2px solid #CFCAC1;padding:2px 0 2px 14px;font:italic 15px/1.6 ${SERIF};color:#333333;white-space:pre-wrap">${esc(p.lead.message)}</div></td></tr>`
     : `    <tr><td style="padding:0 0 12px"></td></tr>`
 }

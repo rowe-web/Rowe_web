@@ -632,7 +632,7 @@ function ClientReply({ msg: m, isNew }: { msg: LeadRow["inbound"][number]; isNew
         <span className={`flex items-center gap-2 ${mono} text-[10px] text-bone`}>
           {KIND.client.mark}
           {KIND.client.label} · email
-          {isNew && <span className="rounded-full bg-rec px-1.5 py-px text-[9px] text-ink">Nueva</span>}
+          {isNew && <span data-new-badge className="inline-flex items-center rounded-full bg-rec px-2 py-[3px] text-[9px] font-bold uppercase leading-none tracking-wider text-[#ffffff]">Nueva</span>}
         </span>
         <span className="font-mono text-[10px] text-muted">{when(m.received_at)}</span>
       </div>

@@ -51,6 +51,21 @@ describe("email de respuesta al cliente", () => {
 });
 
 describe("email de respuesta · datos reales, contraste y modo oscuro", () => {
+  it("resumen «Tu solicitud»: rótulos y funciones elegidas casi negros y en semi-negrita", async () => {
+    const { html } = await replyEmail(base);
+    const summary = html.slice(html.indexOf("Tu solicitud") - 400);
+    for (const label of ["Tu solicitud", "Servicio", "Presupuesto", "Nº de presupuesto", "Solicitud", "Lo que elegiste", "Tu mensaje"]) {
+      const cell = summary.slice(0, summary.indexOf(label)).split("<td").pop()!;
+      expect(cell, label).toContain("font:600 ");
+      expect(cell, label).toContain("color:#222222");
+    }
+    for (const item of ["Web a medida", "8 reels/mes"]) {
+      const chip = summary.slice(0, summary.indexOf(item)).split("<span").pop()!;
+      expect(chip, item).toContain("font:600 ");
+      expect(chip, item).toContain("color:#1a1a1a");
+    }
+  });
+
   it("nunca muestra datos de relleno ni enlaza a un número inventado", async () => {
     const mail = await replyEmail({ ...base, contact: { ...base.contact, phone: "[+34 600 000 000]", whatsapp: "[+34 600 000 000]", city: "[Ciudad, Provincia]" } });
     expect(mail.html).not.toMatch(/\[\+34|\[Ciudad|wa\.me|tel:/);

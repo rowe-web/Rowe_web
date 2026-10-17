@@ -287,6 +287,8 @@ test("tiempo real: avisos abajo a la derecha (mensaje nuevo y respuesta por emai
   await expect(page.locator("[data-thread='client']")).toContainText("Respuesta del cliente E2E", { timeout: 10000 });
   expect(await page.locator("[data-thread]").evaluateAll((els) => els.map((e) => e.getAttribute("data-thread")))).toEqual(["form", "rowe", "client"]);
   await expect(page.locator("[data-thread='client']")).toContainText("Nueva");
+  // «Nueva»: blanco puro en negrita sobre el rojo
+  expect(await page.locator("[data-thread='client'] [data-new-badge]").evaluate((el) => { const c = getComputedStyle(el); return [c.color, Number(c.fontWeight) >= 600, c.textTransform, c.backgroundColor]; })).toEqual(["rgb(255, 255, 255)", true, "uppercase", "rgb(255, 59, 31)"]);
   const client = page.locator("[data-thread='client']");
   await expect(client.getByText("Respuesta del cliente E2E", { exact: true })).toBeHidden();
   await client.getByText("Ver texto").click();
