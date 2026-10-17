@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import { inviteUser, revokeUser, setUserRole } from "@/admin/actions/users";
 import { when } from "@/admin/format";
 import { useFeedback } from "@/admin/ui/feedback";
@@ -164,46 +165,52 @@ export function UsersScreen({ users, meId }: { users: UserRow[]; meId: string })
         </div>
       )}
 
-      {invite && (
-        <div role="dialog" aria-modal="true" aria-label="Invitar usuario" onClick={() => setInvite(null)} className="fixed inset-0 z-[80] flex items-center justify-center bg-[rgb(10_10_10/0.75)] p-5 backdrop-blur-[6px]">
-          <form
-            onClick={(e) => e.stopPropagation()}
-            onSubmit={(e) => (e.preventDefault(), send())}
-            className="toast-in flex w-[min(460px,100%)] flex-col gap-[18px] rounded-[10px] border border-line-strong bg-surface p-[26px]"
-          >
-            <p className="headline-serif text-[30px] leading-none">
-              Invitar <em>usuario</em>
-            </p>
-            <Field label="Email" htmlFor="inv-email">
-              <TextInput id="inv-email" type="email" autoFocus value={invite.email} placeholder="persona@negocio.es" onChange={(e) => setInvite({ ...invite, email: e.target.value })} />
-            </Field>
-            <Field label="Nombre · opcional" htmlFor="inv-name">
-              <TextInput id="inv-name" value={invite.name} placeholder="Cómo aparecerá en el historial" onChange={(e) => setInvite({ ...invite, name: e.target.value })} />
-            </Field>
-            <div className="flex flex-col gap-2">
-              <span className={`${mono} text-muted`}>Rol</span>
-              <Segmented
-                label="Rol"
-                value={invite.role}
-                onChange={(role) => setInvite({ ...invite, role })}
-                options={[
-                  { value: "editor", label: "Editor" },
-                  { value: "admin", label: "Administrador" },
-                ]}
-              />
-              <span className="text-[13px] leading-normal text-muted">{invite.role === "editor" ? "Puede editar textos, proyectos y medios. Un administrador publica." : "Acceso completo, incluidos precios, usuarios y publicación."}</span>
+      {/* En un portal: la pantalla entra con una animación (transform) que hacía el «fixed» relativo a ella y no a
+          la ventana, y el modal salía descentrado y cortado por arriba. Centrado en la ventana; si no cabe, se desplaza. */}
+      {invite &&
+        createPortal(
+          <div role="dialog" aria-modal="true" aria-label="Invitar usuario" onClick={() => setInvite(null)} className="fixed inset-0 z-[80] overflow-y-auto bg-[rgb(10_10_10/0.75)] backdrop-blur-[6px]">
+            <div className="flex min-h-full items-center justify-center p-5">
+              <form
+                onClick={(e) => e.stopPropagation()}
+                onSubmit={(e) => (e.preventDefault(), send())}
+                className="toast-in flex w-[min(460px,100%)] flex-col gap-[18px] rounded-[10px] border border-line-strong bg-surface p-[26px] pt-8"
+              >
+                <p className="headline-serif text-[30px] leading-none">
+                  Invitar <em>usuario</em>
+                </p>
+                <Field label="Email" htmlFor="inv-email">
+                  <TextInput id="inv-email" type="email" autoFocus value={invite.email} placeholder="persona@negocio.es" onChange={(e) => setInvite({ ...invite, email: e.target.value })} />
+                </Field>
+                <Field label="Nombre · opcional" htmlFor="inv-name">
+                  <TextInput id="inv-name" value={invite.name} placeholder="Cómo aparecerá en el historial" onChange={(e) => setInvite({ ...invite, name: e.target.value })} />
+                </Field>
+                <div className="flex flex-col gap-2">
+                  <span className={`${mono} text-muted`}>Rol</span>
+                  <Segmented
+                    label="Rol"
+                    value={invite.role}
+                    onChange={(role) => setInvite({ ...invite, role })}
+                    options={[
+                      { value: "editor", label: "Editor" },
+                      { value: "admin", label: "Administrador" },
+                    ]}
+                  />
+                  <span className="text-[13px] leading-normal text-muted">{invite.role === "editor" ? "Puede editar textos, proyectos y medios. Un administrador publica." : "Acceso completo, incluidos precios, usuarios y publicación."}</span>
+                </div>
+                <div className="flex justify-end gap-2.5">
+                  <AButton variant="ghost" onClick={() => setInvite(null)}>
+                    Cancelar
+                  </AButton>
+                  <AButton variant="primary" type="submit" loading={busy}>
+                    Enviar invitación
+                  </AButton>
+                </div>
+              </form>
             </div>
-            <div className="flex justify-end gap-2.5">
-              <AButton variant="ghost" onClick={() => setInvite(null)}>
-                Cancelar
-              </AButton>
-              <AButton variant="primary" type="submit" loading={busy}>
-                Enviar invitación
-              </AButton>
-            </div>
-          </form>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

@@ -306,6 +306,39 @@ test("tiempo real: avisos abajo a la derecha (mensaje nuevo y respuesta por emai
   await waitFor(async () => (await db.from("lead_inbound").select("seen_at").eq("lead_id", lead.id).single()).data?.seen_at);
 });
 
+test("mensajes en móvil: un texto muy largo y sin espacios parte la línea y no se sale de la pantalla", async ({ page }) => {
+  const long = "x".repeat(700); // cadena continua, sin espacios (el formulario admite hasta 600; el email, más)
+  const text = `${long} https://ejemplo-de-enlace-larguisimo.example.com/${"ruta/".repeat(40)} ${"Texto normal con espacios. ".repeat(30)}`;
+  const { data: lead, error } = await db
+    .from("leads")
+    .insert({ origin: "formulario", need: "Web", sector: "", budget_label: "", message: "x".repeat(600), name: "Texto Largo E2E", company: "", email: email("largo"), phone: "", privacy_accepted_at: new Date().toISOString(), source: {} })
+    .select("id")
+    .single();
+  if (error) throw error;
+  const inbound = await db.from("lead_inbound").insert({
+    lead_id: lead.id, received_at: new Date().toISOString(), from_email: email("largo"), from_name: "Texto Largo E2E",
+    subject: `Re: ${"y".repeat(290)}`, body: text, full_text: `${text}\n\n> ${long}`, message_id: `<largo-${run}@mail>`, in_reply_to: null, matched_by: "sender",
+  });
+  if (inbound.error) throw inbound.error;
+  await page.setViewportSize({ width: 390, height: 844 });
+  await login(page, "admin", `/admin/mensajes?lead=${lead.id}`);
+  for (const kind of ["form", "client"]) {
+    const item = page.locator(`[data-thread="${kind}"]`);
+    await item.getByText("Ver texto").click();
+    await expect(item.locator("[data-fold] p").first()).toBeVisible();
+  }
+  // Nada más ancho que la pantalla: ni la página, ni la zona con scroll, ni las cajas de los mensajes o sus párrafos
+  const overflow = await page.evaluate(() => {
+    const w = window.innerWidth;
+    const bad = [...document.querySelectorAll("[data-thread], [data-thread] *")]
+      .filter((el) => el.getBoundingClientRect().right > w + 0.5 || el.scrollWidth > el.clientWidth + 1 && getComputedStyle(el).overflowX !== "hidden")
+      .map((el) => `${el.tagName}.${el.className}`.slice(0, 80));
+    const scrollers = [document.documentElement, ...document.querySelectorAll("main *")].filter((el) => el.scrollWidth > el.clientWidth + 1 && /auto|scroll/.test(getComputedStyle(el).overflowX));
+    return { bad, scrollers: scrollers.length, page: document.documentElement.scrollWidth - w };
+  });
+  expect(overflow).toEqual({ bad: [], scrollers: 0, page: 0 });
+});
+
 test("medios: sube con progreso, guarda el texto alternativo y borra del almacenamiento", async ({ page }) => {
   await login(page, "editor", "/admin/medios");
   const png = tinyPng();
@@ -381,6 +414,30 @@ test("precios: un mínimo mayor que el máximo se marca y no se guarda", async (
 
 test("usuarios: invita con enlace copiable y el rol queda guardado", async ({ page }) => {
   await login(page, "admin", "/admin/usuarios");
+  // El modal, centrado en la ventana y entero (con el título holgado). Si la ventana es más baja que el modal
+  // (móvil con el teclado abierto, portátil con zoom), empieza arriba con margen y se desplaza: nunca se corta
+  const dialog = page.getByRole("dialog", { name: "Invitar usuario" });
+  for (const size of [{ width: 1440, height: 900 }, { width: 1280, height: 640 }, { width: 390, height: 844 }, { width: 1280, height: 420 }, { width: 390, height: 380 }, { width: 1440, height: 900 }]) {
+    await page.setViewportSize(size);
+    if (!(await dialog.isVisible())) await page.getByRole("button", { name: "Invitar usuario" }).click();
+    const form = dialog.locator("form");
+    await expect(form).toBeVisible();
+    await page.waitForTimeout(600); // fin de la entrada
+    const box = (await form.boundingBox())!;
+    const title = (await form.getByText("Invitar usuario").boundingBox())!;
+    expect(box.y).toBeGreaterThanOrEqual(16);
+    expect(title.y - box.y).toBeGreaterThanOrEqual(30);
+    expect(Math.abs(box.x + box.width / 2 - size.width / 2)).toBeLessThan(2);
+    if (box.height + 40 <= size.height) {
+      expect(box.y + box.height).toBeLessThanOrEqual(size.height - 16);
+      expect(Math.abs(box.y + box.height / 2 - size.height / 2)).toBeLessThan(2);
+    } else {
+      const send = dialog.getByRole("button", { name: "Enviar invitación" });
+      await send.scrollIntoViewIfNeeded();
+      await expect(send).toBeInViewport();
+    }
+    await dialog.getByRole("button", { name: "Cancelar" }).click();
+  }
   await page.getByRole("button", { name: "Invitar usuario" }).click();
   await page.locator("#inv-email").fill(email("invitado"));
   await page.getByRole("dialog").getByRole("radio", { name: "Editor" }).click();

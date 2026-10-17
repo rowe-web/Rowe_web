@@ -116,7 +116,7 @@ export function LeadsScreen({ leads: initial, needs, isAdmin, mailFrom, initialL
         <TextInput value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre o negocio" aria-label="Buscar mensajes" className="!h-[42px] min-w-[200px] flex-1 !rounded-full !px-[18px] !text-[14px]" />
       </div>
 
-      <div className="grid items-start gap-4 min-[820px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+      <div className="grid grid-cols-1 items-start gap-4 min-[820px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
         <Card padded={false} className={selected ? "max-[819px]:hidden" : ""}>
           {filtered.length === 0 ? (
             <EmptyState
@@ -277,7 +277,7 @@ function LeadDetail({
       : { tone: "alert" as const, text: lead.mail.status === "pending" ? "Aviso por email pendiente" : `Aviso por email no enviado (${lead.mail.attempts} intento${lead.mail.attempts === 1 ? "" : "s"})` };
 
   return (
-    <Card className="toast-in flex flex-col gap-[22px]">
+    <Card className="toast-in flex min-w-0 flex-col gap-[22px]">
       <button type="button" onClick={onBack} className="min-h-9 self-start text-[14px] text-muted min-[820px]:hidden">
         ← Mensajes
       </button>
@@ -554,10 +554,10 @@ function Conversation({ lead, unseen }: { lead: LeadRow; unseen: Set<number> }) 
           ))}
         </span>
       </div>
-      <ol className="flex flex-col gap-3">
+      <ol className="flex min-w-0 flex-col gap-3">
         {items.map((it) =>
           it.kind === "form" ? (
-            <li key="form" data-thread="form" className="flex flex-col gap-2.5 rounded-md border border-dashed border-line-strong px-4 py-3.5">
+            <li key="form" data-thread="form" className="flex min-w-0 max-w-full flex-col gap-2.5 rounded-md border border-dashed border-line-strong px-4 py-3.5 [overflow-wrap:anywhere]">
               <ThreadHeader mark={KIND.form.mark} title={lead.origin === "configurador" ? `Configurador de presupuesto${lead.quote ? ` · ${lead.quote.number}` : ""}` : KIND.form.label} meta={when(lead.created_at)} />
               <Fold>
                 <p className="max-w-[62ch] whitespace-pre-wrap text-[14px] leading-relaxed text-bone">{lead.message || "Sin mensaje. Esta solicitud llegó sin texto adicional."}</p>
@@ -589,13 +589,14 @@ function ThreadHeader({ mark, title, meta }: { mark: ReactNode; title: string; m
 /** Texto de un mensaje del hilo: replegado por defecto tras «Ver texto» (los tres tipos igual). */
 function Fold({ children }: { children: ReactNode }) {
   return (
-    <details data-fold className="group/fold">
+    <details data-fold className="group/fold min-w-0 max-w-full">
       <summary className={`flex min-h-8 w-fit cursor-pointer select-none list-none items-center gap-2 rounded-full border border-line px-3 ${mono} text-[10px] text-muted transition-colors hover:border-bone hover:text-bone [&::-webkit-details-marker]:hidden`}>
         <span className="group-open/fold:hidden">Ver texto</span>
         <span className="hidden group-open/fold:inline">Ocultar texto</span>
         <span aria-hidden="true" className="transition-transform group-open/fold:rotate-180">↓</span>
       </summary>
-      <div className="mt-3 rounded border border-line-soft bg-surface px-4 py-3.5">{children}</div>
+      {/* Textos largos o sin espacios (enlaces, cadenas pegadas) parten la línea dentro de la caja: nunca empujan la pantalla */}
+      <div className="mt-3 min-w-0 max-w-full overflow-hidden break-words rounded border border-line-soft bg-surface px-4 py-3.5 [overflow-wrap:anywhere]">{children}</div>
     </details>
   );
 }
@@ -604,7 +605,7 @@ function Fold({ children }: { children: ReactNode }) {
 function RoweReply({ reply: r }: { reply: LeadRow["replies"][number] }) {
   const sent = r.status === "sent";
   return (
-    <li data-thread="rowe" data-reply className={`ml-auto w-full overflow-hidden rounded-md border border-l-2 border-line-soft bg-surface-2 min-[1100px]:w-[90%] ${sent ? "border-l-bone" : "border-l-rec"}`}>
+    <li data-thread="rowe" data-reply className={`ml-auto w-full min-w-0 max-w-full overflow-hidden [overflow-wrap:anywhere] rounded-md border border-l-2 border-line-soft bg-surface-2 min-[1100px]:w-[90%] ${sent ? "border-l-bone" : "border-l-rec"}`}>
       <div className="border-b border-line-soft bg-surface-3 px-3.5 py-2.5">
         <ThreadHeader mark={KIND.rowe.mark} title={KIND.rowe.label} meta={<StatusDot tone={sent ? "half" : "alert"} label={`${sent ? "Enviada" : "No enviada"} · ${when(r.created_at)}`} />} />
       </div>
@@ -626,7 +627,7 @@ function RoweReply({ reply: r }: { reply: LeadRow["replies"][number] }) {
 function ClientReply({ msg: m, isNew }: { msg: LeadRow["inbound"][number]; isNew: boolean }) {
   const quoted = m.full_text.trim() !== m.body.trim();
   return (
-    <li data-thread="client" className="mr-auto w-full overflow-hidden rounded-md border border-l-2 border-line-strong border-l-muted bg-ph-2 min-[1100px]:w-[90%]">
+    <li data-thread="client" className="mr-auto w-full min-w-0 max-w-full overflow-hidden [overflow-wrap:anywhere] rounded-md border border-l-2 border-line-strong border-l-muted bg-ph-2 min-[1100px]:w-[90%]">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-soft bg-ph px-3.5 py-2.5">
         <span className={`flex items-center gap-2 ${mono} text-[10px] text-bone`}>
           {KIND.client.mark}
