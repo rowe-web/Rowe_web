@@ -119,7 +119,7 @@ test("redimensionar o cambiar de pantalla: la web sigue donde estaba, con el con
   const cfg = page.locator("#rw-cfg");
   await cfg.getByRole("radio", { name: /Solo contenido/ }).click();
   await cfg.getByRole("radiogroup", { name: "Reels al mes" }).getByRole("radio", { name: "8" }).click();
-  await expect(page.locator("#rw-monitor")).toContainText("+ 480 – 640 €/mes");
+  await expect(page.locator("#rw-monitor")).toContainText("+ 380 – 510 €/mes");
   for (const size of sizes) {
     await page.setViewportSize(size);
     await page.waitForTimeout(1200);
@@ -127,7 +127,7 @@ test("redimensionar o cambiar de pantalla: la web sigue donde estaba, con el con
     await expect(cfg.getByRole("radio", { name: /Solo contenido/ })).toHaveAttribute("aria-checked", "true");
     await expect(cfg.getByRole("radiogroup", { name: "Reels al mes" }).getByRole("radio", { name: "8" })).toHaveAttribute("aria-checked", "true");
   }
-  await expect(page.locator("#rw-monitor")).toContainText("+ 480 – 640 €/mes");
+  await expect(page.locator("#rw-monitor")).toContainText("+ 380 – 510 €/mes");
   // Nunca vuelve a salir la intro ni se recarga (la marca puesta al principio sigue ahí)
   await expect(page.locator(".rowe-preloader")).toBeHidden();
   expect(await page.evaluate(() => (window as unknown as { __sinRecarga?: number }).__sinRecarga)).toBe(1);

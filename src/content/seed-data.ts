@@ -204,12 +204,12 @@ export const settings: SeedSetting[] = [
       once_text: "Pago único",
       level_label: "Nivel de proyecto",
       levels: [
-        { below: 1800, label: "Esencial" },
-        { below: 3600, label: "Completo" },
+        { below: 1440, label: "Esencial" },
+        { below: 2880, label: "Completo" },
         { below: null, label: "A medida" },
       ],
       vu_bars: 28,
-      vu_max: 5600,
+      vu_max: 4480,
       round_once: 50,
       round_monthly: 10,
       min_weeks: 1,
@@ -686,39 +686,39 @@ export const configSections: SeedConfigSection[] = [
 
 export const configOptions: SeedConfigOption[] = [
   // Toma 01 · Tipo de proyecto (opción base, excluyente)
-  { section: "tipo", key: "nueva", control: "card", setKey: "tipo", badge: "A", label: "Web nueva", lineLabel: "Web nueva", description: "Empezamos de cero, con tu marca y tus objetivos.", priceMin: 900, priceMax: 1400, isBase: true, weeksMin: 3, weeksMax: 4 },
-  { section: "tipo", key: "rediseno", control: "card", setKey: "tipo", badge: "B", label: "Rediseño", lineLabel: "Rediseño", description: "Tu web actual, a la altura de tu negocio actual.", priceMin: 700, priceMax: 1100, isBase: true, weeksMin: 2, weeksMax: 3 },
+  { section: "tipo", key: "nueva", control: "card", setKey: "tipo", badge: "A", label: "Web nueva", lineLabel: "Web nueva", description: "Empezamos de cero, con tu marca y tus objetivos.", priceMin: 720, priceMax: 1120, isBase: true, weeksMin: 3, weeksMax: 4 },
+  { section: "tipo", key: "rediseno", control: "card", setKey: "tipo", badge: "B", label: "Rediseño", lineLabel: "Rediseño", description: "Tu web actual, a la altura de tu negocio actual.", priceMin: 560, priceMax: 880, isBase: true, weeksMin: 2, weeksMax: 3 },
   {
     section: "tipo", key: "contenido", control: "card", setKey: "tipo", badge: "C", label: "Web + contenido", lineLabel: "Web + contenido",
-    description: "Web y vídeo con el mismo equipo y la misma estética.", priceMin: 1250, priceMax: 1900, isBase: true, weeksMin: 4, weeksMax: 5,
+    description: "Web y vídeo con el mismo equipo y la misma estética.", priceMin: 1000, priceMax: 1520, isBase: true, weeksMin: 4, weeksMax: 5,
     components: [
-      { label: "Web a medida", track: "WE", min: 900, max: 1400, base: true },
-      { label: "Jornada de rodaje", track: "RO", min: 350, max: 500 },
+      { label: "Web a medida", track: "WE", min: 720, max: 1120, base: true },
+      { label: "Jornada de rodaje", track: "RO", min: 280, max: 400 },
     ],
   },
   {
     section: "tipo", key: "redes", control: "card", setKey: "tipo", badge: "D", label: "Solo contenido", lineLabel: "Rodaje para redes",
-    description: "Sin web: guion, rodaje y edición de vídeo vertical para tus redes.", priceMin: 350, priceMax: 500, track: "RO", isBase: true, weeksMin: 1, weeksMax: 2,
+    description: "Sin web: guion, rodaje y edición de vídeo vertical para tus redes.", priceMin: 280, priceMax: 400, track: "RO", isBase: true, weeksMin: 1, weeksMax: 2,
   },
   // Toma 02 · Tamaño (excluyente)
-  { section: "tamano", key: "landing", control: "segment", setKey: "paginas", label: "Landing · 1 página", priceMin: -300, priceMax: -450, modifiesBase: true, baseSuffix: " · landing", weeksMin: -1, weeksMax: -1 },
+  { section: "tamano", key: "landing", control: "segment", setKey: "paginas", label: "Landing · 1 página", priceMin: -240, priceMax: -360, modifiesBase: true, baseSuffix: " · landing", weeksMin: -1, weeksMax: -1 },
   { section: "tamano", key: "p5", control: "segment", setKey: "paginas", label: "Hasta 5 páginas", priceMin: 0, priceMax: 0, isDefault: true },
-  { section: "tamano", key: "p10", control: "segment", setKey: "paginas", label: "Hasta 10 páginas", lineLabel: "Hasta 10 páginas", priceMin: 400, priceMax: 600, weeksMin: 1, weeksMax: 1 },
-  { section: "tamano", key: "p10p", control: "segment", setKey: "paginas", label: "Más de 10", lineLabel: "Más de 10", priceMin: 900, priceMax: 1400, weeksMin: 2, weeksMax: 2 },
+  { section: "tamano", key: "p10", control: "segment", setKey: "paginas", label: "Hasta 10 páginas", lineLabel: "Hasta 10 páginas", priceMin: 320, priceMax: 480, weeksMin: 1, weeksMax: 1 },
+  { section: "tamano", key: "p10p", control: "segment", setKey: "paginas", label: "Más de 10", lineLabel: "Más de 10", priceMin: 720, priceMax: 1120, weeksMin: 2, weeksMax: 2 },
   // Toma 03 · Funciones
-  { section: "funciones", key: "reservas", control: "toggle", label: "Reservas / citas", lineLabel: "Reservas / citas", description: "Agenda online para clínicas, restaurantes y servicios.", priceMin: 300, priceMax: 500, weeksMin: 0, weeksMax: 1 },
-  { section: "funciones", key: "tienda", control: "toggle", label: "Tienda online", lineLabel: "Tienda online", description: "Catálogo, carrito y pagos seguros.", priceMin: 900, priceMax: 1500, weeksMin: 2, weeksMax: 2 },
-  { section: "funciones", key: "seo", control: "toggle", label: "SEO local", lineLabel: "SEO local", description: "Que te encuentren en Google en tu zona.", priceMin: 250, priceMax: 400 },
-  { section: "funciones", key: "idiomas", control: "stepper", label: "Idiomas", lineLabel: "Idiomas ×{n}", description: "El primero va incluido. Cada idioma extra suma.", priceMin: 200, priceMax: 300, unitLabel: "c/u", stepper: { min: 1, max: 4, included: 1 } },
+  { section: "funciones", key: "reservas", control: "toggle", label: "Reservas / citas", lineLabel: "Reservas / citas", description: "Agenda online para clínicas, restaurantes y servicios.", priceMin: 240, priceMax: 400, weeksMin: 0, weeksMax: 1 },
+  { section: "funciones", key: "tienda", control: "toggle", label: "Tienda online", lineLabel: "Tienda online", description: "Catálogo, carrito y pagos seguros.", priceMin: 720, priceMax: 1200, weeksMin: 2, weeksMax: 2 },
+  { section: "funciones", key: "seo", control: "toggle", label: "SEO local", lineLabel: "SEO local", description: "Que te encuentren en Google en tu zona.", priceMin: 200, priceMax: 320 },
+  { section: "funciones", key: "idiomas", control: "stepper", label: "Idiomas", lineLabel: "Idiomas ×{n}", description: "El primero va incluido. Cada idioma extra suma.", priceMin: 160, priceMax: 240, unitLabel: "c/u", stepper: { min: 1, max: 4, included: 1 } },
   // Toma 04 · Audiovisual (con «Web + contenido» o «Solo contenido»)
   { section: "audiovisual", key: "reels0", control: "segment", setKey: "reels", setLabel: "Reels al mes", setDescription: "Rodaje y edición de piezas cortas para redes. Cuota mensual.", label: "No", priceMin: 0, priceMax: 0, priceMode: "monthly", track: "RO", isDefault: true },
-  { section: "audiovisual", key: "reels4", control: "segment", setKey: "reels", setLabel: "Reels al mes", label: "4", lineLabel: "4 reels/mes", priceMin: 260, priceMax: 360, priceMode: "monthly", unitLabel: "/mes", track: "RO" },
-  { section: "audiovisual", key: "reels8", control: "segment", setKey: "reels", setLabel: "Reels al mes", label: "8", lineLabel: "8 reels/mes", priceMin: 480, priceMax: 640, priceMode: "monthly", unitLabel: "/mes", track: "RO" },
-  { section: "audiovisual", key: "reels12", control: "segment", setKey: "reels", setLabel: "Reels al mes", label: "12", lineLabel: "12 reels/mes", priceMin: 680, priceMax: 900, priceMode: "monthly", unitLabel: "/mes", track: "RO" },
-  { section: "audiovisual", key: "fotos", control: "toggle", label: "Sesión de fotografía", lineLabel: "Sesión de fotos", description: "Fotos profesionales de tu negocio, equipo y producto.", priceMin: 250, priceMax: 400, track: "RO" },
-  { section: "audiovisual", key: "video", control: "toggle", label: "Vídeo corporativo", lineLabel: "Vídeo corporativo", description: "Una pieza de 60–90 s que cuenta quién eres.", priceMin: 600, priceMax: 1100, track: "RO", weeksMin: 0, weeksMax: 1 },
+  { section: "audiovisual", key: "reels4", control: "segment", setKey: "reels", setLabel: "Reels al mes", label: "4", lineLabel: "4 reels/mes", priceMin: 210, priceMax: 290, priceMode: "monthly", unitLabel: "/mes", track: "RO" },
+  { section: "audiovisual", key: "reels8", control: "segment", setKey: "reels", setLabel: "Reels al mes", label: "8", lineLabel: "8 reels/mes", priceMin: 380, priceMax: 510, priceMode: "monthly", unitLabel: "/mes", track: "RO" },
+  { section: "audiovisual", key: "reels12", control: "segment", setKey: "reels", setLabel: "Reels al mes", label: "12", lineLabel: "12 reels/mes", priceMin: 540, priceMax: 720, priceMode: "monthly", unitLabel: "/mes", track: "RO" },
+  { section: "audiovisual", key: "fotos", control: "toggle", label: "Sesión de fotografía", lineLabel: "Sesión de fotos", description: "Fotos profesionales de tu negocio, equipo y producto.", priceMin: 200, priceMax: 320, track: "RO" },
+  { section: "audiovisual", key: "video", control: "toggle", label: "Vídeo corporativo", lineLabel: "Vídeo corporativo", description: "Una pieza de 60–90 s que cuenta quién eres.", priceMin: 480, priceMax: 880, track: "RO", weeksMin: 0, weeksMax: 1 },
   // Toma 05 · Después del estreno
-  { section: "post", key: "mant", control: "toggle", label: "Mantenimiento mensual", lineLabel: "Mantenimiento", description: "Actualizaciones, copias de seguridad y cambios menores.", priceMin: 35, priceMax: 60, priceMode: "monthly", unitLabel: "/mes", requires: { set: "tipo", in: WEB_TYPES } },
+  { section: "post", key: "mant", control: "toggle", label: "Mantenimiento mensual", lineLabel: "Mantenimiento", description: "Actualizaciones, copias de seguridad y cambios menores.", priceMin: 30, priceMax: 50, priceMode: "monthly", unitLabel: "/mes", requires: { set: "tipo", in: WEB_TYPES } },
   { section: "post", key: "urgente", control: "toggle", label: "Entrega urgente", lineLabel: "Entrega urgente", description: "Priorizamos tu proyecto. Plazo ~40 % más corto.", priceMin: 20, priceMax: 20, priceMode: "percent_once", unitLabel: "%", weeksFactor: 0.6 },
 ];
 

@@ -41,12 +41,12 @@ export const defaultEngineSettings: EngineSettings = {
   round_monthly: 10,
   min_weeks: 1,
   levels: [
-    { below: 1800, label: "Esencial" },
-    { below: 3600, label: "Completo" },
+    { below: 1440, label: "Esencial" },
+    { below: 2880, label: "Completo" },
     { below: null, label: "A medida" },
   ],
   vu_bars: 28,
-  vu_max: 5600,
+  vu_max: 4480,
 };
 
 export interface QuoteItem {

@@ -108,16 +108,16 @@ test("configurador → «Enviar y hablemos» → overlay precargado → lead con
   const cfg = page.locator("#rw-cfg");
   await cfg.getByRole("radio", { name: /Web nueva/ }).click();
   await cfg.getByRole("switch", { name: /SEO local/ }).click();
-  await expect(page.locator("#rw-monitor")).toContainText("1.150 – 1.800 €");
+  await expect(page.locator("#rw-monitor")).toContainText("900 – 1.450 €");
   await page.getByRole("button", { name: /Enviar y hablemos/ }).click();
 
   const overlay = page.getByRole("dialog", { name: "Hablemos" });
   await expect(overlay).toBeVisible();
-  await expect(overlay).toContainText("1.150 – 1.800 €"); // caja «Tu configuración»
+  await expect(overlay).toContainText("900 – 1.450 €"); // caja «Tu configuración»
   await expect(overlay.getByRole("radio", { name: "Web", exact: true })).toHaveAttribute("aria-checked", "true");
   await overlay.getByRole("button", { name: /Siguiente/ }).click();
   await overlay.getByRole("radio", { name: "Comercio" }).click();
-  await expect(overlay.getByRole("radio", { name: /1.150 – 1.800 €/ })).toHaveAttribute("aria-checked", "true");
+  await expect(overlay.getByRole("radio", { name: /900 – 1.450 €/ })).toHaveAttribute("aria-checked", "true");
   await overlay.getByRole("button", { name: /Siguiente/ }).click();
   await overlay.getByRole("button", { name: /Siguiente/ }).click();
   await overlay.getByLabel("Nombre *").fill("Prueba Configurador");
@@ -129,10 +129,10 @@ test("configurador → «Enviar y hablemos» → overlay precargado → lead con
   await expect(overlay.getByText("Grabado.")).toBeVisible({ timeout: 15000 });
 
   const lead = await waitFor(async () => (await db.from("leads").select("*").eq("email", testEmail("cfg")).maybeSingle()).data);
-  expect(lead).toMatchObject({ origin: "configurador", budget_label: "1.150 – 1.800 €" });
+  expect(lead).toMatchObject({ origin: "configurador", budget_label: "900 – 1.450 €" });
   const { data: quote } = await db.from("quotes").select("*").eq("id", lead.quote_id).single();
   expect(quote.number).toMatch(/^ROWE-\d{4}-\d{4,}$/);
-  expect([quote.one_min, quote.one_max]).toEqual([1150, 1800]);
+  expect([quote.one_min, quote.one_max]).toEqual([900, 1450]);
   await page.keyboard.press("Escape");
   await expect(overlay).toBeHidden();
   await expect(page.locator("html")).not.toHaveClass(/scroll-locked/);
@@ -142,7 +142,7 @@ test("el servidor ignora el precio del navegador y recalcula con la base de dato
   const res = await post(request, { ...baseLead("forge"), budget: "cfg", selection: { tipo: "nueva", tienda: true, hack: 1 }, budget_label: "1 €", one_min: 1 }, "10.0.0.1");
   expect(res.status()).toBe(201);
   const { data: lead } = await db.from("leads").select("budget_label, quote_id").eq("email", testEmail("forge")).single();
-  expect(lead!.budget_label).toBe("1.800 – 2.900 €"); // 900–1.400 + 900–1.500
+  expect(lead!.budget_label).toBe("1.450 – 2.300 €"); // 720–1.120 + 720–1.200
 });
 
 test("anti-spam: campo trampa y envíos demasiado rápidos no se guardan", async ({ request }) => {
@@ -181,13 +181,13 @@ test("PDF del presupuesto: real, numerado y registrado", async ({ request }) => 
   const { data: q } = await db.from("quotes").select("id, pdf_downloaded_at, one_min, one_max, monthly_min, monthly_max").eq("number", number).single();
   createdQuotes.push(q!.id);
   expect(q!.pdf_downloaded_at).toBeTruthy();
-  expect([q!.one_min, q!.one_max, q!.monthly_min, q!.monthly_max]).toEqual([1500, 2300, 480, 640]);
+  expect([q!.one_min, q!.one_max, q!.monthly_min, q!.monthly_max]).toEqual([1200, 1850, 380, 510]);
   // «Solo contenido»: el servidor recalcula sin partidas de web aunque lleguen marcadas
   const redes = await request.post("/api/quote/pdf", { data: { selection: { tipo: "redes", reels: "reels4", tienda: true, mant: true } } });
   expect(redes.status()).toBe(200);
   const { data: qr } = await db.from("quotes").select("id, one_min, one_max, monthly_min, monthly_max").eq("number", redes.headers()["x-quote-number"]).single();
   createdQuotes.push(qr!.id);
-  expect([qr!.one_min, qr!.one_max, qr!.monthly_min, qr!.monthly_max]).toEqual([350, 500, 260, 360]);
+  expect([qr!.one_min, qr!.one_max, qr!.monthly_min, qr!.monthly_max]).toEqual([300, 400, 210, 290]);
   const empty = await request.post("/api/quote/pdf", { data: { selection: {} } });
   expect(empty.status()).toBe(400);
 });

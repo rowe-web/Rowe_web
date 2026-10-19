@@ -267,7 +267,7 @@ describe("administrador", () => {
     const [{ r }] = await db.as(adminId, () => db.query<{ r: number }>("select public.republish_release($1) as r", [before.version]));
     const restored = await latest();
     expect(restored.version).toBe(r);
-    expect(restored.configurator.options.find((o) => o.key === "tienda")).toMatchObject({ price_min: 900, price_max: 1500 });
+    expect(restored.configurator.options.find((o) => o.key === "tienda")).toMatchObject({ price_min: 720, price_max: 1200 });
 
     const [log] = await db.query<{ action: string; actor_name: string }>(
       "select action, actor_name from public.audit_log where table_name = 'releases' order by id desc limit 1",

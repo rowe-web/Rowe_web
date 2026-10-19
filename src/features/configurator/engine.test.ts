@@ -6,24 +6,24 @@ import { delta, range } from "./format";
 const config = buildFallbackSnapshot().configurator;
 
 /**
- * ORÁCULO: función compute() copiada tal cual de design/ROWE Presupuesto.dc.html
- * (con sus precios). El motor, que lee los precios de la base de datos, debe dar
+ * ORÁCULO: función compute() copiada tal cual de design/ROWE Presupuesto.dc.html,
+ * con las tarifas vigentes (las del diseño con la bajada general del 20 %, octubre de 2026). El motor, que lee los precios de la base de datos, debe dar
  * exactamente los mismos resultados en todas las combinaciones.
  */
 const PR = {
   type: {
-    nueva: { title: "Web nueva", r: [900, 1400], w: [3, 4] },
-    rediseno: { title: "Rediseño", r: [700, 1100], w: [2, 3] },
-    contenido: { title: "Web + contenido", r: [1250, 1900], w: [4, 5] },
+    nueva: { title: "Web nueva", r: [720, 1120], w: [3, 4] },
+    rediseno: { title: "Rediseño", r: [560, 880], w: [2, 3] },
+    contenido: { title: "Web + contenido", r: [1000, 1520], w: [4, 5] },
   } as Record<string, { title: string; r: number[]; w: number[] }>,
   pages: {
-    "1": { l: "Landing · 1 página", r: [-300, -450], w: -1 },
+    "1": { l: "Landing · 1 página", r: [-240, -360], w: -1 },
     "5": { l: "Hasta 5 páginas", r: [0, 0], w: 0 },
-    "10": { l: "Hasta 10 páginas", r: [400, 600], w: 1 },
-    "10+": { l: "Más de 10", r: [900, 1400], w: 2 },
+    "10": { l: "Hasta 10 páginas", r: [320, 480], w: 1 },
+    "10+": { l: "Más de 10", r: [720, 1120], w: 2 },
   } as Record<string, { l: string; r: number[]; w: number }>,
-  reservas: [300, 500], tienda: [900, 1500], seo: [250, 400], idioma: [200, 300],
-  fotos: [250, 400], video: [600, 1100], reels: { 0: [0, 0], 4: [260, 360], 8: [480, 640], 12: [680, 900] } as Record<number, number[]>, mant: [35, 60],
+  reservas: [240, 400], tienda: [720, 1200], seo: [200, 320], idioma: [160, 240],
+  fotos: [200, 320], video: [480, 880], reels: { 0: [0, 0], 4: [210, 290], 8: [380, 510], 12: [540, 720] } as Record<number, number[]>, mant: [30, 50],
 };
 const r50 = (n: number) => Math.round(n / 50) * 50;
 type S = { type: string; pages: string; reservas: boolean; tienda: boolean; seo: boolean; idiomas: number; reels: number; fotos: boolean; video: boolean; mant: boolean; urgente: boolean };
@@ -31,8 +31,8 @@ function designCompute(s: S) {
   const items: { t: string; l: string; r: number[]; m?: boolean }[] = [];
   const T = PR.type[s.type], pg = PR.pages[s.pages];
   if (s.type === "contenido") {
-    items.push({ t: "WE", l: "Web a medida" + (s.pages === "1" ? " · landing" : ""), r: [900 + (s.pages === "1" ? pg.r[0] : 0), 1400 + (s.pages === "1" ? pg.r[1] : 0)] });
-    items.push({ t: "RO", l: "Jornada de rodaje", r: [350, 500] });
+    items.push({ t: "WE", l: "Web a medida" + (s.pages === "1" ? " · landing" : ""), r: [720 + (s.pages === "1" ? pg.r[0] : 0), 1120 + (s.pages === "1" ? pg.r[1] : 0)] });
+    items.push({ t: "RO", l: "Jornada de rodaje", r: [280, 400] });
   } else items.push({ t: "WE", l: T.title + (s.pages === "1" ? " · landing" : ""), r: [T.r[0] + (s.pages === "1" ? pg.r[0] : 0), T.r[1] + (s.pages === "1" ? pg.r[1] : 0)] });
   if (s.pages === "10" || s.pages === "10+") items.push({ t: "WE", l: pg.l, r: pg.r });
   if (s.reservas) items.push({ t: "WE", l: "Reservas / citas", r: PR.reservas });
@@ -96,10 +96,10 @@ describe("motor de precios", () => {
 
   it("niveles y medidor como en el diseño", () => {
     const q = computeQuote(config, toSelection({ type: "nueva", pages: "5", reservas: true, tienda: false, seo: true, idiomas: 1, reels: 0, fotos: false, video: false, mant: false, urgente: false }))!;
-    expect(q.one).toEqual([1450, 2300]); // simulación A del panel
+    expect(q.one).toEqual([1150, 1850]); // simulación A del panel
     expect(q.level).toBe("Completo");
-    expect(q.lit).toBe(Math.round((2300 / 5600) * 28));
-    expect(quoteLabel(q)).toBe("1.450 – 2.300 €");
+    expect(q.lit).toBe(Math.round((1850 / 4480) * 28));
+    expect(quoteLabel(q)).toBe("1.150 – 1.850 €");
   });
 
   it("sanea selecciones manipuladas desde el navegador", () => {
@@ -117,7 +117,7 @@ describe("motor de precios", () => {
   it("«Solo contenido»: presupuesta solo el rodaje, sin web", () => {
     const q = computeQuote(config, { ...defaultSelection(config), tipo: "redes" })!;
     expect(q.items.map((i) => [i.label, i.track])).toEqual([["Rodaje para redes", "RO"]]);
-    expect(q.one).toEqual([350, 500]);
+    expect(q.one).toEqual([300, 400]); // 280 – 400 €, redondeado de 50 en 50
     expect(q.monthly).toEqual([0, 0]);
     expect(q.weeks).toEqual([1, 2]);
     expect(needFromSelection(config, { tipo: "redes" })).toBe("Audiovisual");
@@ -129,13 +129,13 @@ describe("motor de precios", () => {
     const web = { paginas: "landing", tienda: true, reservas: true, seo: true, idiomas: 3, mant: true };
     const q = computeQuote(config, normalizeSelection(config, { tipo: "redes", reels: "reels8", fotos: true, video: true, ...web }))!;
     expect(q.items.every((i) => i.track === "RO")).toBe(true);
-    expect(q.one).toEqual([350 + 250 + 600, 500 + 400 + 1100]);
-    expect(q.monthly).toEqual([480, 640]);
+    expect(q.one).toEqual([950, 1600]); // 280 + 200 + 480 = 960 → 950 · 400 + 320 + 880
+    expect(q.monthly).toEqual([380, 510]);
     expect(q.weeks).toEqual([1, 3]); // vídeo corporativo: +0 / +1
-    expect(quoteLabel(q)).toBe("1.200 – 2.000 € + 480 – 640 €/mes");
+    expect(quoteLabel(q)).toBe("950 – 1.600 € + 380 – 510 €/mes");
     // Entrega urgente sí aplica (+20 % y plazo ×0,6)
     const u = computeQuote(config, { tipo: "redes", urgente: true })!;
-    expect(u.one).toEqual([400, 600]);
+    expect(u.one).toEqual([350, 500]); // 336 – 480 €, redondeado
     expect(u.weeks).toEqual([1, 2]);
   });
 
