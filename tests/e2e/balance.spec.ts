@@ -93,14 +93,14 @@ test("configurador: «Solo contenido» presupuesta solo el rodaje y bloquea lo q
   const cfg = page.locator("#rw-cfg");
   const monitor = page.locator("#rw-monitor");
   await cfg.getByRole("radio", { name: /Solo contenido/ }).click();
-  await expect(monitor).toContainText("300 – 400 €");
+  await expect(monitor).toContainText("150 – 200 €");
   await expect(monitor).toContainText("Rodaje vertical 9:16");
   await expect(cfg).toContainText("Sin web, de momento.");
   await expect(cfg.getByRole("switch", { name: /Mantenimiento/ })).toBeDisabled();
 
   // Los reels se pueden añadir sin web
   await cfg.getByRole("radiogroup", { name: "Reels al mes" }).getByRole("radio", { name: "8" }).click();
-  await expect(monitor).toContainText("+ 380 – 510 €/mes");
+  await expect(monitor).toContainText("+ 190 – 260 €/mes");
 
   // «Enviar y hablemos» precarga «Audiovisual»
   await page.getByRole("button", { name: /Enviar y hablemos/ }).click();
@@ -113,7 +113,7 @@ test("configurador: «Solo contenido» presupuesta solo el rodaje y bloquea lo q
   await cfg.getByRole("button", { name: /Añadir web/ }).click();
   await expect(cfg.getByRole("radio", { name: /Web \+ contenido/ })).toHaveAttribute("aria-checked", "true");
   await expect(cfg.getByRole("switch", { name: /Mantenimiento/ })).toBeEnabled();
-  await expect(monitor).toContainText("1.000 – 1.500 €");
+  await expect(monitor).toContainText("850 – 1.300 €");
   expect(errors).toEqual([]);
 });
 

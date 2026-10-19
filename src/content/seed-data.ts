@@ -690,15 +690,15 @@ export const configOptions: SeedConfigOption[] = [
   { section: "tipo", key: "rediseno", control: "card", setKey: "tipo", badge: "B", label: "Rediseño", lineLabel: "Rediseño", description: "Tu web actual, a la altura de tu negocio actual.", priceMin: 560, priceMax: 880, isBase: true, weeksMin: 2, weeksMax: 3 },
   {
     section: "tipo", key: "contenido", control: "card", setKey: "tipo", badge: "C", label: "Web + contenido", lineLabel: "Web + contenido",
-    description: "Web y vídeo con el mismo equipo y la misma estética.", priceMin: 1000, priceMax: 1520, isBase: true, weeksMin: 4, weeksMax: 5,
+    description: "Web y vídeo con el mismo equipo y la misma estética.", priceMin: 860, priceMax: 1320, isBase: true, weeksMin: 4, weeksMax: 5,
     components: [
       { label: "Web a medida", track: "WE", min: 720, max: 1120, base: true },
-      { label: "Jornada de rodaje", track: "RO", min: 280, max: 400 },
+      { label: "Jornada de rodaje", track: "RO", min: 140, max: 200 },
     ],
   },
   {
     section: "tipo", key: "redes", control: "card", setKey: "tipo", badge: "D", label: "Solo contenido", lineLabel: "Rodaje para redes",
-    description: "Sin web: guion, rodaje y edición de vídeo vertical para tus redes.", priceMin: 280, priceMax: 400, track: "RO", isBase: true, weeksMin: 1, weeksMax: 2,
+    description: "Sin web: guion, rodaje y edición de vídeo vertical para tus redes.", priceMin: 140, priceMax: 200, track: "RO", isBase: true, weeksMin: 1, weeksMax: 2,
   },
   // Toma 02 · Tamaño (excluyente)
   { section: "tamano", key: "landing", control: "segment", setKey: "paginas", label: "Landing · 1 página", priceMin: -240, priceMax: -360, modifiesBase: true, baseSuffix: " · landing", weeksMin: -1, weeksMax: -1 },
@@ -712,11 +712,11 @@ export const configOptions: SeedConfigOption[] = [
   { section: "funciones", key: "idiomas", control: "stepper", label: "Idiomas", lineLabel: "Idiomas ×{n}", description: "El primero va incluido. Cada idioma extra suma.", priceMin: 160, priceMax: 240, unitLabel: "c/u", stepper: { min: 1, max: 4, included: 1 } },
   // Toma 04 · Audiovisual (con «Web + contenido» o «Solo contenido»)
   { section: "audiovisual", key: "reels0", control: "segment", setKey: "reels", setLabel: "Reels al mes", setDescription: "Rodaje y edición de piezas cortas para redes. Cuota mensual.", label: "No", priceMin: 0, priceMax: 0, priceMode: "monthly", track: "RO", isDefault: true },
-  { section: "audiovisual", key: "reels4", control: "segment", setKey: "reels", setLabel: "Reels al mes", label: "4", lineLabel: "4 reels/mes", priceMin: 210, priceMax: 290, priceMode: "monthly", unitLabel: "/mes", track: "RO" },
-  { section: "audiovisual", key: "reels8", control: "segment", setKey: "reels", setLabel: "Reels al mes", label: "8", lineLabel: "8 reels/mes", priceMin: 380, priceMax: 510, priceMode: "monthly", unitLabel: "/mes", track: "RO" },
-  { section: "audiovisual", key: "reels12", control: "segment", setKey: "reels", setLabel: "Reels al mes", label: "12", lineLabel: "12 reels/mes", priceMin: 540, priceMax: 720, priceMode: "monthly", unitLabel: "/mes", track: "RO" },
-  { section: "audiovisual", key: "fotos", control: "toggle", label: "Sesión de fotografía", lineLabel: "Sesión de fotos", description: "Fotos profesionales de tu negocio, equipo y producto.", priceMin: 200, priceMax: 320, track: "RO" },
-  { section: "audiovisual", key: "video", control: "toggle", label: "Vídeo corporativo", lineLabel: "Vídeo corporativo", description: "Una pieza de 60–90 s que cuenta quién eres.", priceMin: 480, priceMax: 880, track: "RO", weeksMin: 0, weeksMax: 1 },
+  { section: "audiovisual", key: "reels4", control: "segment", setKey: "reels", setLabel: "Reels al mes", label: "4", lineLabel: "4 reels/mes", priceMin: 110, priceMax: 150, priceMode: "monthly", unitLabel: "/mes", track: "RO" },
+  { section: "audiovisual", key: "reels8", control: "segment", setKey: "reels", setLabel: "Reels al mes", label: "8", lineLabel: "8 reels/mes", priceMin: 190, priceMax: 260, priceMode: "monthly", unitLabel: "/mes", track: "RO" },
+  { section: "audiovisual", key: "reels12", control: "segment", setKey: "reels", setLabel: "Reels al mes", label: "12", lineLabel: "12 reels/mes", priceMin: 270, priceMax: 360, priceMode: "monthly", unitLabel: "/mes", track: "RO" },
+  { section: "audiovisual", key: "fotos", control: "toggle", label: "Sesión de fotografía", lineLabel: "Sesión de fotos", description: "Fotos profesionales de tu negocio, equipo y producto.", priceMin: 100, priceMax: 160, track: "RO" },
+  { section: "audiovisual", key: "video", control: "toggle", label: "Vídeo corporativo", lineLabel: "Vídeo corporativo", description: "Una pieza de 60–90 s que cuenta quién eres.", priceMin: 240, priceMax: 440, track: "RO", weeksMin: 0, weeksMax: 1 },
   // Toma 05 · Después del estreno
   { section: "post", key: "mant", control: "toggle", label: "Mantenimiento mensual", lineLabel: "Mantenimiento", description: "Actualizaciones, copias de seguridad y cambios menores.", priceMin: 30, priceMax: 50, priceMode: "monthly", unitLabel: "/mes", requires: { set: "tipo", in: WEB_TYPES } },
   { section: "post", key: "urgente", control: "toggle", label: "Entrega urgente", lineLabel: "Entrega urgente", description: "Priorizamos tu proyecto. Plazo ~40 % más corto.", priceMin: 20, priceMax: 20, priceMode: "percent_once", unitLabel: "%", weeksFactor: 0.6 },
