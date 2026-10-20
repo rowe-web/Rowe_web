@@ -1,5 +1,5 @@
 import type { Db } from "./client";
-import { CONTENT_TYPES, WEB_TYPES } from "../../src/content/seed-data";
+import { CONTENT_TYPES, HERO_TEXT, HOME_SEO, WEB_TYPES } from "../../src/content/seed-data";
 
 /**
  * Actualizaciones de contenido posteriores a la carga inicial (equilibrio web / audiovisual).
@@ -9,6 +9,13 @@ import { CONTENT_TYPES, WEB_TYPES } from "../../src/content/seed-data";
 type Obj = Record<string, unknown>;
 
 const OLD_HABLEMOS = "¿Grabamos tu próxima *escena?*";
+
+/** Textos originales del diseño que se sustituyen solo si nadie los ha cambiado. */
+const OLD_HOME_SEO = {
+  title: "ROWE — Estudio de web y audiovisual",
+  description: "Webs a medida y vídeo para empresas y negocios que quieren verse profesionales en internet y conseguir más clientes.",
+};
+const OLD_HERO_BODY = "Estudio boutique de web y audiovisual para empresas y negocios que quieren verse profesionales en internet y conseguir más clientes.";
 const NEW_HABLEMOS = "¿Empezamos tu próximo *proyecto?*";
 
 /** Resumen de cada elemento del menú, por enlace (los demás quedan vacíos para rellenar en el panel). */
@@ -137,6 +144,24 @@ export async function applyContentUpdates(db: Db, log: (msg: string) => void): P
       return changed;
     }),
     "Menú: resumen de cada sección",
+  );
+
+  // --- Hero: frase de posicionamiento y SEO de la home ----------------------------
+  done(
+    await updateJson(db, "scenes", "data", "key", "hero", (v) => add(v, "claim", HERO_TEXT.claim)),
+    "Hero: frase de posicionamiento",
+  );
+  done(
+    (await db.query(`update public.scenes set body = $2 where key = 'hero' and body = $1 returning key`, [OLD_HERO_BODY, HERO_TEXT.body])).length > 0,
+    "Hero: texto más corto (sin repetir la frase)",
+  );
+  done(
+    await updateJson(db, "site_settings", "value", "key", "seo", (v) => {
+      const a = swap(v, "title", OLD_HOME_SEO.title, HOME_SEO.title);
+      const b = swap(v, "description", OLD_HOME_SEO.description, HOME_SEO.description);
+      return a || b;
+    }),
+    "SEO de la home: qué hacemos y dónde",
   );
 
   // --- Título de la pestaña al salir --------------------------------------------

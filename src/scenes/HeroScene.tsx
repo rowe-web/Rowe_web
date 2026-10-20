@@ -9,6 +9,8 @@ import { SceneMotion } from "@/motion/SceneMotion";
 import { getMedia, type SceneProps } from "./types";
 
 interface HeroData {
+  /** Frase de posicionamiento: qué hacemos y dónde (encima del texto, *texto* = cursiva). */
+  claim?: string;
   secondary_cta?: { label: string; href: string };
   reel_label?: string;
   sound_label?: string;
@@ -62,8 +64,8 @@ export function HeroScene({ scene, site }: SceneProps<HeroData>) {
           <span className="hidden md:inline">{brand.year}</span>
         </div>
 
-        <div className="relative mt-8 md:mt-12 md:flex-1">
-          <h1 data-hero-title className="headline relative z-10 text-[clamp(44px,14.2vw,80px)] md:text-[clamp(72px,11.67vw,168px)]">
+        <div className="relative mt-8 md:mt-8 md:flex-1">
+          <h1 data-hero-title className="headline relative z-10 text-[clamp(44px,14.2vw,80px)] md:text-[clamp(72px,min(11.67vw,17vh),168px)]">
             {lines.map((line, i) => (
               <span key={i} className={`block whitespace-nowrap ${i === 1 ? "pl-[9vw] md:pl-[18.75vw]" : ""}`} style={{ clipPath: "inset(-40% -12% -0.16em -12%)" }} data-line>
                 <span className="block" data-line-inner>
@@ -82,25 +84,32 @@ export function HeroScene({ scene, site }: SceneProps<HeroData>) {
           </figure>
         </div>
 
-        <div className="mt-8 grid gap-8 md:mt-10 md:grid-cols-[minmax(0,440px)_1fr_27.4vw] md:items-end md:gap-10">
-          {/* Texto + CTAs */}
-          <div data-hero-intro className="flex flex-col gap-6">
-            <div className="flex items-start gap-4">
-              <p className="max-w-[44ch] text-[14px] leading-[1.55] text-muted md:text-[17px]">{scene.body}</p>
-              {/* Fig. 01 en móvil, junto al texto */}
-              {fig01("40vw", "w-[36%] shrink-0 md:hidden")}
-            </div>
-            <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:gap-7">
-              {scene.cta_label && (
-                <Button href={scene.cta_href || "#presupuesto"} size="md" className="sm:w-auto">
-                  {scene.cta_label}
-                </Button>
-              )}
-              {d.secondary_cta && (
-                <Button variant="link" href={d.secondary_cta.href} arrow="→" className="self-start sm:self-auto">
-                  {d.secondary_cta.label}
-                </Button>
-              )}
+        <div className="mt-8 grid gap-8 md:mt-7 md:grid-cols-[minmax(0,440px)_1fr_27.4vw] md:items-end md:gap-10">
+          {/* Frase de posicionamiento + texto + CTAs */}
+          <div className="flex flex-col gap-4">
+            {d.claim && (
+              <p data-hero-claim data-hero-intro className="max-w-[38ch] text-[18px] leading-[1.35] text-bone md:text-[clamp(20px,1.6vw,24px)]">
+                <RichText text={d.claim} />
+              </p>
+            )}
+            <div data-hero-intro className="flex flex-col gap-6">
+              <div className="flex items-start gap-4">
+                <p className="max-w-[44ch] text-[14px] leading-[1.55] text-muted md:text-[17px]">{scene.body}</p>
+                {/* Fig. 01 en móvil, junto al texto */}
+                {fig01("40vw", "w-[36%] shrink-0 md:hidden")}
+              </div>
+              <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:gap-7">
+                {scene.cta_label && (
+                  <Button href={scene.cta_href || "#presupuesto"} size="md" className="sm:w-auto">
+                    {scene.cta_label}
+                  </Button>
+                )}
+                {d.secondary_cta && (
+                  <Button variant="link" href={d.secondary_cta.href} arrow="→" className="self-start sm:self-auto">
+                    {d.secondary_cta.label}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 

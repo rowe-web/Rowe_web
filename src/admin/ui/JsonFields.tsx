@@ -16,7 +16,7 @@ const LABELS: Record<string, string> = {
   description: "Descripción", key: "Clave / número", value: "Valor", items: "Elementos", steps: "Pasos", points: "Puntos",
   stats: "Cifras", tracks: "Pistas", clips: "Clips", size: "Tamaño relativo", duration: "Duración", sector: "Sector", track: "Pista",
   word: "Palabra", hover: "Al pasar el ratón", master: "Máster", reels: "Reels", formats: "Formatos", specs: "Ficha técnica",
-  secondary_cta: "Botón secundario", reel_label: "Texto del showreel", sound_label: "Texto de sonido", scroll_hint: "Texto «Desliza»",
+  claim: "Frase de posicionamiento (*texto* = cursiva)", secondary_cta: "Botón secundario", reel_label: "Texto del showreel", sound_label: "Texto de sonido", scroll_hint: "Texto «Desliza»",
   photo_caption: "Pie de la Fig. 01 (proceso)", video_caption: "Pie del vídeo", process_video_media_id: "Vídeo del proceso 4:5 (la foto hace de póster)",
   process_steps: "Fases de la animación del proceso", view_desktop: "Botón vista escritorio", view_mobile: "Botón vista móvil",
   mobile_media_id: "Grabación de la web en móvil (vertical)", photo_media_id: "Póster del vídeo del proceso (4:5)", program_label: "Rótulo del programa", format_label: "Formato",
@@ -52,7 +52,7 @@ const LABELS: Record<string, string> = {
   owner: "Titular (nombre y apellidos o razón social)", nif: "NIF / CIF", hosting: "Proveedor de alojamiento web", updated: "Última actualización",
 };
 
-const LONG = new Set(["a", "body", "text", "lead", "description", "note", "message_placeholder", "success_body", "send_body", "not_found_body", "overlay_lead", "disclaimer", "includes", "includes_content", "summary"]);
+const LONG = new Set(["a", "body", "claim", "text", "lead", "description", "note", "message_placeholder", "success_body", "send_body", "not_found_body", "overlay_lead", "disclaimer", "includes", "includes_content", "summary"]);
 
 export function humanize(key: string) {
   return LABELS[key] ?? key.replace(/_media_id$/, "").replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());

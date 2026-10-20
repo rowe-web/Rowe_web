@@ -122,6 +122,18 @@ export interface SeedLead {
 // ---------------------------------------------------------------------------
 // Ajustes
 // ---------------------------------------------------------------------------
+/** SEO de la home: el h1 es el eslogan; título y descripción dicen qué hacemos y dónde. */
+export const HOME_SEO = {
+  title: "ROWE — Diseño web a medida y vídeo para empresas",
+  description: "Webs a medida para negocios de toda España y vídeo para redes grabado en el Camp de Tarragona: Tarragona, Reus, Salou y Cambrils. Pide tu presupuesto.",
+};
+
+/** Hero: frase de posicionamiento (encima del texto) y texto corto que ya no la repite. */
+export const HERO_TEXT = {
+  claim: "Diseñamos *webs a medida* para negocios de toda España y grabamos su contenido en el Camp de Tarragona.",
+  body: "Estudio boutique de web y audiovisual. Un solo equipo, sin intermediarios ni plantillas.",
+};
+
 export const settings: SeedSetting[] = [
   {
     key: "contact",
@@ -148,9 +160,8 @@ export const settings: SeedSetting[] = [
     isPublic: true,
     editorCanEdit: false,
     value: {
-      title: "ROWE — Estudio de web y audiovisual",
-      description:
-        "Webs a medida y vídeo para empresas y negocios que quieren verse profesionales en internet y conseguir más clientes.",
+      title: HOME_SEO.title,
+      description: HOME_SEO.description,
       og_media_id: null,
     },
   },
@@ -370,10 +381,11 @@ export const scenes: SeedScene[] = [
     name: "Hero",
     kicker: "Escena 00",
     title: "Que te vean.\nQue *confíen.*\nQue te *elijan.*",
-    body: "Estudio boutique de web y audiovisual para empresas y negocios que quieren verse profesionales en internet y conseguir más clientes.",
+    body: HERO_TEXT.body,
     ctaLabel: "Pide tu propuesta",
     ctaHref: "#presupuesto",
     data: {
+      claim: HERO_TEXT.claim,
       secondary_cta: { label: "Ver proyectos", href: "/proyectos" },
       reel_label: "Showreel",
       sound_label: "Sonido off · R",
