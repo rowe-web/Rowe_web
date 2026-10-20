@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { requirePageUser } from "@/admin/auth";
@@ -7,6 +6,7 @@ import { loadDraftSnapshot } from "@/admin/data";
 import { SiteShell } from "@/components/chrome/SiteShell";
 import { PageMotion } from "@/motion/PageMotion";
 import { HomeScenes } from "@/scenes/HomeScenes";
+import { PreviewBar } from "./PreviewBar";
 
 export const metadata: Metadata = { title: "Vista previa", robots: { index: false, follow: false } };
 
@@ -30,17 +30,5 @@ async function Preview() {
         <HomeScenes site={site} />
       </PageMotion>
     </SiteShell>
-  );
-}
-
-function PreviewBar() {
-  return (
-    <div role="status" className="fixed bottom-4 left-1/2 z-[700] flex max-w-[calc(100%-32px)] -translate-x-1/2 items-center gap-3 rounded-full border border-line-strong bg-[rgb(10_10_10/0.92)] py-2 pl-4 pr-2 backdrop-blur-md">
-      <span className="h-2 w-2 flex-none animate-rec rounded-full bg-rec" aria-hidden="true" />
-      <span className="truncate font-mono text-[10px] uppercase tracking-[0.12em] text-bone">Vista previa · borrador sin publicar</span>
-      <Link href="/admin" className="flex h-8 flex-none items-center rounded-full bg-bone px-3.5 text-[12px] text-ink">
-        Volver al panel
-      </Link>
-    </div>
   );
 }

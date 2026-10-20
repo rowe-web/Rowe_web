@@ -13,6 +13,59 @@ const HABLEMOS = { label: "Hablemos", href: "/contacto" };
 const PROPUESTA = { label: "Pide tu propuesta", href: "/contacto" };
 const NONE = { label: "", href: "" };
 
+/**
+ * Textos legales adaptados a ROWE: sin oficina abierta al público, datos y plazos reales,
+ * proveedores reales y las claves que la web guarda de verdad en el navegador.
+ * content-updates.ts los aplica solo donde sigue el texto original (LEGAL_TEXT_ORIGINAL).
+ */
+export const LEGAL_TEXT = {
+  avisoTitular:
+    "Titular: {titular}\nNIF: {nif}\nDomicilio a efectos legales y de notificaciones: {domicilio}\nEmail: {email}\nWeb: {web}\n\nROWE no tiene oficina abierta al público: trabajamos online y en el lugar de cada rodaje.",
+  avisoPresupuestos:
+    "Los importes que muestra el configurador son rangos orientativos y no constituyen una oferta vinculante. El precio definitivo se fija en un presupuesto cerrado tras el briefing.",
+  privResponsable: "{titular} · NIF {nif}\nEmail: {email}",
+  privDatos:
+    "Los que nos das en el formulario «Hablemos» o al enviar tu presupuesto: nombre, empresa, email, teléfono, ciudad, sector, lo que necesitas y tu mensaje, además de la configuración que elijas en el configurador.\n\nCon tu solicitud guardamos también la página desde la que nos escribes, de dónde llegaste a la web (incluidas las etiquetas de campaña del enlace, si las hay) y el navegador que usas. Si nos respondes por email, guardamos esos correos junto a tu solicitud.\n\nSi aceptas la analítica, datos de navegación: páginas vistas, origen de la visita y tiempo en la página, asociados a un identificador aleatorio que se borra al cerrar la pestaña. No guardamos tu dirección IP: para frenar envíos abusivos usamos una huella cifrada e irreversible de ella.",
+  privFinalidad:
+    "Responder a tu solicitud y prepararte una propuesta o un presupuesto: aplicación de medidas precontractuales a petición tuya (art. 6.1.b RGPD). La ciudad la usamos para valorar el desplazamiento del rodaje: los hacemos en el Camp de Tarragona y, consultándolo, algo más lejos.\n\nMedir y mejorar la web: tu consentimiento en el aviso de cookies (art. 6.1.a RGPD), que puedes retirar cuando quieras.\n\nEvitar el spam y los abusos: nuestro interés legítimo en proteger la web (art. 6.1.f RGPD).\n\nNo tomamos decisiones automatizadas ni hacemos perfiles, y no te enviaremos publicidad sin tu permiso.",
+  privProveedores:
+    "No vendemos ni cedemos tus datos. Solo acceden a ellos, como encargados del tratamiento y con contrato, los proveedores que necesitamos para que la web funcione:\n\nAlojamiento web: {alojamiento}.\nBase de datos y archivos: Supabase, con servidores en Frankfurt (Alemania, Unión Europea).\nCorreo electrónico: Google (Gmail), para recibir tu solicitud, avisarte y responderte.\nEnvío de emails automáticos: Resend, cuando lo activemos (hasta entonces salen desde Google).\n\nAlgunos de estos proveedores son empresas de EE. UU. o de su grupo: la transferencia de datos fuera del Espacio Económico Europeo se ampara en el Marco de Privacidad de Datos UE–EE. UU. o en las cláusulas contractuales tipo de la Comisión Europea.",
+  cookiesNecesarias:
+    "rowe-consent — Guarda tu decisión sobre la analítica. Almacenamiento local, hasta que lo borres.\nrowe-consent-at — Fecha en que tomaste esa decisión. Almacenamiento local, hasta que lo borres.\nrowe:intro — Recuerda que ya has visto la presentación inicial. Se borra al cerrar la pestaña.\nrowe:cfg — Guarda tu configuración del presupuesto mientras navegas. Se borra al cerrar la pestaña.",
+  cookiesPanel:
+    "Solo si accedes al panel de administración (personal de ROWE):\nsb-…-auth-token — Cookie técnica de la sesión (puede dividirse en partes .0, .1…). Si marcas «Recordarme», hasta 400 días; si no, se borra al cerrar el navegador.\nrowe-remember — Cookie que recuerda si marcaste «Recordarme». Hasta 400 días.\nrowe-admin:… y rowe:reply:… — Almacenamiento local con lo que estás editando y los borradores de respuesta, para no perderlos si se cierra la pestaña. Se borran al guardar o enviar.",
+};
+
+/** Textos originales del diseño (Fase 5): solo se sustituyen si nadie los ha cambiado. */
+export const LEGAL_TEXT_ORIGINAL: Record<keyof typeof LEGAL_TEXT, string> = {
+  avisoTitular: "Titular: {titular}\nNIF: {nif}\nDomicilio: {domicilio}\nEmail: {email}\nWeb: {web}",
+  avisoPresupuestos:
+    "Los importes que muestra el configurador son rangos orientativos, sin IVA, y no constituyen una oferta vinculante. El precio definitivo se fija en un presupuesto cerrado tras el briefing.",
+  privResponsable: "{titular} · NIF {nif}\n{domicilio}\nEmail: {email}",
+  privDatos:
+    "Los que nos das en el formulario «Hablemos» o al enviar tu presupuesto: nombre, empresa, email, teléfono, sector, lo que necesitas y tu mensaje, además de la configuración que elijas en el configurador.\n\nSi aceptas la analítica, datos de navegación: páginas vistas, origen de la visita y tiempo en la página, asociados a un identificador aleatorio que se borra al cerrar la pestaña. No guardamos tu dirección IP: para frenar envíos abusivos usamos una huella cifrada e irreversible de ella.",
+  privFinalidad:
+    "Responder a tu solicitud y prepararte una propuesta o un presupuesto: aplicación de medidas precontractuales a petición tuya (art. 6.1.b RGPD).\n\nMedir y mejorar la web: tu consentimiento en el aviso de cookies (art. 6.1.a RGPD), que puedes retirar cuando quieras.\n\nEvitar el spam y los abusos: nuestro interés legítimo en proteger la web (art. 6.1.f RGPD).\n\nNo tomamos decisiones automatizadas ni hacemos perfiles, y no te enviaremos publicidad sin tu permiso.",
+  privProveedores:
+    "No vendemos ni cedemos tus datos. Solo acceden a ellos, como encargados del tratamiento y con contrato, los proveedores que necesitamos para que la web funcione: alojamiento web ({alojamiento}), base de datos y archivos (Supabase, con servidores en la Unión Europea) y correo electrónico (Google).\n\nSi algún proveedor trata datos fuera del Espacio Económico Europeo, la transferencia se ampara en el Marco de Privacidad de Datos UE–EE. UU. o en las cláusulas contractuales tipo de la Comisión Europea.",
+  cookiesNecesarias:
+    "rowe-consent — Guarda tu decisión sobre la analítica. Almacenamiento local, hasta que lo borres.\nrowe:intro — Recuerda que ya has visto la presentación inicial. Se borra al cerrar la pestaña.\nrowe:cfg — Guarda tu configuración del presupuesto mientras navegas. Se borra al cerrar la pestaña.",
+  cookiesPanel:
+    "Si accedes al panel de administración (solo personal de ROWE), se usan cookies técnicas de sesión para mantenerte identificado: sb-…-auth-token y rowe-remember.",
+};
+
+/** Apartado de cada texto: página y título. */
+export const LEGAL_TEXT_PLACE: Record<keyof typeof LEGAL_TEXT, { slug: string; title: string }> = {
+  avisoTitular: { slug: "aviso-legal", title: "Titular de la web" },
+  avisoPresupuestos: { slug: "aviso-legal", title: "Presupuestos orientativos" },
+  privResponsable: { slug: "privacidad", title: "Responsable del tratamiento" },
+  privDatos: { slug: "privacidad", title: "Qué datos tratamos" },
+  privFinalidad: { slug: "privacidad", title: "Para qué y con qué base legal" },
+  privProveedores: { slug: "privacidad", title: "Con quién los compartimos" },
+  cookiesNecesarias: { slug: "cookies", title: "Necesarias · siempre activas" },
+  cookiesPanel: { slug: "cookies", title: "Área privada" },
+};
+
 export const pages: SeedPage[] = [
   {
     slug: "web",
@@ -143,11 +196,11 @@ export const pages: SeedPage[] = [
     seoTitle: "Aviso legal — ROWE",
     seoDescription: "Datos del titular y condiciones de uso de la web de ROWE.",
     blocks: [
-      { title: "Titular de la web", body: "Titular: {titular}\nNIF: {nif}\nDomicilio: {domicilio}\nEmail: {email}\nWeb: {web}" },
+      { title: "Titular de la web", body: LEGAL_TEXT.avisoTitular },
       { title: "Objeto", body: "Esta web presenta los servicios de diseño y desarrollo web y de producción audiovisual de ROWE, y permite pedir información y calcular presupuestos orientativos." },
       { title: "Condiciones de uso", body: "El acceso a la web es libre y gratuito. Quien la usa se compromete a hacerlo de forma lícita, sin dañar la web ni a terceros, y a facilitar datos veraces en los formularios." },
       { title: "Propiedad intelectual e industrial", body: "Los textos, diseños, logotipos, fotografías, vídeos y el código de esta web pertenecen a {titular}, a sus clientes o a sus autores, y están protegidos por la normativa de propiedad intelectual e industrial. No se permite reproducirlos, distribuirlos ni transformarlos sin autorización expresa." },
-      { title: "Presupuestos orientativos", body: "Los importes que muestra el configurador son rangos orientativos, sin IVA, y no constituyen una oferta vinculante. El precio definitivo se fija en un presupuesto cerrado tras el briefing." },
+      { title: "Presupuestos orientativos", body: LEGAL_TEXT.avisoPresupuestos },
       { title: "Responsabilidad y enlaces", body: "{titular} no se hace responsable de los daños derivados de un uso indebido de la web, de interrupciones técnicas ajenas a su control ni del contenido de las webs de terceros a las que se enlace." },
       { title: "Legislación aplicable", body: "Estas condiciones se rigen por la legislación española. Cualquier controversia se resolverá ante los juzgados y tribunales que correspondan conforme a la ley.\n\nÚltima actualización: {actualizado}." },
     ],
@@ -160,11 +213,11 @@ export const pages: SeedPage[] = [
     seoTitle: "Política de privacidad — ROWE",
     seoDescription: "Cómo trata ROWE los datos personales de quien escribe o pide presupuesto desde la web.",
     blocks: [
-      { title: "Responsable del tratamiento", body: "{titular} · NIF {nif}\n{domicilio}\nEmail: {email}" },
-      { title: "Qué datos tratamos", body: "Los que nos das en el formulario «Hablemos» o al enviar tu presupuesto: nombre, empresa, email, teléfono, sector, lo que necesitas y tu mensaje, además de la configuración que elijas en el configurador.\n\nSi aceptas la analítica, datos de navegación: páginas vistas, origen de la visita y tiempo en la página, asociados a un identificador aleatorio que se borra al cerrar la pestaña. No guardamos tu dirección IP: para frenar envíos abusivos usamos una huella cifrada e irreversible de ella." },
-      { title: "Para qué y con qué base legal", body: "Responder a tu solicitud y prepararte una propuesta o un presupuesto: aplicación de medidas precontractuales a petición tuya (art. 6.1.b RGPD).\n\nMedir y mejorar la web: tu consentimiento en el aviso de cookies (art. 6.1.a RGPD), que puedes retirar cuando quieras.\n\nEvitar el spam y los abusos: nuestro interés legítimo en proteger la web (art. 6.1.f RGPD).\n\nNo tomamos decisiones automatizadas ni hacemos perfiles, y no te enviaremos publicidad sin tu permiso." },
+      { title: "Responsable del tratamiento", body: LEGAL_TEXT.privResponsable },
+      { title: "Qué datos tratamos", body: LEGAL_TEXT.privDatos },
+      { title: "Para qué y con qué base legal", body: LEGAL_TEXT.privFinalidad },
       { title: "Cuánto tiempo los guardamos", body: "Los datos de tu solicitud, mientras la gestionamos y, si no llega a contratarse, un máximo de 12 meses. Si pasas a ser cliente, durante la relación y los plazos que exija la ley (por ejemplo, fiscales). Los datos de analítica, un máximo de 26 meses." },
-      { title: "Con quién los compartimos", body: "No vendemos ni cedemos tus datos. Solo acceden a ellos, como encargados del tratamiento y con contrato, los proveedores que necesitamos para que la web funcione: alojamiento web ({alojamiento}), base de datos y archivos (Supabase, con servidores en la Unión Europea) y correo electrónico (Google).\n\nSi algún proveedor trata datos fuera del Espacio Económico Europeo, la transferencia se ampara en el Marco de Privacidad de Datos UE–EE. UU. o en las cláusulas contractuales tipo de la Comisión Europea." },
+      { title: "Con quién los compartimos", body: LEGAL_TEXT.privProveedores },
       { title: "Tus derechos", body: "Puedes pedir el acceso, la rectificación, la supresión, la oposición, la limitación del tratamiento y la portabilidad de tus datos, y retirar tu consentimiento en cualquier momento, escribiendo a {email}.\n\nSi crees que no hemos atendido bien tu petición, puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es)." },
       { title: "Seguridad", body: "Aplicamos medidas técnicas y organizativas para proteger tus datos: conexión cifrada, acceso al panel solo para el personal autorizado y copias de seguridad." },
       { title: "Cambios en esta política", body: "Si la cambiamos, publicaremos la nueva versión en esta página.\n\nÚltima actualización: {actualizado}." },
@@ -179,9 +232,9 @@ export const pages: SeedPage[] = [
     seoDescription: "Qué cookies y qué almacenamiento del navegador usa la web de ROWE y cómo cambiar tu decisión.",
     blocks: [
       { title: "Qué son", body: "Las cookies y el almacenamiento del navegador son pequeños datos que una web guarda en tu dispositivo para recordar información entre páginas o entre visitas." },
-      { title: "Necesarias · siempre activas", body: "rowe-consent — Guarda tu decisión sobre la analítica. Almacenamiento local, hasta que lo borres.\nrowe:intro — Recuerda que ya has visto la presentación inicial. Se borra al cerrar la pestaña.\nrowe:cfg — Guarda tu configuración del presupuesto mientras navegas. Se borra al cerrar la pestaña." },
+      { title: "Necesarias · siempre activas", body: LEGAL_TEXT.cookiesNecesarias },
       { title: "Analítica propia · solo si la aceptas", body: "rowe-sid — Identificador aleatorio de la visita para contar páginas vistas sin identificarte. Se borra al cerrar la pestaña.\n\nLos datos se guardan en nuestra propia base de datos y no se comparten con terceros." },
-      { title: "Área privada", body: "Si accedes al panel de administración (solo personal de ROWE), se usan cookies técnicas de sesión para mantenerte identificado: sb-…-auth-token y rowe-remember." },
+      { title: "Área privada", body: LEGAL_TEXT.cookiesPanel },
       { title: "Cómo cambiar tu decisión", body: "Cuando quieras, desde «Preferencias de cookies» en el pie de la web, o borrando los datos de este sitio en tu navegador." },
       { title: "Más información", body: "Para cualquier duda, escríbenos a {email}.\n\nÚltima actualización: {actualizado}." },
     ],
