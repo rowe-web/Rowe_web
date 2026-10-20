@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { emptyContact, emptyLegal, fillLegal, getSetting, instagramHref, isPlaceholderValue, mediaUrl, type ContactSettings, type LegalSettings } from "@/lib/content/settings";
+import { emptyContact, emptyLegal, fillLegal, getSetting, hasRealValue, instagramHref, mediaUrl, serviceCities, type ContactSettings, type LegalSettings } from "@/lib/content/settings";
 import type { Project, SiteSnapshot } from "@/lib/content/types";
 import { plainText } from "@/lib/rich-text";
 import { absoluteUrl, siteHost, siteUrl, supabaseConfig } from "@/lib/site";
@@ -74,17 +74,27 @@ export function pageMetadata(site: SiteSnapshot, slug: string, fallbackTitle: st
 // Datos estructurados
 // ---------------------------------------------------------------------------
 
-/** Un dato entre corchetes es provisional («[+34 600 000 000]»): no se publica en JSON-LD. */
-const real = (v: string | undefined | null) => (v && !isPlaceholderValue(v) ? v : undefined);
+/** Un dato vacío o entre corchetes es provisional («[+34 600 000 000]»): no se publica en JSON-LD. */
+const real = (v: string | undefined | null) => (hasRealValue(v) ? v : undefined);
+
+/** Las webs se hacen para toda España. */
+const SPAIN = { "@type": "Country", name: "España" } as const;
+
+/** Rodajes: las ciudades de la zona (Ajustes → Contacto); sin ninguna, toda España. */
+function videoAreaServed(site: SiteSnapshot) {
+  const cities = serviceCities(getSetting<ContactSettings>(site, "contact", emptyContact));
+  if (!cities.length) return SPAIN;
+  return cities.map((name) => ({ "@type": "City", name, containedInPlace: { "@type": "AdministrativeArea", name: "Provincia de Tarragona" } }));
+}
 
 export function organizationLd(site: SiteSnapshot) {
   const contact = getSetting<ContactSettings>(site, "contact", emptyContact);
   const seo = seoSettings(site);
   const sameAs = [
     instagramHref(contact.instagram),
-    contact.tiktok ? `https://tiktok.com/${contact.tiktok.startsWith("@") ? contact.tiktok : `@${contact.tiktok}`}` : "",
-    contact.linkedin ? `https://${contact.linkedin.replace(/^https?:\/\//, "")}` : "",
-    contact.youtube ? `https://${contact.youtube.replace(/^https?:\/\//, "")}` : "",
+    hasRealValue(contact.tiktok) ? `https://tiktok.com/${contact.tiktok.startsWith("@") ? contact.tiktok : `@${contact.tiktok}`}` : "",
+    hasRealValue(contact.linkedin) ? `https://${contact.linkedin.replace(/^https?:\/\//, "")}` : "",
+    hasRealValue(contact.youtube) ? `https://${contact.youtube.replace(/^https?:\/\//, "")}` : "",
   ].filter(Boolean);
   return {
     "@context": "https://schema.org",
@@ -98,7 +108,7 @@ export function organizationLd(site: SiteSnapshot) {
     email: real(contact.email_contact),
     telephone: real(contact.phone),
     address: real(contact.address) ? { "@type": "PostalAddress", streetAddress: contact.address, addressCountry: "ES" } : undefined,
-    areaServed: "ES",
+    areaServed: SPAIN,
     knowsAbout: ["Diseño web", "Desarrollo web", "Producción audiovisual", "Vídeo para redes sociales", "Fotografía"],
     sameAs: sameAs.length ? sameAs : undefined,
   };
@@ -137,7 +147,7 @@ export function serviceLd(site: SiteSnapshot, slug: string, discipline: "web" | 
     name: plainText(page?.title ?? slug),
     description: plainText(page?.seo_description || page?.intro || "") || undefined,
     url: absoluteUrl(`/${slug}`),
-    areaServed: "ES",
+    areaServed: discipline === "audiovisual" ? videoAreaServed(site) : SPAIN,
     provider: { "@id": `${siteUrl}/#organizacion` },
     hasOfferCatalog: {
       "@type": "OfferCatalog",

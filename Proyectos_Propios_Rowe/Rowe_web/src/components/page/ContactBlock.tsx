@@ -4,26 +4,26 @@ import { HablemosForm } from "@/features/hablemos/HablemosForm";
 import { PrefillBox } from "@/features/hablemos/PrefillBox";
 import { getHablemosSettings } from "@/features/hablemos/settings";
 import type { ContactoBlock } from "@/lib/content/blocks";
-import { emptyContact, getSetting, instagramHref, whatsappHref, type ContactSettings } from "@/lib/content/settings";
+import { emptyContact, getSetting, hasRealValue, instagramHref, mailtoHref, telHref, videoAreaText, whatsappHref, type ContactSettings } from "@/lib/content/settings";
 import type { SiteSnapshot } from "@/lib/content/types";
 
 /**
  * /contacto · «Hoja de rodaje»: los canales directos (Ajustes → Contacto) en una ficha
- * monoespaciada, y al lado el formulario «Hablemos» en 5 tomas (el mismo de la escena 10,
+ * monoespaciada (sin lo vacío o provisional), y al lado el formulario «Hablemos» en 5 tomas (el mismo de la escena 10,
  * con el resumen del configurador si se viene de allí).
  */
 export function ContactBlock({ block, site }: { block: ContactoBlock; site: SiteSnapshot }) {
   const contact = getSetting<ContactSettings>(site, "contact", emptyContact);
   const settings = getHablemosSettings(site);
-  const tel = contact.phone.replace(/[^\d+]/g, "");
   const rows = [
-    { label: "Email", value: contact.email_contact, href: contact.email_contact ? `mailto:${contact.email_contact}` : "" },
-    { label: "Teléfono", value: contact.phone, href: tel ? `tel:${tel}` : "" },
+    { label: "Email", value: contact.email_contact, href: mailtoHref(contact.email_contact) },
+    { label: "Teléfono", value: contact.phone, href: telHref(contact.phone) },
     { label: "WhatsApp", value: contact.whatsapp, href: whatsappHref(contact.whatsapp), external: true },
     { label: "Instagram", value: contact.instagram, href: instagramHref(contact.instagram), external: true },
-    { label: "Estudio", value: contact.address, href: "" },
+    { label: "Web", value: contact.service_area_web, href: "" },
+    { label: "Rodajes", value: videoAreaText(contact), href: "" },
     { label: "Horario", value: contact.hours, href: "" },
-  ].filter((r) => r.value);
+  ].filter((r) => hasRealValue(r.value));
 
   return (
     <section id="hablemos" data-scene="hablemos" className="relative gutter-x pb-[clamp(72px,12vh,140px)]">

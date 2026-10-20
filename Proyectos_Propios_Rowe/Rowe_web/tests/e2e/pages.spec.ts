@@ -136,6 +136,33 @@ test("escenas reutilizadas: el pin de Ecosistema vive en /audiovisual y no se fu
   expect(await pins()).toBeGreaterThan(0);
 });
 
+test("contacto: nada vacío ni provisional a la vista y «Dónde trabajamos» en el pie y en /contacto", async ({ page }) => {
+  for (const path of ["/", "/contacto"]) {
+    await open(page, path);
+    const footer = page.locator("[data-site-footer]");
+    await expect(footer.getByText("Dónde trabajamos", { exact: true })).toBeVisible();
+    await expect(footer.getByText("Estudio", { exact: true })).toHaveCount(0);
+    for (const zone of [footer, page.locator("[data-hero-intro]"), page.locator("#hablemos")]) {
+      if (!(await zone.count())) continue;
+      expect(await zone.first().innerText(), `${path}: dato entre corchetes`).not.toMatch(/\[[^\]]*\]/);
+    }
+    // Ningún enlace de contacto vacío o provisional
+    const hrefs = await page.locator('a[href^="tel:"], a[href^="mailto:"], a[href*="wa.me/"]').evaluateAll((as) => as.map((a) => a.getAttribute("href") ?? ""));
+    for (const href of hrefs) expect(href, path).toMatch(/^(tel:\+?\d{6,}|mailto:[^\s@]+@[^\s@]+|https:\/\/wa\.me\/\d{6,})$/);
+    // Ningún campo con un ejemplo provisional
+    for (const ph of await page.locator("input[placeholder]").evaluateAll((els) => els.map((e) => e.getAttribute("placeholder") ?? ""))) expect(ph, path).not.toMatch(/\[.*\]/);
+  }
+  // /contacto: «Web» y «Rodajes» en lugar de «Estudio» (cuando hay dato)
+  const labels = await page.locator("#hablemos dl dt").allInnerTexts();
+  expect(labels.map((l) => l.trim().toLowerCase())).not.toContain("estudio");
+
+  // Datos para Google: España como zona; sin dirección provisional
+  await open(page, "/");
+  const ld = (await page.locator('script[type="application/ld+json"]').allInnerTexts()).join("\n");
+  expect(ld).toContain('"areaServed":{"@type":"Country","name":"España"}');
+  expect(ld).not.toMatch(/"(streetAddress|telephone)":"\[/);
+});
+
 test("SEO: sitemap con proyectos publicados y robots desde la variable de entorno", async ({ request }) => {
   const sitemap = await (await request.get("/sitemap.xml")).text();
   expect(sitemap).toContain("/proyectos/clinica-dental-mar</loc>");

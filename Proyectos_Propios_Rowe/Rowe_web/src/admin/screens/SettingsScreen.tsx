@@ -52,7 +52,7 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 const HINTS: Partial<Record<string, string>> = {
-  contact: "Aparecen en el pie, en «Hablemos», en el PDF del presupuesto y en los textos legales.",
+  contact: "Aparecen en el pie, en «Hablemos», en el PDF del presupuesto y en los textos legales. Lo que dejes vacío o entre corchetes no se muestra en la web.",
   brand: "Textos generales de la web: lema, pie, pestaña al salir, sonido ambiente y página 404.",
   navigation: "Enlaces del menú (con su pie de foto), botón «Hablemos», pie de página y preloader.",
   configurator: "Textos de la escena «Tu presupuesto», del PDF, niveles del medidor y redondeos. Los precios están en Precios.",
@@ -60,6 +60,9 @@ const HINTS: Partial<Record<string, string>> = {
   legal: "Titular de la web para el aviso legal y la privacidad. En los textos legales, {titular}, {nif}, {domicilio}, {email}, {alojamiento} y {actualizado} se sustituyen por estos datos, y {web} y {dominio} por la dirección real de la web. Lo que va entre corchetes es provisional.",
   notifications: "A quién se envía el aviso de cada mensaje nuevo. No se publica: se aplica al guardar.",
 };
+
+/** Ajustes → Contacto: «Dónde trabajamos» se edita en su propio bloque (vacío si aún no existe). */
+const SERVICE_AREA_KEYS = ["service_area_web", "service_area_video", "service_area_cities", "service_area_note"] as const;
 
 /** Ajustes (ROWE Admin · Ajustes). Cada editor ve solo lo que puede cambiar. */
 export function SettingsScreen({ settings, pages, isAdmin, host, initialTab }: { settings: SettingRow[]; pages: PageRow[]; isAdmin: boolean; host: string; initialTab: string | null }) {
@@ -202,6 +205,19 @@ function SettingEditor({ setting, isAdmin, host }: { setting: SettingRow; isAdmi
           </div>
         )}
         <JsonFields value={v as Json} onChange={(n) => ed.set(n as Record<string, unknown>)} hide={["enabled"]} />
+      </Card>
+    );
+  } else if (setting.key === "contact") {
+    const area = Object.fromEntries(SERVICE_AREA_KEYS.map((k) => [k, (v[k] ?? (k === "service_area_cities" ? [] : "")) as Json]));
+    body = (
+      <Card className="flex flex-col gap-4">
+        <p className="text-[13px] leading-relaxed text-muted">{HINTS.contact}</p>
+        <JsonFields value={v as Json} onChange={(n) => ed.set(n as Record<string, unknown>)} grid hide={[...SERVICE_AREA_KEYS]} />
+        <fieldset data-service-area-editor className="flex flex-col gap-3 rounded-md border border-line-soft p-3.5">
+          <legend className={`${mono} px-1 text-muted`}>Dónde trabajamos</legend>
+          <p className="text-[13px] leading-relaxed text-muted">En el pie y en /contacto, y las ciudades en los datos para Google del servicio audiovisual. Las webs, para toda España; los rodajes, en estas ciudades.</p>
+          <JsonFields value={area} onChange={(n) => ed.set((s) => ({ ...s, ...(n as Record<string, unknown>) }))} />
+        </fieldset>
       </Card>
     );
   } else {

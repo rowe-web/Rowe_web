@@ -7,7 +7,11 @@ import {
   emptyContact,
   emptyNavigation,
   getSetting,
+  hasRealValue,
   instagramHref,
+  mailtoHref,
+  serviceCities,
+  telHref,
   whatsappHref,
   type BrandSettings,
   type ContactSettings,
@@ -17,7 +21,8 @@ import { siteHost } from "@/lib/site";
 
 /**
  * Pie — «créditos finales» (amplía el pie centrado y monoespaciado de ROWE Presupuesto).
- * Logo, créditos, columnas de contacto / redes / estudio / legal y cierre con el timecode.
+ * Logo, créditos, columnas de contacto / redes / dónde trabajamos / legal y cierre con el timecode.
+ * Lo vacío o provisional (entre corchetes) no se pinta ni genera enlaces.
  */
 export function SiteFooter({ site }: { site: SiteSnapshot }) {
   const contact = getSetting<ContactSettings>(site, "contact", emptyContact);
@@ -26,10 +31,14 @@ export function SiteFooter({ site }: { site: SiteSnapshot }) {
   const credits = brand.credits.split("·").map((c) => c.trim()).filter(Boolean);
   const social = [
     { label: "Instagram", value: contact.instagram, href: instagramHref(contact.instagram) },
-    { label: "TikTok", value: contact.tiktok, href: contact.tiktok ? `https://tiktok.com/${contact.tiktok.startsWith("@") ? contact.tiktok : `@${contact.tiktok}`}` : "" },
-    { label: "LinkedIn", value: "LinkedIn", href: contact.linkedin ? `https://${contact.linkedin.replace(/^https?:\/\//, "")}` : "" },
-    { label: "YouTube", value: "YouTube", href: contact.youtube ? `https://${contact.youtube.replace(/^https?:\/\//, "")}` : "" },
+    { label: "TikTok", value: contact.tiktok, href: hasRealValue(contact.tiktok) ? `https://tiktok.com/${contact.tiktok.startsWith("@") ? contact.tiktok : `@${contact.tiktok}`}` : "" },
+    { label: "LinkedIn", value: "LinkedIn", href: hasRealValue(contact.linkedin) ? `https://${contact.linkedin.replace(/^https?:\/\//, "")}` : "" },
+    { label: "YouTube", value: "YouTube", href: hasRealValue(contact.youtube) ? `https://${contact.youtube.replace(/^https?:\/\//, "")}` : "" },
   ].filter((s) => s.href);
+  const mail = mailtoHref(contact.email_contact);
+  const wa = whatsappHref(contact.whatsapp);
+  const tel = telHref(contact.phone);
+  const cities = serviceCities(contact);
 
   const col = "flex flex-col gap-3 text-[15px]";
   const head = "label-mono text-[10px] text-muted pb-1";
@@ -49,17 +58,21 @@ export function SiteFooter({ site }: { site: SiteSnapshot }) {
       <div className="mt-[8vh] grid grid-cols-2 gap-x-6 gap-y-10 border-t border-line pt-10 md:grid-cols-4">
         <div className={col}>
           <span className={head}>Contacto</span>
-          <a className={link} href={`mailto:${contact.email_contact}`}>
-            {contact.email_contact}
-          </a>
-          {whatsappHref(contact.whatsapp) && (
-            <a className={link} href={whatsappHref(contact.whatsapp)} target="_blank" rel="noopener noreferrer">
+          {mail && (
+            <a className={link} href={mail}>
+              {contact.email_contact}
+            </a>
+          )}
+          {wa && (
+            <a className={link} href={wa} target="_blank" rel="noopener noreferrer">
               WhatsApp {contact.whatsapp}
             </a>
           )}
-          <a className={link} href={`tel:${contact.phone.replace(/[^\d+]/g, "")}`}>
-            {contact.phone}
-          </a>
+          {tel && (
+            <a className={link} href={tel}>
+              {contact.phone}
+            </a>
+          )}
         </div>
         <div className={col}>
           <span className={head}>Redes</span>
@@ -69,10 +82,17 @@ export function SiteFooter({ site }: { site: SiteSnapshot }) {
             </a>
           ))}
         </div>
-        <div className={col}>
-          <span className={head}>Estudio</span>
-          <span>{contact.address}</span>
-          <span className="text-muted">{contact.hours}</span>
+        <div className={col} data-service-area>
+          <span className={head}>Dónde trabajamos</span>
+          {hasRealValue(contact.service_area_web) && <span>{contact.service_area_web}</span>}
+          {(hasRealValue(contact.service_area_video) || cities.length > 0) && (
+            <span>
+              {hasRealValue(contact.service_area_video) && <span className="block">{contact.service_area_video}</span>}
+              {cities.length > 0 && <span className="block">{cities.join(" · ")}</span>}
+            </span>
+          )}
+          {hasRealValue(contact.service_area_note) && <span className="text-muted">{contact.service_area_note}</span>}
+          {hasRealValue(contact.hours) && <span className="text-muted">{contact.hours}</span>}
         </div>
         <div className={col}>
           <span className={head}>Legal</span>

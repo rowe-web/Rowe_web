@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { RichText } from "@/components/ui/RichText";
 import { track } from "@/lib/analytics/client";
 import type { ContactSettings } from "@/lib/content/settings";
-import { instagramHref, whatsappHref } from "@/lib/content/settings";
+import { hasRealValue, instagramHref, whatsappHref } from "@/lib/content/settings";
 import { fieldErrors } from "./schema";
 import type { HablemosSettings } from "./settings";
 import { useHablemos } from "./store";
@@ -288,7 +288,7 @@ export function HablemosForm({ settings, contact, variant = "section" }: Props) 
                     <TextField id="name" label={settings.fields.name} placeholder={settings.fields.name_placeholder} value={name} autoComplete="name" error={errors.name ? settings.errors.name : ""} onChange={(v) => { startClock(); setName(v); setErrors((e) => ({ ...e, name: undefined })); }} variant={variant} />
                     <TextField id="company" label={settings.fields.company} placeholder={settings.fields.company_placeholder} value={company} autoComplete="organization" onChange={setCompany} variant={variant} />
                     <TextField id="email" type="email" label={settings.fields.email} placeholder={settings.fields.email_placeholder} value={email} autoComplete="email" error={errors.email ? settings.errors.email : ""} onChange={(v) => { setEmail(v); setErrors((e) => ({ ...e, email: undefined })); }} variant={variant} />
-                    <TextField id="phone" type="tel" label={settings.fields.phone} placeholder={settings.fields.phone_placeholder} value={phone} autoComplete="tel" onChange={setPhone} variant={variant} />
+                    <TextField id="phone" type="tel" label={settings.fields.phone} placeholder={hasRealValue(settings.fields.phone_placeholder) ? settings.fields.phone_placeholder : ""} value={phone} autoComplete="tel" onChange={setPhone} variant={variant} />
                     <TextField id="city" label={settings.fields.city} placeholder={settings.fields.city_placeholder} value={city} autoComplete="address-level2" error={errors.city ? settings.errors.city : ""} onChange={(v) => { setCity(v); setErrors((e) => ({ ...e, city: undefined })); }} variant={variant} />
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -323,7 +323,7 @@ export function HablemosForm({ settings, contact, variant = "section" }: Props) 
               <span className="mt-[7px] h-2 w-2 flex-none rounded-full bg-rec" />
               <div className="flex flex-col gap-1">
                 <span className="text-[16px]">{settings.errors.send_title}</span>
-                <span className="text-[14px] leading-normal text-muted">{errorText || settings.errors.send_body.replace("{email}", contact.email_contact)}</span>
+                <span className="text-[14px] leading-normal text-muted">{errorText || settings.errors.send_body.replace("{email}", hasRealValue(contact.email_contact) ? contact.email_contact : "")}</span>
               </div>
             </div>
           )}
@@ -371,10 +371,12 @@ export function HablemosForm({ settings, contact, variant = "section" }: Props) 
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={copy} data-cursor={settings.copy} className="flex min-h-12 items-center gap-3.5 border border-line-strong px-[18px] text-[15px] transition-colors hover:border-[rgb(237_234_228/0.5)]">
-          <span>{contact.email_contact}</span>
-          <span className={`label-mono text-[10px] ${copied ? "text-bone" : "text-muted"}`}>{copied ? settings.copied : settings.copy}</span>
-        </button>
+        {hasRealValue(contact.email_contact) && (
+          <button type="button" onClick={copy} data-cursor={settings.copy} className="flex min-h-12 items-center gap-3.5 border border-line-strong px-[18px] text-[15px] transition-colors hover:border-[rgb(237_234_228/0.5)]">
+            <span>{contact.email_contact}</span>
+            <span className={`label-mono text-[10px] ${copied ? "text-bone" : "text-muted"}`}>{copied ? settings.copied : settings.copy}</span>
+          </button>
+        )}
         {whatsappHref(contact.whatsapp) && (
           <a href={whatsappHref(contact.whatsapp)} target="_blank" rel="noopener noreferrer" className="flex min-h-12 items-center gap-2.5 border border-line-strong px-[18px] text-[15px] transition-colors hover:border-[rgb(237_234_228/0.5)]">
             WhatsApp <span className="label-mono text-[10px] text-muted">{contact.whatsapp}</span>

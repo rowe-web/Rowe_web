@@ -12,6 +12,11 @@ export interface ContactSettings {
   tiktok: string;
   linkedin: string;
   youtube: string;
+  /** Dónde trabajamos: las webs (online) y los rodajes (presenciales, en una zona). */
+  service_area_web: string;
+  service_area_video: string;
+  service_area_cities: string[];
+  service_area_note: string;
 }
 
 export interface BrandSettings {
@@ -86,6 +91,10 @@ export const emptyContact: ContactSettings = {
   tiktok: "",
   linkedin: "",
   youtube: "",
+  service_area_web: "",
+  service_area_video: "",
+  service_area_cities: [],
+  service_area_note: "",
 };
 
 export const emptyBrand: BrandSettings = {
@@ -107,16 +116,44 @@ export function isPlaceholderValue(value: unknown): value is string {
   return typeof value === "string" && /\[.*\]/.test(value);
 }
 
-/** Enlace de WhatsApp a partir del número escrito en el panel (ignora espacios y corchetes). */
+/** Un dato que se puede enseñar: no está vacío ni es provisional. Lo que no lo es, ni se ve ni genera enlaces. */
+export function hasRealValue(value: unknown): value is string {
+  return typeof value === "string" && value.trim() !== "" && !isPlaceholderValue(value);
+}
+
+/** Enlace de WhatsApp a partir del número escrito en el panel (ignora espacios). */
 export function whatsappHref(phone: string): string {
-  const digits = phone.replace(/\D/g, "");
+  const digits = hasRealValue(phone) ? phone.replace(/\D/g, "") : "";
   return digits ? `https://wa.me/${digits}` : "";
+}
+
+/** Enlace tel: a partir del número escrito en el panel. */
+export function telHref(phone: string): string {
+  const tel = hasRealValue(phone) ? phone.replace(/[^\d+]/g, "") : "";
+  return tel ? `tel:${tel}` : "";
+}
+
+/** Enlace mailto: a partir del email escrito en el panel. */
+export function mailtoHref(email: string): string {
+  return hasRealValue(email) ? `mailto:${email.trim()}` : "";
 }
 
 /** Enlace de Instagram a partir de «@usuario». */
 export function instagramHref(handle: string): string {
-  const user = handle.replace(/^@/, "").trim();
+  const user = hasRealValue(handle) ? handle.replace(/^@/, "").trim() : "";
   return user ? `https://instagram.com/${user}` : "";
+}
+
+/** Ciudades de la zona de rodaje que se pueden enseñar. */
+export function serviceCities(contact: ContactSettings): string[] {
+  return (Array.isArray(contact.service_area_cities) ? contact.service_area_cities : []).filter(hasRealValue).map((c) => c.trim());
+}
+
+/** «Rodajes en el Camp de Tarragona: Tarragona · Reus · Salou…» (vacío si no hay nada real). */
+export function videoAreaText(contact: ContactSettings): string {
+  const video = hasRealValue(contact.service_area_video) ? contact.service_area_video.trim() : "";
+  const cities = serviceCities(contact).join(" · ");
+  return video && cities ? `${video}: ${cities}` : video || cities;
 }
 
 /** URL pública de un fichero del bucket de medios. */

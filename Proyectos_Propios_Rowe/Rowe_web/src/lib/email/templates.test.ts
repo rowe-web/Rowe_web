@@ -85,6 +85,12 @@ describe("email de respuesta · datos reales, contraste y modo oscuro", () => {
     expect(mail.html).toContain("mailto:rowe.web.contacto@gmail.com");
   });
 
+  it("tampoco con el dato provisional a medias, vacío o solo con espacios", async () => {
+    const mail = await replyEmail({ ...base, contact: { ...base.contact, phone: "  ", whatsapp: "", city: "Reus [por confirmar]" } });
+    expect(mail.html).not.toMatch(/por confirmar|wa\.me|tel:/);
+    expect(mail.text).not.toMatch(/por confirmar|wa\.me/);
+  });
+
   it("texto oscuro sobre fondo claro, HTML limpio: solo estilos en línea, sin clases, CSS ni texto oculto", async () => {
     const mail = await replyEmail(base);
     expect(mail.html).toContain("color:#111111");

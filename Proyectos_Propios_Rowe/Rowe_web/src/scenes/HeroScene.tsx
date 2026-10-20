@@ -4,7 +4,7 @@ import { RichText } from "@/components/ui/RichText";
 import { MediaFrame } from "@/components/scene/MediaFrame";
 import { ProcessLoop, type ProcessStep } from "@/components/scene/ProcessLoop";
 import { Timecode } from "@/components/scene/Timecode";
-import { getSetting, emptyBrand, type BrandSettings } from "@/lib/content/settings";
+import { getSetting, emptyBrand, hasRealValue, type BrandSettings } from "@/lib/content/settings";
 import { SceneMotion } from "@/motion/SceneMotion";
 import { getMedia, type SceneProps } from "./types";
 
@@ -60,7 +60,7 @@ export function HeroScene({ scene, site }: SceneProps<HeroData>) {
         <div data-hero-intro className="flex justify-between gap-4 border-b border-line pb-3 label-mono text-[9px] text-muted md:text-[11px]">
           <span>{scene.kicker}</span>
           <span>{brand.tagline}</span>
-          <span className="hidden md:inline">{brand.city}</span>
+          {hasRealValue(brand.city) && <span className="hidden md:inline">{brand.city}</span>}
           <span className="hidden md:inline">{brand.year}</span>
         </div>
 
