@@ -1,5 +1,6 @@
 import type { Db } from "./client";
 import { CONTENT_TYPES, HERO_TEXT, HOME_SEO, SERVICE_AREA, WEB_TYPES } from "../../src/content/seed-data";
+import { LEGAL_TEXT, LEGAL_TEXT_ORIGINAL, LEGAL_TEXT_PLACE } from "../../src/content/seed-pages";
 
 /**
  * Actualizaciones de contenido posteriores a la carga inicial (equilibrio web / audiovisual).
@@ -173,6 +174,20 @@ export async function applyContentUpdates(db: Db, log: (msg: string) => void): P
     }),
     "SEO de la home: qué hacemos y dónde",
   );
+
+  // --- Textos legales adaptados a ROWE (solo donde sigue el texto original) -------
+  for (const [key, place] of Object.entries(LEGAL_TEXT_PLACE) as [keyof typeof LEGAL_TEXT, { slug: string; title: string }][]) {
+    const [row] = await db.query<{ blocks: Obj[] }>("select blocks from public.pages where slug = $1", [place.slug]);
+    if (!Array.isArray(row?.blocks)) continue;
+    let changed = false;
+    const blocks = row.blocks.map((b) => {
+      if (b.title !== place.title || b.body !== LEGAL_TEXT_ORIGINAL[key]) return b;
+      changed = true;
+      return { ...b, body: LEGAL_TEXT[key] };
+    });
+    if (changed) await db.query("update public.pages set blocks = $2::text::jsonb where slug = $1", [place.slug, JSON.stringify(blocks)]);
+    done(changed, `/${place.slug}: «${place.title}» adaptado a ROWE`);
+  }
 
   // --- Título de la pestaña al salir --------------------------------------------
   done(

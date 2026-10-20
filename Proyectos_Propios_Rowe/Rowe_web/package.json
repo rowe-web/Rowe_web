@@ -16,6 +16,7 @@
     "db:setup": "npm run db:migrate && npm run db:seed",
     "db:publish": "tsx --env-file-if-exists=.env.local scripts/db/publish.ts",
     "db:backup": "tsx --env-file-if-exists=.env.local scripts/db/backup.ts",
+    "db:legal": "tsx --env-file-if-exists=.env.local scripts/db/legal-data.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

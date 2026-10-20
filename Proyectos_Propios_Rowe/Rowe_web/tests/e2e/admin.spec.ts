@@ -220,6 +220,22 @@ test("lista de lanzamiento: pendientes en el inicio y aviso accesible antes de p
   expect(after?.version ?? 0).toBe(before?.version ?? 0);
 });
 
+test("vista previa: aviso legal, privacidad y cookies con el borrador", async ({ page }) => {
+  await login(page, "admin");
+  for (const slug of ["aviso-legal", "privacidad", "cookies"]) {
+    await page.goto(`/vista-previa/${slug}`);
+    await expect(page.getByText("Vista previa · borrador sin publicar")).toBeVisible();
+    const main = page.locator("main#contenido");
+    await expect(main.locator("h1")).toBeVisible();
+    // Las marcas del titular salen rellenas
+    expect(await main.innerText(), slug).not.toMatch(/\{(titular|nif|domicilio|email|web|dominio|alojamiento|actualizado)\}/);
+  }
+  // Sin sesión no se ve: lleva al acceso
+  await page.context().clearCookies();
+  await page.goto("/vista-previa/privacidad");
+  await expect(page).toHaveURL(/\/admin\/acceso/);
+});
+
 test("páginas: añade, edita, reordena y quita secciones de /web (borrador)", async ({ page }) => {
   const { data: before } = await db.from("pages").select("blocks").eq("slug", "web").single();
   try {
