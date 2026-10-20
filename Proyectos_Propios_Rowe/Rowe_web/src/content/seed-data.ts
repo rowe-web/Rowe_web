@@ -135,6 +135,16 @@ export const HERO_TEXT = {
   body: "Estudio boutique de web y audiovisual. Un solo equipo, sin intermediarios ni plantillas.",
 };
 
+/** Email de confirmación al cliente tras «Hablemos» (Ajustes → Email de confirmación). {nombre} = su nombre. */
+export const CONFIRMATION_EMAIL = {
+  enabled: true,
+  subject: "Tenemos tu solicitud · ROWE",
+  title: "Hola {nombre}, tenemos *tu solicitud.*",
+  intro: "Gracias por escribirnos. Te respondemos en menos de 24 h (en días laborables) con los siguientes pasos y, si hace falta, una propuesta a medida.",
+  outro: "¿Quieres añadir algo, como fotos o enlaces de referencia? Responde a este email: llega directamente a nuestro equipo.",
+  reason: "Recibes este email porque has enviado una solicitud desde la web de ROWE.",
+};
+
 /** Dónde trabajamos (Ajustes → Contacto): webs 100 % online; rodajes solo en el Camp de Tarragona. */
 export const SERVICE_AREA = {
   service_area_web: "Webs para toda España, 100 % online",
@@ -368,6 +378,13 @@ export const settings: SeedSetting[] = [
       hosting: "[Vercel Inc. · por confirmar]",
       updated: "16 de octubre de 2026",
     },
+  },
+  {
+    key: "confirmation_email",
+    label: "Email de confirmación al cliente",
+    isPublic: false,
+    editorCanEdit: false,
+    value: CONFIRMATION_EMAIL,
   },
   {
     key: "notifications",

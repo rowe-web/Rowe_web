@@ -9,6 +9,8 @@ export interface Mail {
   html: string;
   text: string;
   replyTo?: string;
+  /** Message-ID fijo (p. ej. la confirmación de una solicitud, para reconocer las respuestas). Sin él, uno aleatorio. */
+  messageId?: string;
   /** Cabeceras extra (p. ej. Auto-Submitted en los avisos automáticos). */
   headers?: Record<string, string>;
   attachments?: { filename: string; path?: string; content?: Buffer; cid?: string; contentDisposition?: "inline" | "attachment" }[];
@@ -49,7 +51,7 @@ export function smtpMessage(mail: Mail, account: string) {
     to: mail.to,
     replyTo: mail.replyTo || account,
     subject: mail.subject,
-    messageId: `<${randomUUID()}@${domain}>`,
+    messageId: mail.messageId ?? `<${randomUUID()}@${domain}>`,
     date: new Date(),
     text: mail.text,
     html: mail.html,
@@ -71,7 +73,7 @@ export function smtpMessage(mail: Mail, account: string) {
 export async function sendMail(mail: Mail): Promise<{ id: string }> {
   const env = serverEnv();
   // Pruebas automáticas: nunca llega nada a ningún buzón (ni a los del equipo)
-  if (env.EMAIL_DRY_RUN === "1" && env.EMAIL_PROVIDER) return { id: `dry-run-${Date.now()}` };
+  if (env.EMAIL_DRY_RUN === "1" && env.EMAIL_PROVIDER) return { id: mail.messageId ?? `dry-run-${Date.now()}` };
 
   if (env.EMAIL_PROVIDER === "smtp") {
     if (!env.SMTP_USER || !env.SMTP_PASSWORD) throw new EmailNotConfiguredError();
@@ -95,7 +97,7 @@ export async function sendMail(mail: Mail): Promise<{ id: string }> {
         from: env.EMAIL_FROM,
         to: mail.to,
         reply_to: mail.replyTo || mailSender(),
-        headers: mail.headers,
+        headers: mail.messageId ? { ...mail.headers, "Message-ID": mail.messageId } : mail.headers,
         subject: mail.subject,
         html: mail.html,
         text: mail.text,

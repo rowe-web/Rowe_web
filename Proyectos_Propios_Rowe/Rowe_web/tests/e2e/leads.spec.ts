@@ -94,12 +94,24 @@ test("formulario «Hablemos»: 5 tomas → «Grabado» → lead guardado aunque 
   expect(lead.ip_hash).toMatch(/^[0-9a-f]{32}$/);
   // El aviso por email queda registrado (fallido si no hay email configurado, enviado si lo hay)
   const mail = await waitFor(async () => {
-    const { data } = await db.from("email_outbox").select("status, attempts, last_error, payload").eq("lead_id", lead.id).maybeSingle();
+    const { data } = await db.from("email_outbox").select("status, attempts, last_error, payload").eq("lead_id", lead.id).eq("template", "new-lead").maybeSingle();
     return data && data.attempts > 0 ? data : null;
   });
   expect(["sent", "failed"]).toContain(mail.status);
   expect(mail.payload).toMatchObject({ city: "Valencia" }); // va en el aviso por email
   if (mail.status === "failed") expect(mail.last_error).toBeTruthy();
+
+  // Confirmación al cliente (si está activada en Ajustes): después del aviso, a su email, con el resumen
+  const { data: setting } = await db.from("site_settings").select("value").eq("key", "confirmation_email").maybeSingle();
+  if ((setting?.value as { enabled?: boolean } | null)?.enabled) {
+    const confirmation = await waitFor(async () => {
+      const { data } = await db.from("email_outbox").select("id, status, attempts, to_addresses, payload").eq("lead_id", lead.id).eq("template", "lead-confirmation").maybeSingle();
+      return data && data.attempts > 0 ? data : null;
+    });
+    expect(confirmation.to_addresses).toEqual([testEmail("form")]);
+    expect(confirmation.payload).toMatchObject({ name: "Prueba E2E", need: "Web", sector: "Salud", budget: "1.000 – 2.500 €", quoteNumber: null });
+    expect(["sent", "failed"]).toContain(confirmation.status);
+  }
 });
 
 test("configurador → «Enviar y hablemos» → overlay precargado → lead con presupuesto recalculado", async ({ page }) => {
@@ -133,6 +145,17 @@ test("configurador → «Enviar y hablemos» → overlay precargado → lead con
   const { data: quote } = await db.from("quotes").select("*").eq("id", lead.quote_id).single();
   expect(quote.number).toMatch(/^ROWE-\d{4}-\d{4,}$/);
   expect([quote.one_min, quote.one_max]).toEqual([900, 1450]);
+  // Confirmación al cliente (si está activada): con su nº de presupuesto y el presupuesto para el PDF adjunto
+  const { data: setting } = await db.from("site_settings").select("value").eq("key", "confirmation_email").maybeSingle();
+  if ((setting?.value as { enabled?: boolean } | null)?.enabled) {
+    const confirmation = await waitFor(async () => {
+      const { data } = await db.from("email_outbox").select("status, attempts, last_error, payload").eq("lead_id", lead.id).eq("template", "lead-confirmation").maybeSingle();
+      return data && data.attempts > 0 ? data : null;
+    });
+    expect(confirmation.payload).toMatchObject({ quoteNumber: quote.number, quote: { one: [900, 1450] } });
+    // Con EMAIL_DRY_RUN no sale nada, pero el email (con el PDF) se ha generado sin errores
+    if (confirmation.status === "failed") expect(confirmation.last_error).not.toMatch(/PDF|plantilla|Plantilla/);
+  }
   await page.keyboard.press("Escape");
   await expect(overlay).toBeHidden();
   await expect(page.locator("html")).not.toHaveClass(/scroll-locked/);

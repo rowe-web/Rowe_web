@@ -5,7 +5,8 @@ import { leadSchema, MIN_ELAPSED_MS } from "@/features/hablemos/schema";
 import { getHablemosSettings } from "@/features/hablemos/settings";
 import { getSetting, emptyContact, type ContactSettings } from "@/lib/content/settings";
 import { loadSite } from "@/lib/content/site";
-import { enqueueNewLead, processOutbox } from "@/lib/email/outbox";
+import { loadConfirmationSettings } from "@/lib/email/confirmation";
+import { enqueueConfirmation, enqueueNewLead, processOutbox } from "@/lib/email/outbox";
 import { clientIp, hashIp, json, sameOrigin } from "@/lib/server/request";
 import { adminClient } from "@/lib/supabase/admin";
 
@@ -21,8 +22,9 @@ const RATE = { limit: 5, windowSeconds: 3600 };
  *     y límite por IP (anónima).
  *  3. Si viene del configurador: el presupuesto se RECALCULA aquí con los precios publicados.
  *  4. Se guarda el lead. Si esto falla → error 500 y el formulario ofrece reintentar.
- *  5. El aviso por email se encola y se envía DESPUÉS de responder. Si falla, el lead ya
- *     está guardado y el error queda registrado para reintentarlo.
+ *  5. El aviso por email (y la confirmación al cliente, si está activada) se encolan y se
+ *     envían DESPUÉS de responder. Si fallan, el lead ya está guardado y el error queda
+ *     registrado para reintentarlo.
  */
 export async function POST(req: Request) {
   if (!sameOrigin(req)) return json({ message: "Origen no permitido" }, 403);
@@ -72,8 +74,10 @@ export async function POST(req: Request) {
   let quoteId: string | null = null;
   let quoteNumber: string | null = null;
   let items = "";
+  let cfgQuote: ReturnType<typeof serverQuote>["quote"] = null;
   if (lead.budget === "cfg") {
     const { selection, quote } = serverQuote(site, lead.selection);
+    cfgQuote = quote;
     if (quote) {
       budgetLabel = quoteLabel(quote);
       items = quote.items.map((i) => i.label).join(" · ");
@@ -137,7 +141,29 @@ export async function POST(req: Request) {
     },
     recipients,
   );
-  if (outboxId) after(() => processOutbox({ ids: [outboxId] }));
+  // Confirmación al cliente, después del aviso (mismos reintentos). Nunca rompe la respuesta.
+  let confirmationId: number | null = null;
+  try {
+    if ((await loadConfirmationSettings())?.enabled) {
+      confirmationId = await enqueueConfirmation({
+        leadId: inserted.id,
+        name: lead.name,
+        email: lead.email,
+        need: lead.need,
+        sector: lead.sector,
+        budget: budgetLabel || "Sin indicar",
+        items: items ? items.split(" · ") : [],
+        quoteNumber,
+        message: lead.message,
+        createdAt: inserted.created_at,
+        quote: quoteNumber ? cfgQuote : null,
+      });
+    }
+  } catch (err) {
+    console.error("[leads] Confirmación al cliente", err instanceof Error ? err.message : err);
+  }
+  const ids = [outboxId, confirmationId].filter((id): id is number => id !== null);
+  if (ids.length) after(() => processOutbox({ ids }));
 
   return json({ ok: true }, 201);
 }

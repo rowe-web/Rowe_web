@@ -22,7 +22,7 @@ export default async function MensajesPage({ searchParams }: PageProps<"/admin/m
   // Estado de los avisos por email (tabla interna: se lee en el servidor tras comprobar el acceso)
   const ids = (leads ?? []).map((l) => l.id);
   const mails = ids.length && user.role
-    ? ((await adminClient().from("email_outbox").select("lead_id, status, attempts, last_error, sent_at").in("lead_id", ids)).data ?? [])
+    ? ((await adminClient().from("email_outbox").select("lead_id, status, attempts, last_error, sent_at").in("lead_id", ids).eq("template", "new-lead")).data ?? [])
     : [];
   const mailBy = new Map(mails.map((m) => [m.lead_id, m]));
 

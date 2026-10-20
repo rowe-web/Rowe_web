@@ -1,5 +1,5 @@
 import type { Db } from "./client";
-import { CONTENT_TYPES, HERO_TEXT, HOME_SEO, SERVICE_AREA, WEB_TYPES } from "../../src/content/seed-data";
+import { CONFIRMATION_EMAIL, CONTENT_TYPES, HERO_TEXT, HOME_SEO, SERVICE_AREA, WEB_TYPES } from "../../src/content/seed-data";
 import { LEGAL_TEXT, LEGAL_TEXT_ORIGINAL, LEGAL_TEXT_PLACE } from "../../src/content/seed-pages";
 
 /**
@@ -173,6 +173,16 @@ export async function applyContentUpdates(db: Db, log: (msg: string) => void): P
       return a || b;
     }),
     "SEO de la home: qué hacemos y dónde",
+  );
+
+  // --- Email de confirmación al cliente (la fila la crea el seed; aquí, los campos que falten) ---
+  done(
+    await updateJson(db, "site_settings", "value", "key", "confirmation_email", (v) => {
+      let changed = false;
+      for (const [k, val] of Object.entries(CONFIRMATION_EMAIL)) changed = add(v, k, val) || changed;
+      return changed;
+    }),
+    "Email de confirmación: textos que faltaban",
   );
 
   // --- Textos legales adaptados a ROWE (solo donde sigue el texto original) -------

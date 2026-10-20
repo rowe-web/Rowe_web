@@ -143,38 +143,21 @@ const LABEL = `font:10px/1.5 ${MONO};letter-spacing:.14em;text-transform:upperca
 // Rótulos del resumen «Tu solicitud»: casi negros y en semi-negrita, nítidos sobre el fondo claro
 const SUMMARY_LABEL = `font:600 10px/1.5 ${MONO};letter-spacing:.14em;text-transform:uppercase;color:#222222`;
 
-/**
- * Respuesta a un mensaje, escrita en el panel y enviada desde la cuenta de ROWE.
- * Mismo lenguaje que la web (titular en serif, rótulos monoespaciados, punto REC) en una
- * versión clara de máximo contraste. Incluye el resumen de lo que pidió.
- *
- * Pensada para llegar a la bandeja de entrada: estructura de tablas con estilos en línea
- * (sin scripts, formularios, clases ni CSS), versión de texto equivalente, texto real (no una
- * imagen), pocos enlaces y todos válidos (nunca a localhost ni a un número de relleno) y una
- * línea que explica por qué se recibe.
- */
-export async function replyEmail(p: { to: string; subject: string; body: string; from: string; lead: ReplyLeadSummary; contact: ReplyContact }): Promise<Mail> {
-  const hosted = absoluteUrl("/").startsWith("https://");
-  // Logotipo: con dominio propio, la imagen servida desde la web; sin él, un rótulo de texto (nunca
-  // una imagen adjunta, que en el correo de un remitente nuevo pesa en contra en los filtros de spam).
-  const wordmark = hosted
+// ---------------------------------------------------------------------------
+// Piezas comunes de los emails al cliente (respuesta y confirmación)
+// ---------------------------------------------------------------------------
+
+/** Logotipo: con dominio propio, la imagen servida desde la web; sin él, un rótulo de texto (nunca
+ * una imagen adjunta, que en el correo de un remitente nuevo pesa en contra en los filtros de spam). */
+function wordmark(): string {
+  return absoluteUrl("/").startsWith("https://")
     ? `<img src="${absoluteUrl("/brand/rowe-logo-email.png")}" alt="ROWE" width="124" height="47" style="display:block;width:124px;height:47px;border:0">`
     : `<span style="font:400 26px/1 ${SERIF};letter-spacing:.08em;color:${INK}">ROWE</span><span style="font:26px/1 ${SANS};color:${REC}">&nbsp;&#8226;</span>`;
-  const received = new Date(p.lead.createdAt).toLocaleDateString("es-ES", { timeZone: "Europe/Madrid", day: "numeric", month: "long", year: "numeric" });
-  const tagline = realValue(p.contact.tagline) || "Web & Audiovisual";
-  const city = realValue(p.contact.city);
-  const phone = realValue(p.contact.phone);
-  const wa = realValue(p.contact.whatsapp).replace(/[^\d]/g, "");
-  const contactEmail = realValue(p.contact.email) || p.from;
+}
 
-  const rows: [string, string][] = [
-    ["Servicio", p.lead.need],
-    ["Presupuesto", realValue(p.lead.budget) || "Sin indicar"],
-    ...(p.lead.quoteNumber ? ([["Nº de presupuesto", p.lead.quoteNumber]] as [string, string][]) : []),
-    ["Solicitud", `Recibida el ${received}`],
-  ];
-
-  const summary = `
+/** Recuadro «Tu solicitud»: filas, lo que eligió y su mensaje. */
+function summaryHtml(rows: [string, string][], items: string[], message: string): string {
+  return `
 <tr><td style="padding:30px 28px 0">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#F7F5F1" style="background:#F7F5F1;border:1px solid ${LINE};border-radius:4px">
     <tr><td style="padding:18px 22px 6px;${SUMMARY_LABEL}"><span style="color:${REC}">&#9679;</span>&nbsp; Tu solicitud</td></tr>
@@ -189,9 +172,9 @@ ${rows
       </table>
     </td></tr>
 ${
-  p.lead.items.length
+  items.length
     ? `    <tr><td style="padding:10px 22px 6px;${SUMMARY_LABEL}">Lo que elegiste</td></tr>
-    <tr><td style="padding:2px 22px 12px">${p.lead.items
+    <tr><td style="padding:2px 22px 12px">${items
         .map(
           (i) =>
             `<span style="display:inline-block;margin:0 6px 8px 0;padding:6px 11px;border:1px solid #CFCAC1;border-radius:999px;background:${CARD};font:600 12px/1.3 ${MONO};letter-spacing:.04em;color:#1a1a1a">${esc(i)}</span>`,
@@ -200,27 +183,50 @@ ${
     : ""
 }
 ${
-  p.lead.message
+  message
     ? `    <tr><td style="padding:8px 22px 6px;${SUMMARY_LABEL}">Tu mensaje</td></tr>
-    <tr><td style="padding:2px 22px 20px"><div style="border-left:2px solid #CFCAC1;padding:2px 0 2px 14px;font:italic 15px/1.6 ${SERIF};color:#333333;white-space:pre-wrap">${esc(p.lead.message)}</div></td></tr>`
+    <tr><td style="padding:2px 22px 20px"><div style="border-left:2px solid #CFCAC1;padding:2px 0 2px 14px;font:italic 15px/1.6 ${SERIF};color:#333333;white-space:pre-wrap">${esc(message)}</div></td></tr>`
     : `    <tr><td style="padding:0 0 12px"></td></tr>`
 }
   </table>
 </td></tr>`;
+}
 
-  const contactBits = [
-    `<a href="mailto:${esc(contactEmail)}" style="color:${INK};text-decoration:underline">${esc(contactEmail)}</a>`,
+/** Versión de texto del resumen. */
+function summaryText(rows: [string, string][], items: string[], message: string): string[] {
+  return [
+    "----------------------------------------",
+    "TU SOLICITUD",
+    ...rows.map(([k, v]) => `${k}: ${v}`),
+    ...(items.length ? [`Lo que elegiste: ${items.join(" · ")}`] : []),
+    ...(message ? ["", "Tu mensaje:", message] : []),
+    "----------------------------------------",
+  ];
+}
+
+/** Datos de contacto reales de ROWE (sin vacíos ni provisionales). */
+function contactLines(contact: ReplyContact, from: string) {
+  const phone = realValue(contact.phone);
+  const wa = realValue(contact.whatsapp).replace(/[^\d]/g, "");
+  const email = realValue(contact.email) || from;
+  const html = [
+    `<a href="mailto:${esc(email)}" style="color:${INK};text-decoration:underline">${esc(email)}</a>`,
     phone ? `<a href="tel:${esc(phone.replace(/[^\d+]/g, ""))}" style="color:${INK};text-decoration:none">${esc(phone)}</a>` : "",
     wa ? `<a href="https://wa.me/${wa}" style="color:${INK};text-decoration:underline">WhatsApp</a>` : "",
   ].filter(Boolean);
+  const text = [email, phone, wa ? `WhatsApp: https://wa.me/${wa}` : ""].filter(Boolean).join(" · ");
+  return { html: html.join(` <span style="color:#999999">&middot;</span> `), text };
+}
 
-  const html = `<!doctype html>
+/** Marco del email: cabecera con el logotipo, titular, contenido, contacto, pie y por qué lo recibe. */
+function layout(o: { subject: string; kicker: string; titleHtml: string; content: string; contactHtml: string; tagline: string; city: string; reason: string }): string {
+  return `<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>${esc(p.subject)}</title>
+<title>${esc(o.subject)}</title>
 </head>
 <body style="margin:0;padding:0;background:${PAPER};color:${INK}" bgcolor="${PAPER}">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${PAPER}" style="background:${PAPER}">
@@ -229,46 +235,77 @@ ${
 
 <tr><td style="padding:20px 28px;border-bottom:1px solid ${LINE}">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-    <td style="vertical-align:middle">${wordmark}</td>
-    <td align="right" style="vertical-align:middle;${LABEL}"><span style="color:${REC}">&#9679;</span>&nbsp; ${esc(tagline)}</td>
+    <td style="vertical-align:middle">${wordmark()}</td>
+    <td align="right" style="vertical-align:middle;${LABEL}"><span style="color:${REC}">&#9679;</span>&nbsp; ${esc(o.tagline)}</td>
   </tr></table>
 </td></tr>
 
-<tr><td style="padding:36px 28px 6px;${LABEL}">Para ${esc(p.lead.name)}</td></tr>
-<tr><td style="padding:6px 28px 0;font:400 34px/1.1 ${SERIF};color:${INK}">${esc(p.subject)}</td></tr>
-
-<tr><td style="padding:26px 28px 0;font:16px/1.7 ${SANS};color:${INK};white-space:pre-wrap">${esc(p.body)}</td></tr>
-${summary}
+<tr><td style="padding:36px 28px 6px;${LABEL}">${esc(o.kicker)}</td></tr>
+<tr><td style="padding:6px 28px 0;font:400 34px/1.1 ${SERIF};color:${INK}">${o.titleHtml}</td></tr>
+${o.content}
 
 <tr><td style="padding:30px 28px 28px">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid ${LINE}"><tr>
-    <td style="padding-top:18px;font:14px/1.8 ${SANS};color:${SOFT}">Responde a este email o escríbenos:<br>${contactBits.join(` <span style="color:#999999">&middot;</span> `)}</td>
+    <td style="padding-top:18px;font:14px/1.8 ${SANS};color:${SOFT}">Responde a este email o escríbenos:<br>${o.contactHtml}</td>
   </tr></table>
 </td></tr>
 
-<tr><td style="padding:16px 28px 20px;border-top:1px solid ${LINE};${LABEL}">ROWE &middot; ${esc(tagline)}${city ? ` &middot; ${esc(city)}` : ""}</td></tr>
+<tr><td style="padding:16px 28px 20px;border-top:1px solid ${LINE};${LABEL}">ROWE &middot; ${esc(o.tagline)}${o.city ? ` &middot; ${esc(o.city)}` : ""}</td></tr>
 </table>
-<p style="max-width:640px;margin:14px auto 0;font:12px/1.6 ${SANS};color:${SOFT};text-align:center">Recibes este email porque nos escribiste desde la web de ROWE.</p>
+<p style="max-width:640px;margin:14px auto 0;font:12px/1.6 ${SANS};color:${SOFT};text-align:center">${esc(o.reason)}</p>
 </td></tr>
 </table>
 </body>
 </html>`;
+}
+
+/**
+ * Respuesta a un mensaje, escrita en el panel y enviada desde la cuenta de ROWE.
+ * Mismo lenguaje que la web (titular en serif, rótulos monoespaciados, punto REC) en una
+ * versión clara de máximo contraste. Incluye el resumen de lo que pidió.
+ *
+ * Pensada para llegar a la bandeja de entrada: estructura de tablas con estilos en línea
+ * (sin scripts, formularios, clases ni CSS), versión de texto equivalente, texto real (no una
+ * imagen), pocos enlaces y todos válidos (nunca a localhost ni a un número de relleno) y una
+ * línea que explica por qué se recibe.
+ */
+export async function replyEmail(p: { to: string; subject: string; body: string; from: string; lead: ReplyLeadSummary; contact: ReplyContact }): Promise<Mail> {
+  const received = new Date(p.lead.createdAt).toLocaleDateString("es-ES", { timeZone: "Europe/Madrid", day: "numeric", month: "long", year: "numeric" });
+  const tagline = realValue(p.contact.tagline) || "Web & Audiovisual";
+  const city = realValue(p.contact.city);
+  const contact = contactLines(p.contact, p.from);
+  const reason = "Recibes este email porque nos escribiste desde la web de ROWE.";
+
+  const rows: [string, string][] = [
+    ["Servicio", p.lead.need],
+    ["Presupuesto", realValue(p.lead.budget) || "Sin indicar"],
+    ...(p.lead.quoteNumber ? ([["Nº de presupuesto", p.lead.quoteNumber]] as [string, string][]) : []),
+    ["Solicitud", `Recibida el ${received}`],
+  ];
+
+  const html = layout({
+    subject: p.subject,
+    kicker: `Para ${p.lead.name}`,
+    titleHtml: esc(p.subject),
+    content: `
+<tr><td style="padding:26px 28px 0;font:16px/1.7 ${SANS};color:${INK};white-space:pre-wrap">${esc(p.body)}</td></tr>
+${summaryHtml(rows, p.lead.items, p.lead.message)}`,
+    contactHtml: contact.html,
+    tagline,
+    city,
+    reason,
+  });
 
   const text = [
     p.body,
     "",
-    "----------------------------------------",
-    "TU SOLICITUD",
-    ...rows.map(([k, v]) => `${k}: ${v}`),
-    ...(p.lead.items.length ? [`Lo que elegiste: ${p.lead.items.join(" · ")}`] : []),
-    ...(p.lead.message ? ["", "Tu mensaje:", p.lead.message] : []),
-    "----------------------------------------",
+    ...summaryText(rows, p.lead.items, p.lead.message),
     "",
     "Responde a este email o escríbenos:",
-    [contactEmail, phone, wa ? `WhatsApp: https://wa.me/${wa}` : ""].filter(Boolean).join(" · "),
+    contact.text,
     "",
     `ROWE · ${tagline}${city ? ` · ${city}` : ""}`,
-    "Recibes este email porque nos escribiste desde la web de ROWE.",
+    reason,
   ].join("\n");
 
   return {
@@ -277,5 +314,127 @@ ${summary}
     subject: p.subject,
     html,
     text,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Confirmación automática al cliente
+// ---------------------------------------------------------------------------
+
+/** Textos del email de confirmación (Ajustes → Email de confirmación). {nombre} = nombre del cliente. */
+export interface ConfirmationTexts {
+  subject: string;
+  title: string;
+  intro: string;
+  outro: string;
+  /** Línea final: por qué recibe el email. */
+  reason: string;
+}
+
+/** Lo que se guarda en la cola para enviar la confirmación (y el PDF, si viene del configurador). */
+export interface ConfirmationPayload {
+  leadId: string;
+  name: string;
+  email: string;
+  need: string;
+  sector: string;
+  budget: string;
+  items: string[];
+  quoteNumber: string | null;
+  message: string;
+  createdAt: string;
+}
+
+/** «Hola {nombre}» con el nombre de pila del cliente. */
+const fillName = (t: string, name: string) => t.replace(/\{nombre\}/g, name.trim().split(/\s+/)[0] || name.trim());
+
+/** *texto* → cursiva (como en la web), escapando todo lo demás. */
+const richHtml = (t: string) => esc(t).replace(/\*([^*\n]+)\*/g, `<em style="font-style:italic">$1</em>`);
+const plain = (t: string) => t.replace(/\*([^*\n]+)\*/g, "$1");
+
+/**
+ * Confirmación automática al cliente justo después de enviar «Hablemos»: tenemos tu solicitud,
+ * cuándo respondemos, el resumen de lo que pidió y, si existe una agenda activa, el botón para
+ * reservar videollamada. Si viene del configurador, el PDF del presupuesto va adjunto.
+ * Mismas reglas que la respuesta: alta legibilidad, versión de texto, pocos enlaces y válidos,
+ * Reply-To a ROWE y la línea de por qué se recibe. Auto-Submitted: es un aviso automático
+ * (RFC 3834), así los clientes de correo no le contestan con respuestas automáticas.
+ */
+export async function confirmationEmail(p: {
+  lead: ConfirmationPayload;
+  texts: ConfirmationTexts;
+  contact: ReplyContact;
+  from: string;
+  /** Agenda para reservar videollamada, si existe y está activa. */
+  booking?: { url: string; label: string } | null;
+  pdf?: { filename: string; content: Buffer } | null;
+  messageId?: string;
+}): Promise<Mail> {
+  const received = new Date(p.lead.createdAt).toLocaleDateString("es-ES", { timeZone: "Europe/Madrid", day: "numeric", month: "long", year: "numeric" });
+  const tagline = realValue(p.contact.tagline) || "Web & Audiovisual";
+  const city = realValue(p.contact.city);
+  const contact = contactLines(p.contact, p.from);
+  const name = p.lead.name;
+  const subject = plain(fillName(p.texts.subject, name));
+  const title = fillName(p.texts.title, name);
+  const intro = fillName(p.texts.intro, name);
+  const outro = fillName(p.texts.outro, name);
+  const reason = realValue(p.texts.reason) || "Recibes este email porque has enviado una solicitud desde la web de ROWE.";
+  const booking = p.booking && /^https:\/\//.test(p.booking.url) ? { url: p.booking.url, label: realValue(p.booking.label) || "Reserva tu videollamada" } : null;
+
+  const rows: [string, string][] = [
+    ["Servicio", p.lead.need],
+    ...(realValue(p.lead.sector) ? ([["Sector", p.lead.sector]] as [string, string][]) : []),
+    ["Presupuesto", realValue(p.lead.budget) || "Sin indicar"],
+    ...(p.lead.quoteNumber ? ([["Nº de presupuesto", p.lead.quoteNumber]] as [string, string][]) : []),
+    ["Solicitud", `Recibida el ${received}`],
+  ];
+  const pdfNote = p.pdf ? `Te adjuntamos el PDF de tu presupuesto orientativo${p.lead.quoteNumber ? ` (${p.lead.quoteNumber})` : ""}.` : "";
+
+  const html = layout({
+    subject,
+    kicker: "Solicitud recibida",
+    titleHtml: richHtml(title),
+    content: `
+${intro ? `<tr><td style="padding:26px 28px 0;font:16px/1.7 ${SANS};color:${INK};white-space:pre-wrap">${richHtml(intro)}</td></tr>` : ""}
+${pdfNote ? `<tr><td style="padding:14px 28px 0;font:15px/1.6 ${SANS};color:${INK}">${esc(pdfNote)}</td></tr>` : ""}
+${
+  booking
+    ? `<tr><td style="padding:26px 28px 0"><a href="${esc(booking.url)}" style="display:inline-block;background:${INK};color:#FFFFFF;text-decoration:none;padding:14px 24px;border-radius:999px;font:500 15px/1 ${SANS}">${esc(booking.label)}</a></td></tr>`
+    : ""
+}
+${summaryHtml(rows, p.lead.items, p.lead.message)}
+${outro ? `<tr><td style="padding:26px 28px 0;font:15px/1.7 ${SANS};color:${INK};white-space:pre-wrap">${richHtml(outro)}</td></tr>` : ""}`,
+    contactHtml: contact.html,
+    tagline,
+    city,
+    reason,
+  });
+
+  const text = [
+    plain(title),
+    "",
+    ...(intro ? [plain(intro), ""] : []),
+    ...(pdfNote ? [pdfNote, ""] : []),
+    ...(booking ? [`${booking.label}: ${booking.url}`, ""] : []),
+    ...summaryText(rows, p.lead.items, p.lead.message),
+    ...(outro ? ["", plain(outro)] : []),
+    "",
+    "Responde a este email o escríbenos:",
+    contact.text,
+    "",
+    `ROWE · ${tagline}${city ? ` · ${city}` : ""}`,
+    reason,
+  ].join("\n");
+
+  return {
+    to: [p.lead.email],
+    replyTo: p.from || undefined,
+    messageId: p.messageId,
+    headers: { "Auto-Submitted": "auto-generated" },
+    subject,
+    html,
+    text,
+    attachments: p.pdf ? [{ filename: p.pdf.filename, content: p.pdf.content, contentDisposition: "attachment" }] : undefined,
   };
 }
