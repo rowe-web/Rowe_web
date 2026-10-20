@@ -7,7 +7,7 @@ import { MediaFrame } from "@/components/scene/MediaFrame";
 import { MenuPreview, MenuSummary, menuPreviewKind } from "./MenuPreview";
 import { Timecode } from "@/components/scene/Timecode";
 import type { BrandSettings, ContactSettings, NavigationSettings } from "@/lib/content/settings";
-import { instagramHref, whatsappHref } from "@/lib/content/settings";
+import { hasRealValue, instagramHref, whatsappHref } from "@/lib/content/settings";
 
 interface SiteMenuProps {
   nav: NavigationSettings;
@@ -109,10 +109,12 @@ export function SiteMenu({ nav, contact, brand, open, onClose, onCloseAnimated, 
           </figure>
 
           <div className="flex flex-col gap-2">
-            <button type="button" onClick={copy} className="flex min-h-12 items-center justify-between gap-4 border border-line-strong px-[18px] text-left text-[15px] transition-colors hover:border-[rgb(237_234_228/0.5)]" data-cursor="Copiar">
-              <span className="truncate">{contact.email_contact}</span>
-              <span className={`label-mono text-[10px] ${copied ? "text-bone" : "text-muted"}`}>{copied ? "Copiado ✓" : "Copiar"}</span>
-            </button>
+            {hasRealValue(contact.email_contact) && (
+              <button type="button" onClick={copy} className="flex min-h-12 items-center justify-between gap-4 border border-line-strong px-[18px] text-left text-[15px] transition-colors hover:border-[rgb(237_234_228/0.5)]" data-cursor="Copiar">
+                <span className="truncate">{contact.email_contact}</span>
+                <span className={`label-mono text-[10px] ${copied ? "text-bone" : "text-muted"}`}>{copied ? "Copiado ✓" : "Copiar"}</span>
+              </button>
+            )}
             <div className="flex flex-wrap gap-2">
               {whatsappHref(contact.whatsapp) && (
                 <a href={whatsappHref(contact.whatsapp)} target="_blank" rel="noopener noreferrer" className="flex min-h-12 items-center gap-2.5 border border-line-strong px-[18px] text-[15px] transition-colors hover:border-[rgb(237_234_228/0.5)]">
@@ -131,9 +133,9 @@ export function SiteMenu({ nav, contact, brand, open, onClose, onCloseAnimated, 
 
       <div className="flex flex-wrap justify-between gap-4 border-t border-line-soft gutter-x py-5 label-mono text-[10px] text-muted">
         <span>
-          {brand.tagline} · {brand.city}
+          {[brand.tagline, brand.city].filter(hasRealValue).join(" · ")}
         </span>
-        <span className="hidden sm:inline">{contact.hours}</span>
+        {hasRealValue(contact.hours) && <span className="hidden sm:inline">{contact.hours}</span>}
         <Timecode />
       </div>
     </div>

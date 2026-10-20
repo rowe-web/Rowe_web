@@ -1,6 +1,7 @@
 import "server-only";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { hasRealValue } from "@/lib/content/settings";
 import { absoluteUrl } from "@/lib/site";
 import type { Mail } from "./transport";
 
@@ -120,10 +121,9 @@ export interface ReplyContact {
   tagline: string;
 }
 
-/** «[+34 600 000 000]», «[Ciudad, Provincia]»…: datos de relleno que nunca salen en un email. */
+/** «[+34 600 000 000]», «[Ciudad, Provincia]»…: datos de relleno que nunca salen en un email (ni vacíos). */
 export function realValue(v: string | null | undefined): string {
-  const t = (v ?? "").trim();
-  return !t || /^\[.*\]$/.test(t) ? "" : t;
+  return hasRealValue(v) ? v.trim() : "";
 }
 
 // Paleta clara (máximo contraste) con el lenguaje de la web, solo con estilos en línea: sin

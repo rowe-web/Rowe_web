@@ -1,5 +1,5 @@
 import type { Db } from "./client";
-import { CONTENT_TYPES, HERO_TEXT, HOME_SEO, WEB_TYPES } from "../../src/content/seed-data";
+import { CONTENT_TYPES, HERO_TEXT, HOME_SEO, SERVICE_AREA, WEB_TYPES } from "../../src/content/seed-data";
 
 /**
  * Actualizaciones de contenido posteriores a la carga inicial (equilibrio web / audiovisual).
@@ -144,6 +144,16 @@ export async function applyContentUpdates(db: Db, log: (msg: string) => void): P
       return changed;
     }),
     "Menú: resumen de cada sección",
+  );
+
+  // --- Contacto: dónde trabajamos ------------------------------------------------
+  done(
+    await updateJson(db, "site_settings", "value", "key", "contact", (v) => {
+      let changed = false;
+      for (const [k, val] of Object.entries(SERVICE_AREA)) changed = add(v, k, val) || changed;
+      return changed;
+    }),
+    "Contacto: «Dónde trabajamos» (webs online, rodajes en el Camp de Tarragona)",
   );
 
   // --- Hero: frase de posicionamiento y SEO de la home ----------------------------

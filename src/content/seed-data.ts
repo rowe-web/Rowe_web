@@ -122,6 +122,7 @@ export interface SeedLead {
 // ---------------------------------------------------------------------------
 // Ajustes
 // ---------------------------------------------------------------------------
+
 /** SEO de la home: el h1 es el eslogan; título y descripción dicen qué hacemos y dónde. */
 export const HOME_SEO = {
   title: "ROWE — Diseño web a medida y vídeo para empresas",
@@ -132,6 +133,14 @@ export const HOME_SEO = {
 export const HERO_TEXT = {
   claim: "Diseñamos *webs a medida* para negocios de toda España y grabamos su contenido en el Camp de Tarragona.",
   body: "Estudio boutique de web y audiovisual. Un solo equipo, sin intermediarios ni plantillas.",
+};
+
+/** Dónde trabajamos (Ajustes → Contacto): webs 100 % online; rodajes solo en el Camp de Tarragona. */
+export const SERVICE_AREA = {
+  service_area_web: "Webs para toda España, 100 % online",
+  service_area_video: "Rodajes en el Camp de Tarragona",
+  service_area_cities: ["Tarragona", "Reus", "Salou", "Cambrils", "Vila-seca"],
+  service_area_note: "Fuera de la zona, consúltanos el desplazamiento",
 };
 
 export const settings: SeedSetting[] = [
@@ -152,6 +161,7 @@ export const settings: SeedSetting[] = [
       tiktok: "@rowe.estudio",
       linkedin: "linkedin.com/company/rowe",
       youtube: "youtube.com/@rowe",
+      ...SERVICE_AREA,
     },
   },
   {
@@ -173,7 +183,7 @@ export const settings: SeedSetting[] = [
     value: {
       tagline: "Web & Audiovisual",
       year: "2026",
-      city: "[Ciudad, Provincia]",
+      city: "Camp de Tarragona · Toda España",
       legend: ["RO — Rodaje", "WE — Web"],
       credits: "Dirección: ROWE · Web: ROWE · Audiovisual: ROWE",
       tab_away_title: "ROWE en pausa — vuelve pronto",

@@ -49,6 +49,7 @@ const LABELS: Record<string, string> = {
   discipline: "Disciplina (web o audiovisual)", category: "Categoría (Web, Audiovisual o vacío = todas)", limit: "Máximo de proyectos",
   q: "Pregunta", a: "Respuesta", cta: "Botón principal", secondary: "Botón secundario", image_media_id: "Imagen 2.39:1",
   video_media_id: "Vídeo 2.39:1 (opcional, usa la imagen como póster)", channels_label: "Rótulo de los canales", form_label: "Rótulo del formulario",
+  service_area_web: "Webs (dónde)", service_area_video: "Rodajes (dónde)", service_area_cities: "Ciudades de rodaje", service_area_note: "Nota sobre el desplazamiento",
   owner: "Titular (nombre y apellidos o razón social)", nif: "NIF / CIF", hosting: "Proveedor de alojamiento web", updated: "Última actualización",
 };
 

@@ -2,7 +2,7 @@ import { RichText } from "@/components/ui/RichText";
 import { SceneHeader } from "@/components/scene/SceneHeader";
 import { Configurator } from "@/features/configurator/Configurator";
 import { getConfiguratorSettings } from "@/features/configurator/settings";
-import { emptyContact, getSetting, type ContactSettings } from "@/lib/content/settings";
+import { emptyContact, getSetting, hasRealValue, type ContactSettings } from "@/lib/content/settings";
 import { siteHost } from "@/lib/site";
 import type { SceneProps } from "./types";
 
@@ -22,7 +22,7 @@ export function PresupuestoScene({ site }: SceneProps) {
           <p className="label-mono">{s.promise}</p>
         </div>
       </div>
-      <Configurator config={site.configurator} settings={s} pdfFooter={[contact.email_contact, siteHost, contact.phone].filter(Boolean)} />
+      <Configurator config={site.configurator} settings={s} pdfFooter={[contact.email_contact, siteHost, contact.phone].filter(hasRealValue)} />
     </section>
   );
 }
