@@ -185,6 +185,29 @@ test("Escena 00 · Fig. 01: la flecha de «Tráfico» es un SVG, nunca el carác
   expect(await fig.locator("svg path[d^='M6.5 17.5']").count()).toBeGreaterThan(0);
 });
 
+test("Escena 00 · 390×844: «Pide tu propuesta» se ve sin hacer scroll, con la frase de posicionamiento encima del texto", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await open(page);
+  // Tras la entrada del hero (data-hero-intro), sin desplazarse
+  const cta = page.locator("#hero").getByRole("link", { name: "Pide tu propuesta" });
+  await expect(cta).toBeVisible();
+  await expect(cta).toBeInViewport({ ratio: 1 });
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  const box = (await cta.boundingBox())!;
+  expect(box.y + box.height).toBeLessThanOrEqual(844);
+
+  // La frase (cuando está publicada) va encima del texto, en bone y con más cuerpo que él
+  const claim = page.locator("[data-hero-claim]");
+  if (await claim.count()) {
+    await expect(claim).toBeInViewport({ ratio: 1 });
+    const [c, body] = await Promise.all([claim.evaluate((e) => ({ y: e.getBoundingClientRect().top, size: parseFloat(getComputedStyle(e).fontSize) })), page.locator("#hero p.text-muted").first().evaluate((e) => ({ y: e.getBoundingClientRect().top, size: parseFloat(getComputedStyle(e).fontSize) }))]);
+    expect(c.y).toBeLessThan(body.y);
+    expect(c.size).toBeGreaterThanOrEqual(18);
+    expect(c.size).toBeGreaterThan(body.size);
+  }
+  expect(errors).toEqual([]);
+});
+
 test("lo que hay dentro de una escena pinneada se ve aunque se llegue de un salto", async ({ page }, info) => {
   test.skip(!isDesktop(info.project.name));
   await open(page);
