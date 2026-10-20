@@ -1,0 +1,94 @@
+.link {
+  display: inline-flex;
+  border-radius: 2px;
+}
+
+.root {
+  display: inline-flex;
+  align-items: center;
+  /* El REC ↔ </> ocupa 1,8 × su alto: el hueco compensa para que el punto quede donde estaba */
+  gap: calc(var(--logo-h) * 0.4);
+}
+
+.mark {
+  position: relative;
+  display: block;
+  width: var(--logo-w);
+  height: var(--logo-h);
+}
+
+/* Cada mitad recorta el mismo PNG a tamaño completo (sin redibujar nada) */
+.half {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  overflow: hidden;
+  transition: transform 0.6s var(--ease-cut);
+  will-change: auto;
+}
+.ro {
+  left: 0;
+  width: var(--split);
+}
+.we {
+  right: 0;
+  width: calc(100% - var(--split));
+}
+
+.img {
+  position: absolute;
+  top: 0;
+  width: var(--logo-w) !important;
+  height: var(--logo-h) !important;
+  max-width: none;
+}
+.ro .img {
+  left: 0;
+}
+.we .img {
+  right: 0;
+}
+
+.label {
+  position: absolute;
+  top: calc(100% + 7px);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease-out), transform 0.6s var(--ease-cut);
+  pointer-events: none;
+}
+.labelRo {
+  left: 0;
+  transform: translate(0, -4px);
+}
+.labelWe {
+  right: 0;
+  transform: translate(0, -4px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .interactive:hover .ro,
+  .link:focus-visible .ro {
+    transform: translateX(calc(var(--logo-h) * -0.32));
+  }
+  .interactive:hover .we,
+  .link:focus-visible .we {
+    transform: translateX(calc(var(--logo-h) * 0.32));
+  }
+  .interactive:hover .labelRo,
+  .link:focus-visible .labelRo {
+    opacity: 1;
+    transform: translate(calc(var(--logo-h) * -0.32), 0);
+  }
+  .interactive:hover .labelWe,
+  .link:focus-visible .labelWe {
+    opacity: 1;
+    transform: translate(calc(var(--logo-h) * 0.32), 0);
+  }
+}

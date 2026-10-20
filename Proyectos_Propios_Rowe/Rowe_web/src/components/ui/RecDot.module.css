@@ -1,0 +1,57 @@
+/* Punto REC ↔ </> — ROWE = Rodaje + Web.
+   Ciclo de 6 s: el punto graba (parpadea), se encoge y se abre en </> como los corchetes
+   del preloader; vuelve a cerrarse en el punto. Con movimiento reducido la animación
+   termina al instante en el último fotograma: el punto, quieto. */
+.morph {
+  --cycle: 6s;
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.dot {
+  position: absolute;
+  top: 0;
+  left: calc(50% - var(--s) / 2);
+  width: var(--s);
+  height: var(--s);
+  animation: dot var(--cycle) var(--ease-cut) infinite both;
+}
+.start .dot {
+  left: 0;
+}
+@keyframes dot {
+  0%, 44% { opacity: 1; transform: scale(1); }
+  50%, 92% { opacity: 0; transform: scale(0.2); }
+  98%, 100% { opacity: 1; transform: scale(1); }
+}
+
+.glyph {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: var(--color-rec);
+  stroke-width: 2.6;
+  stroke-linecap: square;
+}
+.glyph path {
+  transform-box: view-box;
+  animation: glyph var(--cycle) var(--ease-cut) infinite both;
+}
+.lt { --dx: 8px; }
+.gt { --dx: -8px; }
+.sl { --dx: 0px; }
+@keyframes glyph {
+  0%, 44% { opacity: 0; transform: translateX(var(--dx)) scaleY(0.2); }
+  52%, 90% { opacity: 1; transform: none; }
+  97%, 100% { opacity: 0; transform: translateX(var(--dx)) scaleY(0.2); }
+}
+.glyph .sl {
+  transform-origin: 18px 10px;
+}
+.glyph .lt,
+.glyph .gt {
+  transform-origin: 18px 10px;
+}

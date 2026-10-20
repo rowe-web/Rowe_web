@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Inter+Tight:wght@300;400;500&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0A0A0A;-webkit-font-smoothing:antialiased}
+a{color:#EDEAE4;text-decoration:none}a:hover{color:#FFFFFF}
+@keyframes hfStepIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes hfClap{0%{transform:rotate(-7deg)}55%{transform:rotate(0)}70%{transform:rotate(-1.2deg)}100%{transform:rotate(0)}}
+@keyframes hfRec{0%,100%{opacity:1}50%{opacity:.22}}
+@keyframes hfRecOff{0%{transform:scale(1);opacity:1}35%{transform:scale(1.15);opacity:1}100%{transform:scale(.15);opacity:0}}
+</style>
+</helmet>
+<div style="display:flex;flex-direction:column;gap:18px;font-family:'Inter Tight',sans-serif;color:#EDEAE4;width:100%">
+  <div style="background:#121212;border:1px solid rgba(237,234,228,0.10);position:relative">
+    <div style="height:14px;position:relative;border-bottom:1px solid rgba(237,234,228,0.10)">{{ clap }}</div>
+    <div style="padding:clamp(22px,3.5vw,44px);display:flex;flex-direction:column;gap:30px;min-height:470px;box-sizing:border-box">
+
+      <sc-if value="{{ showProgress }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Toma <span style="color:#EDEAE4">{{ stepNum }}</span> / 05</span><span>{{ tc }}</span></div>
+          <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px">
+            <sc-for list="{{ segs }}" as="g" hint-placeholder-count="5"><div style="height:2px;background:{{ g.bg }};transition:background .6s cubic-bezier(0.76,0,0.24,1)"></div></sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ s0 }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:26px;animation:hfStepIn .7s cubic-bezier(0.76,0,0.24,1) both">
+          <div style="display:flex;flex-direction:column;gap:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Pregunta 01</div><div style="font-family:'Instrument Serif',serif;font-size:clamp(34px,3.6vw,54px);line-height:1">¿Qué <em>necesitas?</em></div></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+            <sc-for list="{{ needs }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.on }}" style="all:unset;box-sizing:border-box;cursor:pointer;min-height:112px;padding:18px 20px;display:flex;flex-direction:column;justify-content:space-between;gap:16px;border:1px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};transition:background .4s cubic-bezier(0.76,0,0.24,1), color .4s, border-color .25s" style-hover="border-color:#EDEAE4" style-focus="outline:2px solid #EDEAE4;outline-offset:4px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;opacity:0.6">{{ o.key }}</span><span style="font-size:21px">{{ o.label }}</span></button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ s1 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:26px;animation:hfStepIn .7s cubic-bezier(0.76,0,0.24,1) both">
+          <div style="display:flex;flex-direction:column;gap:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Pregunta 02</div><div style="font-family:'Instrument Serif',serif;font-size:clamp(34px,3.6vw,54px);line-height:1">¿A qué se dedica <em>tu negocio?</em></div></div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ sectors }}" as="o" hint-placeholder-count="8">
+              <button onClick="{{ o.on }}" style="all:unset;box-sizing:border-box;cursor:pointer;min-height:48px;padding:0 20px;display:flex;align-items:center;border-radius:999px;border:1px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};font-size:16px;transition:background .4s cubic-bezier(0.76,0,0.24,1), color .4s, border-color .25s" style-hover="border-color:#EDEAE4" style-focus="outline:2px solid #EDEAE4;outline-offset:4px">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ s2 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:26px;animation:hfStepIn .7s cubic-bezier(0.76,0,0.24,1) both">
+          <div style="display:flex;flex-direction:column;gap:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Pregunta 03</div><div style="font-family:'Instrument Serif',serif;font-size:clamp(34px,3.6vw,54px);line-height:1">Presupuesto <em>aproximado</em></div></div>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ budgets }}" as="o" hint-placeholder-count="5">
+              <button onClick="{{ o.on }}" style="all:unset;box-sizing:border-box;cursor:pointer;min-height:54px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid rgba(237,234,228,0.10);background:{{ o.bg }};color:{{ o.fg }};font-size:17px;transition:background .4s cubic-bezier(0.76,0,0.24,1), color .4s, padding .3s cubic-bezier(0.22,1,0.36,1)" style-hover="padding-left:26px" style-focus="outline:2px solid #EDEAE4;outline-offset:2px"><span>{{ o.label }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;opacity:0.6">{{ o.tag }}</span></button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ s3 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:22px;animation:hfStepIn .7s cubic-bezier(0.76,0,0.24,1) both">
+          <div style="display:flex;flex-direction:column;gap:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Pregunta 04</div><div style="font-family:'Instrument Serif',serif;font-size:clamp(34px,3.6vw,54px);line-height:1">Cuéntanos <em>un poco más</em></div></div>
+          <textarea value="{{ msg }}" onChange="{{ onMsg }}" rows="5" maxlength="600" placeholder="Qué haces, qué te gustaría conseguir, si tienes web actual, plazos…" style="width:100%;box-sizing:border-box;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);color:#EDEAE4;padding:16px 18px;font-family:'Inter Tight',sans-serif;font-size:16px;line-height:1.6;resize:vertical;outline:none" style-focus="border-color:#EDEAE4"></textarea>
+          <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Opcional</span><span>{{ msgCount }} / 600</span></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ s4 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:26px;animation:hfStepIn .7s cubic-bezier(0.76,0,0.24,1) both">
+          <div style="display:flex;flex-direction:column;gap:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Pregunta 05</div><div style="font-family:'Instrument Serif',serif;font-size:clamp(34px,3.6vw,54px);line-height:1">¿Cómo <em>te contactamos?</em></div></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px 28px">
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Nombre *</span><input value="{{ name }}" onChange="{{ onName }}" placeholder="Tu nombre" style="background:transparent;border:none;border-bottom:1px solid {{ errNameBd }};color:#EDEAE4;padding:12px 0;font-family:'Inter Tight',sans-serif;font-size:17px;outline:none" style-focus="border-bottom-color:#EDEAE4"><sc-if value="{{ errName }}"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#FF3B1F">Necesitamos tu nombre para dirigirnos a ti.</span></sc-if></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Empresa</span><input value="{{ company }}" onChange="{{ onCompany }}" placeholder="Nombre del negocio" style="background:transparent;border:none;border-bottom:1px solid rgba(237,234,228,0.25);color:#EDEAE4;padding:12px 0;font-family:'Inter Tight',sans-serif;font-size:17px;outline:none" style-focus="border-bottom-color:#EDEAE4"></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Email *</span><input value="{{ email }}" onChange="{{ onEmail }}" type="email" placeholder="tu@negocio.es" style="background:transparent;border:none;border-bottom:1px solid {{ errEmailBd }};color:#EDEAE4;padding:12px 0;font-family:'Inter Tight',sans-serif;font-size:17px;outline:none" style-focus="border-bottom-color:#EDEAE4"><sc-if value="{{ errEmail }}"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#FF3B1F">Revisa el email: parece incompleto.</span></sc-if></label>
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Teléfono</span><input value="{{ phone }}" onChange="{{ onPhone }}" type="tel" placeholder="[+34 600 000 000]" style="background:transparent;border:none;border-bottom:1px solid rgba(237,234,228,0.25);color:#EDEAE4;padding:12px 0;font-family:'Inter Tight',sans-serif;font-size:17px;outline:none" style-focus="border-bottom-color:#EDEAE4"></label>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button onClick="{{ onPrivacy }}" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:14px;min-height:44px;font-size:15px;color:#8A8780" style-focus="outline:2px solid #EDEAE4;outline-offset:4px"><span style="width:20px;height:20px;box-sizing:border-box;border:1px solid {{ privBd }};background:{{ privBg }};color:#0A0A0A;display:flex;align-items:center;justify-content:center;font-size:13px;transition:background .25s">{{ privMark }}</span><span>He leído y acepto la <span style="color:#EDEAE4;border-bottom:1px solid rgba(237,234,228,0.3)">política de privacidad</span>.</span></button>
+            <sc-if value="{{ errPrivacy }}"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#FF3B1F">Acepta la política de privacidad para continuar.</span></sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isError }}" hint-placeholder-val="{{ false }}">
+        <div style="border:1px solid rgba(255,59,31,0.5);padding:16px 18px;display:flex;gap:14px;align-items:flex-start;animation:hfStepIn .5s cubic-bezier(0.22,1,0.36,1) both">
+          <span style="width:8px;height:8px;border-radius:50%;background:#FF3B1F;margin-top:7px;flex:none"></span>
+          <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:16px">No se ha podido enviar.</div><div style="font-size:14px;line-height:1.5;color:#8A8780">Revisa tu conexión e inténtalo de nuevo, o escríbenos a rowe.web.contacto@gmail.com.</div></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:20px;border-top:1px solid rgba(237,234,228,0.08)">
+          <button onClick="{{ onBack }}" style="all:unset;cursor:pointer;visibility:{{ backVis }};min-height:44px;display:flex;align-items:center;gap:8px;font-size:15px;color:#8A8780" style-hover="color:#EDEAE4" style-focus="outline:2px solid #EDEAE4;outline-offset:4px">← Atrás</button>
+          <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">{{ hint }}</span>
+            <button onClick="{{ onNext }}" data-magnet="1" style="all:unset;cursor:pointer;box-sizing:border-box;height:52px;padding:0 26px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:15px;font-weight:500;display:flex;align-items:center;gap:10px;opacity:{{ nextOpacity }};transition:background .25s, opacity .3s, transform .15s" style-hover="background:#FFFFFF" style-active="transform:scale(0.97)" style-focus="outline:2px solid #EDEAE4;outline-offset:4px"><sc-if value="{{ isLoading }}"><span style="width:8px;height:8px;border-radius:50%;background:#FF3B1F;animation:hfRec .8s ease-in-out infinite"></span></sc-if>{{ nextLabel }}</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isSuccess }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:24px;animation:hfStepIn .8s cubic-bezier(0.76,0,0.24,1) both">
+          <div style="width:56px;height:56px;position:relative"><div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(237,234,228,0.25)"></div><div style="position:absolute;inset:0;border-radius:50%;background:#FF3B1F;animation:hfRecOff 1.8s cubic-bezier(0.76,0,0.24,1) .5s both"></div></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Toma 01 · Corten · 00:00:05:24</div>
+          <div style="font-family:'Instrument Serif',serif;font-size:clamp(48px,5.5vw,84px);line-height:0.95">Toma 1. <em>Grabado.</em></div>
+          <div style="font-size:17px;line-height:1.6;color:#8A8780;max-width:44ch">Gracias{{ thanksName }}. Te respondemos en menos de 24 h en <span style="color:#EDEAE4">{{ email }}</span>.</div>
+          <button onClick="{{ onReset }}" style="all:unset;cursor:pointer;align-self:flex-start;display:flex;gap:10px;font-size:15px;padding-bottom:4px;border-bottom:1px solid rgba(237,234,228,0.3);min-height:28px" style-hover="border-bottom-color:#EDEAE4"><span>Enviar otra solicitud</span><span>→</span></button>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:8px">
+    <button onClick="{{ onCopy }}" data-cursor="Copiar" style="all:unset;cursor:pointer;box-sizing:border-box;min-height:48px;padding:0 18px;display:flex;align-items:center;gap:14px;border:1px solid rgba(237,234,228,0.14);font-size:15px" style-hover="border-color:rgba(237,234,228,0.5)"><span>rowe.web.contacto@gmail.com</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:{{ copyColor }}">{{ copyLabel }}</span></button>
+    <a href="https://wa.me/34600000000" target="_blank" style="box-sizing:border-box;min-height:48px;padding:0 18px;display:flex;align-items:center;gap:10px;border:1px solid rgba(237,234,228,0.14);font-size:15px" style-hover="border-color:rgba(237,234,228,0.5)">WhatsApp <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;color:#8A8780">[+34 600 000 000]</span></a>
+    <a href="https://instagram.com/rowe.estudio" target="_blank" style="box-sizing:border-box;min-height:48px;padding:0 18px;display:flex;align-items:center;border:1px solid rgba(237,234,228,0.14);font-size:15px" style-hover="border-color:rgba(237,234,228,0.5)">@rowe.estudio</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:760,&quot;height&quot;:780},&quot;prefill&quot;:{&quot;editor&quot;:null,&quot;default&quot;:null,&quot;tsType&quot;:&quot;{id:number,need:string,range:string}|null&quot;},&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;section&quot;,&quot;overlay&quot;],&quot;default&quot;:&quot;section&quot;,&quot;tsType&quot;:&quot;'section'|'overlay'&quot;},&quot;simulateError&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { step: 0, need: null, sector: null, budget: null, msg: '', name: '', company: '', email: '', phone: '', privacy: false, errors: {}, status: 'idle', copied: false, pid: null };
+  componentDidMount() { this.sync(); }
+  componentDidUpdate() { this.sync(); }
+  componentWillUnmount() { clearTimeout(this.pt); clearTimeout(this.lt); clearTimeout(this.ct); }
+  sync() {
+    const p = this.props.prefill;
+    if (p && p.id && p.id !== this.state.pid) this.setState({ pid: p.id, need: p.need, budget: 'cfg', step: 0, status: 'idle' });
+  }
+  pick(field, v, next) {
+    this.setState({ [field]: v });
+    clearTimeout(this.pt);
+    this.pt = setTimeout(() => this.setState({ step: next }), 340);
+  }
+  submit() {
+    const s = this.state, e = {};
+    if (!s.name.trim()) e.name = 1;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s.email.trim())) e.email = 1;
+    if (!s.privacy) e.privacy = 1;
+    if (Object.keys(e).length) return this.setState({ errors: e });
+    this.setState({ errors: {}, status: 'loading' });
+    this.lt = setTimeout(() => this.setState({ status: this.props.simulateError ? 'error' : 'success' }), 1600);
+  }
+  renderVals() {
+    const s = this.state, P = this.props.prefill;
+    const C = sel => ({ bg: sel ? '#EDEAE4' : 'transparent', fg: sel ? '#0A0A0A' : '#EDEAE4', bd: sel ? '#EDEAE4' : 'rgba(237,234,228,0.18)' });
+    const success = s.status === 'success', loading = s.status === 'loading';
+    const can = [!!s.need, !!s.sector, !!s.budget, true, true][s.step];
+    const budgets = (P && P.range ? [{ key: 'cfg', label: P.range, tag: 'Del configurador' }] : [])
+      .concat(['Menos de 1.000 €', '1.000 – 2.500 €', '2.500 – 5.000 €', 'Más de 5.000 €', 'Aún no lo sé'].map(l => ({ key: l, label: l, tag: '' })))
+      .map(b => { const sel = s.budget === b.key; return { ...b, bg: sel ? '#EDEAE4' : 'transparent', fg: sel ? '#0A0A0A' : '#EDEAE4', on: () => this.pick('budget', b.key, 3) }; });
+    const p2 = n => String(n).padStart(2, '0');
+    return {
+      clap: React.createElement('div', { key: s.step + s.status, style: { position: 'absolute', left: 0, right: 0, top: 0, height: 14, transformOrigin: '0 100%', animation: 'hfClap .55s cubic-bezier(0.76,0,0.24,1) both', backgroundImage: 'repeating-linear-gradient(-45deg, rgba(237,234,228,0.85) 0px, rgba(237,234,228,0.85) 10px, #0A0A0A 10px, #0A0A0A 20px)' } }),
+      showProgress: !success, stepNum: p2(s.step + 1), tc: `00:00:${p2(s.step + 1)}:${p2(s.step * 5)}`,
+      segs: [0, 1, 2, 3, 4].map(i => ({ bg: i <= s.step || success ? '#EDEAE4' : 'rgba(237,234,228,0.12)' })),
+      s0: !success && s.step === 0, s1: !success && s.step === 1, s2: !success && s.step === 2, s3: !success && s.step === 3, s4: !success && s.step === 4,
+      needs: [['A', 'Web'], ['B', 'Audiovisual'], ['C', 'Las dos cosas']].map(([k, v]) => ({ key: k, label: v, ...C(s.need === v), on: () => this.pick('need', v, 1) })),
+      sectors: ['Salud', 'Restauración', 'Despacho profesional', 'Comercio', 'Bienestar', 'Inmobiliaria', 'Empresa B2B', 'Otro'].map(v => ({ label: v, ...C(s.sector === v), on: () => this.pick('sector', v, 2) })),
+      budgets,
+      msg: s.msg, msgCount: s.msg.length, onMsg: e => this.setState({ msg: e.target.value }),
+      name: s.name, company: s.company, email: s.email, phone: s.phone,
+      onName: e => this.setState({ name: e.target.value, errors: { ...s.errors, name: 0 } }),
+      onCompany: e => this.setState({ company: e.target.value }),
+      onEmail: e => this.setState({ email: e.target.value, errors: { ...s.errors, email: 0 } }),
+      onPhone: e => this.setState({ phone: e.target.value }),
+      errName: !!s.errors.name, errEmail: !!s.errors.email, errPrivacy: !!s.errors.privacy,
+      errNameBd: s.errors.name ? '#FF3B1F' : 'rgba(237,234,228,0.25)', errEmailBd: s.errors.email ? '#FF3B1F' : 'rgba(237,234,228,0.25)',
+      onPrivacy: () => this.setState({ privacy: !s.privacy, errors: { ...s.errors, privacy: 0 } }),
+      privBg: s.privacy ? '#EDEAE4' : 'transparent', privBd: s.errors.privacy ? '#FF3B1F' : (s.privacy ? '#EDEAE4' : 'rgba(237,234,228,0.4)'), privMark: s.privacy ? '✓' : '',
+      isError: s.status === 'error' && s.step === 4, isLoading: loading, isSuccess: success,
+      showNav: !success, backVis: s.step > 0 ? 'visible' : 'hidden',
+      hint: ['Un clic y seguimos', 'Un clic y seguimos', 'Sin compromiso', 'Opcional', 'Respuesta en 24 h'][s.step],
+      nextOpacity: can && !loading ? 1 : 0.35,
+      nextLabel: s.step < 4 ? 'Siguiente →' : loading ? 'Grabando…' : s.status === 'error' ? 'Reintentar' : 'Enviar solicitud',
+      onBack: () => this.setState({ step: Math.max(0, s.step - 1), status: 'idle' }),
+      onNext: () => { if (!can || loading) return; if (s.step < 4) this.setState({ step: s.step + 1 }); else this.submit(); },
+      thanksName: s.name.trim() ? ', ' + s.name.trim().split(' ')[0] : '',
+      onReset: () => this.setState({ step: 0, need: null, sector: null, budget: null, msg: '', status: 'idle', errors: {} }),
+      onCopy: () => { try { navigator.clipboard.writeText('rowe.web.contacto@gmail.com').catch(() => {}); } catch (e) {} this.setState({ copied: true }); clearTimeout(this.ct); this.ct = setTimeout(() => this.setState({ copied: false }), 1800); },
+      copyLabel: s.copied ? 'Copiado ✓' : 'Copiar', copyColor: s.copied ? '#EDEAE4' : '#8A8780'
+    };
+  }
+}
+</script>
+</body>
+</html>

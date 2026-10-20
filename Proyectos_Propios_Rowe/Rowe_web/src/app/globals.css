@@ -1,0 +1,366 @@
+@import "tailwindcss";
+
+/* =============================================================================
+   ROWE · Sistema de diseño
+   Tokens extraídos de design/*.dc.html (mezcla 1a + 1b + 1c, Turno 2).
+   El rojo REC es el ÚNICO color fuerte.
+   ============================================================================= */
+
+@theme {
+  /* Color */
+  --color-ink: #0a0a0a;        /* fondo */
+  --color-bone: #edeae4;       /* texto principal, botón primario */
+  --color-white: #ffffff;      /* hover del primario */
+  --color-muted: #8a8780;      /* texto secundario (AA sobre ink) */
+  --color-dim: #6b6862;        /* placeholders, metadatos tenues */
+  --color-ghost: #4a4844;      /* decorativo / palabras sin iluminar */
+  --color-rec: #ff3b1f;        /* REC: único acento */
+  --color-surface: #121212;
+  --color-surface-2: #1a1a1a;
+  --color-surface-3: #161616;
+  --color-monitor: #0e0e0e;
+  --color-deep: #050505;
+  --color-canvas: #1f1e1c;
+  --color-ph: #171615;         /* placeholders de imagen/vídeo (cálidos) */
+  --color-ph-2: #1c1b19;
+  --color-ph-3: #2b2a27;
+  --color-line-faint: rgb(237 234 228 / 0.06);
+  --color-line-soft: rgb(237 234 228 / 0.08);
+  --color-line: rgb(237 234 228 / 0.10);
+  --color-line-strong: rgb(237 234 228 / 0.14);
+  --color-line-input: rgb(237 234 228 / 0.18);
+  --color-line-dashed: rgb(237 234 228 / 0.25);
+  --color-line-cta: rgb(237 234 228 / 0.30);
+  --color-line-bright: rgb(237 234 228 / 0.70);
+
+  /* Tipografía (next/font define las variables --font-*-src) */
+  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* Movimiento */
+  --ease-cut: cubic-bezier(0.76, 0, 0.24, 1);   /* cortes, cortinillas, rellenos */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);   /* respuestas a interacción */
+
+  /* Layout */
+  --spacing-gutter: 6vw;
+  --breakpoint-tablet: 834px;
+  --breakpoint-desk: 1440px;
+
+  --animate-rec: rec 1.6s ease-in-out infinite;
+  --animate-rec-fast: rec 0.8s ease-in-out infinite;
+  --animate-grain: grain 1s steps(5) infinite;
+  --animate-drawy: drawy 2.4s var(--ease-cut) infinite;
+  --animate-drawx: drawx 2.4s var(--ease-cut) infinite;
+  --animate-pulse-ring: pulse-ring 1.4s var(--ease-out) infinite;
+
+  @keyframes rec {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.22; }
+  }
+  @keyframes grain {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(-22px, 12px); }
+    40% { transform: translate(14px, -18px); }
+    60% { transform: translate(-8px, 24px); }
+    80% { transform: translate(18px, 6px); }
+    100% { transform: translate(0, 0); }
+  }
+  @keyframes drawy {
+    0% { transform: scaleY(0); transform-origin: top; }
+    45% { transform: scaleY(1); transform-origin: top; }
+    55% { transform: scaleY(1); transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+  @keyframes drawx {
+    0% { transform: scaleX(0); transform-origin: left; }
+    45% { transform: scaleX(1); transform-origin: left; }
+    55% { transform: scaleX(1); transform-origin: right; }
+    100% { transform: scaleX(0); transform-origin: right; }
+  }
+  @keyframes pulse-ring {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+    100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+   --------------------------------------------------------------------------- */
+@layer base {
+  html {
+    background: var(--color-ink);
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+  ::selection {
+    background: var(--color-bone);
+    color: var(--color-ink);
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  /* Foco visible del diseño: 2 px, separación 4 px */
+  :focus-visible {
+    outline: 2px solid var(--color-bone);
+    outline-offset: 4px;
+  }
+  /* Cursiva serif en titulares: *texto* → <em> */
+  em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-dim);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Utilidades del sistema
+   --------------------------------------------------------------------------- */
+
+/* Etiqueta monoespaciada en mayúsculas (Escena 00, timecodes, metadatos) */
+@utility label-mono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+/* Titular editorial (1c): sans 300 con cursiva serif más grande */
+@utility headline {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  & em {
+    font-size: 1.1em;
+    letter-spacing: -0.015em;
+  }
+}
+
+/* Titular serif (1a) */
+@utility headline-serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 0.95;
+}
+
+/* Placeholder de imagen/vídeo: rayado cálido del diseño */
+@utility media-placeholder {
+  background-color: var(--color-ph);
+  background-image:
+    radial-gradient(ellipse 55% 75% at 28% 42%, rgb(237 234 228 / 0.1), rgb(237 234 228 / 0) 70%),
+    repeating-linear-gradient(135deg, rgb(237 234 228 / 0.03) 0 1px, transparent 1px 14px);
+}
+
+/* Texto relleno con textura (RO del diseño, antes de mostrar el vídeo) */
+@utility text-textured {
+  background-color: var(--color-ph-3);
+  background-image:
+    radial-gradient(ellipse at 30% 40%, rgb(237 234 228 / 0.6), rgb(237 234 228 / 0.1) 70%),
+    repeating-linear-gradient(135deg, rgb(237 234 228 / 0.14) 0 2px, transparent 2px 9px);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility gutter-x {
+  padding-inline: var(--spacing-gutter);
+}
+
+/* Altura de pantalla estable en móvil (barra del navegador) */
+@utility h-screen-safe {
+  height: 100vh;
+  height: 100svh;
+}
+@utility min-h-screen-safe {
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+/* ---------------------------------------------------------------------------
+   Estados iniciales del movimiento.
+   html.motion-ready lo pone un script en línea ANTES de pintar (sin parpadeo).
+   Si el movimiento no arranca en 4 s, el script lo quita y todo se ve igualmente.
+   --------------------------------------------------------------------------- */
+html.motion-ready [data-reveal] {
+  opacity: 0;
+}
+html.motion-ready:not(.reduced) [data-hero-title] [data-line-inner] {
+  /* debajo de la máscara de la línea (clip-path con margen para cursivas y descendentes) */
+  transform: translateY(130%);
+}
+html.motion-ready:not(.reduced) [data-manifesto] [data-word] {
+  opacity: 0.28;
+}
+html.scroll-locked,
+html.scroll-locked body {
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------------------
+   Movimiento reducido: sin grano animado, parpadeos ni bucles decorativos.
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.15s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Cursor personalizado (src/components/chrome/Cursor.tsx)
+   --------------------------------------------------------------------------- */
+html.has-cursor,
+html.has-cursor * {
+  cursor: none !important;
+}
+.cursor-ring,
+.cursor-dot {
+  position: fixed;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  visibility: hidden;
+  will-change: transform;
+}
+.cursor-ring {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: -16px 0 0 -16px;
+  border: 1px solid var(--color-bone);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  transition:
+    width 0.25s var(--ease-out),
+    height 0.25s var(--ease-out),
+    margin 0.25s var(--ease-out),
+    background-color 0.25s,
+    border-radius 0.25s,
+    padding 0.25s;
+}
+.cursor-ring[data-mode="link"] {
+  width: 58px;
+  height: 58px;
+  margin: -29px 0 0 -29px;
+}
+.cursor-ring[data-mode="text"] {
+  width: 2px;
+  height: 28px;
+  margin: -14px 0 0 -1px;
+  border: 0;
+  border-radius: 0;
+  background: var(--color-bone);
+}
+.cursor-ring[data-mode="label"] {
+  width: auto;
+  height: 30px;
+  margin: -15px 0 0 0;
+  padding: 0 14px;
+  border: 0;
+  background: var(--color-bone);
+  translate: -50% 0;
+}
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--color-bone);
+  transition: background-color 0.2s, opacity 0.2s;
+}
+.cursor-ring[data-mode="link"] ~ .cursor-dot,
+.cursor-ring[data-mode="text"] ~ .cursor-dot,
+.cursor-ring[data-mode="label"] ~ .cursor-dot {
+  opacity: 0 !important;
+}
+/* Modo REC: dentro de «Hablemos» el punto es rojo (sin mezcla de diferencia para que se vea rojo) */
+.cursor-dot[data-rec="1"] {
+  background: var(--color-rec);
+}
+
+/* Halo de luz que sigue al ratón: muy sutil, solo con cursor activo */
+.cursor-halo {
+  display: none;
+}
+html.has-cursor .cursor-halo {
+  display: block;
+  background: radial-gradient(560px circle at var(--mx, 50%) var(--my, 30%), rgb(237 234 228 / 0.045), transparent 62%);
+}
+
+/* Aviso (toast) del diseño */
+.toast-in {
+  animation: toast-in 0.5s var(--ease-out) both;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Preloader: red de seguridad sin JavaScript. Si los scripts no llegan a cargar (red lenta,
+   bloqueo del navegador…), el preloader se retira solo a los 8 s y deja ver la web. Con
+   JavaScript (lo normal) ya se ha ido antes y este CSS no llega a actuar.
+   La animación crea un contexto de apilamiento propio en este contenedor, así que la capa
+   (fija, a pantalla completa y por encima de la web) tiene que ser el propio contenedor:
+   si no, la cabecera y el vídeo del inicio se pintarían por encima del negro. */
+.rowe-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  animation: preloader-failsafe 0.6s ease 8s forwards;
+}
+@keyframes preloader-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+/* Preloader: solo en la primera visita de la sesión (el script en línea marca html.intro-seen) */
+html.intro-seen .rowe-preloader,
+html.reduced .rowe-preloader {
+  display: none;
+}
+
+/* Cabecera con fondo al salir del inicio (diseño: rgba(10,10,10,.72) + desenfoque) */
+.header-solid {
+  background-color: rgb(10 10 10 / 0.72);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+/* Panel: esqueleto de carga */
+@keyframes skel {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}

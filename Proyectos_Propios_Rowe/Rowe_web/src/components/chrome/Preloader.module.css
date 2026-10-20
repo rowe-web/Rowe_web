@@ -1,0 +1,48 @@
+/* Preloader · etiqueta de código < ROWE /> y registro de build */
+
+/* Los corchetes se abren desde el logo, como un marco de render */
+.open,
+.close {
+  display: inline-block;
+  animation: bracket 0.9s var(--ease-cut) 0.15s both;
+}
+.open {
+  --from: 0.35em;
+}
+.close {
+  --from: -0.35em;
+}
+@keyframes bracket {
+  from {
+    opacity: 0;
+    transform: translateX(var(--from));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Cursor de terminal */
+.caret {
+  display: inline-block;
+  animation: caret 1s steps(1) infinite;
+}
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Cada línea nueva se «teclea» (el script reinicia la animación al cambiar de línea) */
+.step {
+  animation: type 0.55s steps(22) both;
+}
+@keyframes type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}

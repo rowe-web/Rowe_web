@@ -1,0 +1,323 @@
+/* Fig. 01 del hero · animación del proceso ROWE (web → contenido → tráfico).
+   Ciclo de 9 s, tres planos de 3 s con corte seco. Tamaños relativos al marco (cqw). */
+.root {
+  container-type: inline-size;
+  --cycle: 9s;
+  --line: rgb(237 234 228 / 0.14);
+  --fill: rgb(237 234 228 / 0.1);
+  --fill-strong: rgb(237 234 228 / 0.24);
+}
+.shot {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: shot var(--cycle) steps(1, end) infinite;
+  animation-delay: var(--d);
+}
+.s1 { --d: 0s; }
+.s2 { --d: -6s; }
+.s3 { --d: -3s; }
+@keyframes shot {
+  0% { opacity: 1; }
+  33.333%, 100% { opacity: 0; }
+}
+
+/* Bloques que se montan dentro de su plano */
+.g {
+  animation-duration: var(--cycle);
+  animation-iteration-count: infinite;
+  animation-timing-function: var(--ease-cut);
+  animation-fill-mode: both;
+  animation-delay: var(--d);
+}
+.page .g[data-i="0"] { animation-name: gx0; }
+.chart .g[data-i="0"] { animation-name: gy0; }
+.page .g[data-i="1"] { animation-name: gx1; }
+.chart .g[data-i="1"] { animation-name: gy1; }
+.page .g[data-i="2"] { animation-name: gx2; }
+.chart .g[data-i="2"] { animation-name: gy2; }
+.page .g[data-i="3"] { animation-name: gx3; }
+.chart .g[data-i="3"] { animation-name: gy3; }
+.page .g[data-i="4"] { animation-name: gx4; }
+.chart .g[data-i="4"] { animation-name: gy4; }
+.page .g[data-i="5"] { animation-name: gx5; }
+.chart .g[data-i="5"] { animation-name: gy5; }
+.page .g[data-i="6"] { animation-name: gx6; }
+.chart .g[data-i="6"] { animation-name: gy6; }
+@keyframes gx0 { 0%, 0.0% { transform: scaleX(0); } 7.0%, 100% { transform: scaleX(1); } }
+@keyframes gy0 { 0%, 0.0% { transform: scaleY(0); } 7.0%, 100% { transform: scaleY(1); } }
+@keyframes gx1 { 0%, 1.6% { transform: scaleX(0); } 8.6%, 100% { transform: scaleX(1); } }
+@keyframes gy1 { 0%, 1.6% { transform: scaleY(0); } 8.6%, 100% { transform: scaleY(1); } }
+@keyframes gx2 { 0%, 3.2% { transform: scaleX(0); } 10.2%, 100% { transform: scaleX(1); } }
+@keyframes gy2 { 0%, 3.2% { transform: scaleY(0); } 10.2%, 100% { transform: scaleY(1); } }
+@keyframes gx3 { 0%, 4.8% { transform: scaleX(0); } 11.8%, 100% { transform: scaleX(1); } }
+@keyframes gy3 { 0%, 4.8% { transform: scaleY(0); } 11.8%, 100% { transform: scaleY(1); } }
+@keyframes gx4 { 0%, 6.4% { transform: scaleX(0); } 13.4%, 100% { transform: scaleX(1); } }
+@keyframes gy4 { 0%, 6.4% { transform: scaleY(0); } 13.4%, 100% { transform: scaleY(1); } }
+@keyframes gx5 { 0%, 8.0% { transform: scaleX(0); } 15.0%, 100% { transform: scaleX(1); } }
+@keyframes gy5 { 0%, 8.0% { transform: scaleY(0); } 15.0%, 100% { transform: scaleY(1); } }
+@keyframes gx6 { 0%, 9.6% { transform: scaleX(0); } 16.6%, 100% { transform: scaleX(1); } }
+@keyframes gy6 { 0%, 9.6% { transform: scaleY(0); } 16.6%, 100% { transform: scaleY(1); } }
+
+.label {
+  position: absolute;
+  left: 8%;
+  bottom: calc(6% + 6cqw);
+  font-family: var(--font-mono);
+  font-size: max(8px, 4.2cqw);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-bone);
+  white-space: nowrap;
+}
+
+/* 01 · Web */
+.browser {
+  position: absolute;
+  left: 9%;
+  right: 9%;
+  top: 12%;
+  height: 58%;
+  border: 1px solid var(--line);
+  background: var(--color-monitor);
+  overflow: hidden;
+}
+.chrome {
+  display: flex;
+  align-items: center;
+  gap: 1.6cqw;
+  height: 8cqw;
+  padding: 0 3cqw;
+  border-bottom: 1px solid var(--line);
+}
+.chrome span {
+  width: 1.8cqw;
+  height: 1.8cqw;
+  border-radius: 50%;
+  background: var(--fill-strong);
+}
+.chrome i {
+  margin-left: auto;
+  margin-right: auto;
+  width: 34%;
+  height: 3.2cqw;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+}
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 2.2cqw;
+  padding: 5cqw 6cqw 0;
+}
+.page b,
+.page em {
+  display: block;
+  transform-origin: left;
+  border-radius: 1px;
+}
+.page b { height: 4.6cqw; background: var(--fill-strong); }
+.page em { height: 1.8cqw; background: var(--fill); }
+.btn {
+  display: block;
+  width: 22cqw;
+  height: 5cqw;
+  margin-top: 1cqw;
+  border-radius: 99px;
+  background: rgb(237 234 228 / 0.5);
+  transform-origin: left;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2cqw;
+  margin-top: 2cqw;
+}
+.cards span {
+  aspect-ratio: 4 / 3;
+  background: var(--fill);
+  border: 1px solid var(--line);
+  transform-origin: left;
+}
+.code {
+  position: absolute;
+  right: 9%;
+  top: 73%;
+  display: flex;
+  align-items: center;
+  gap: 1cqw;
+  font-family: var(--font-mono);
+  font-size: max(9px, 5cqw);
+  /* </> con aire entre los caracteres (igual en el menú: MenuPreview) */
+  letter-spacing: 0.24em;
+  color: var(--color-muted);
+}
+.caret {
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  background: var(--color-bone);
+  animation: caret 1s steps(1) infinite;
+}
+@keyframes caret {
+  50% { opacity: 0; }
+}
+
+/* 02 · Contenido vertical 9:16 */
+.vertical {
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  height: 64%;
+  aspect-ratio: 9 / 16;
+  translate: -50% 0;
+  border: 1px solid rgb(237 234 228 / 0.3);
+  background: var(--color-surface-2) repeating-linear-gradient(135deg, rgb(237 234 228 / 0.06) 0 1px, transparent 1px 6px);
+  animation: push var(--cycle) linear infinite;
+  animation-delay: var(--d);
+}
+@keyframes push {
+  0% { transform: scale(1.08); }
+  33.333%, 100% { transform: scale(1); }
+}
+.rec,
+.ratio {
+  position: absolute;
+  top: 5cqw;
+  display: flex;
+  align-items: center;
+  gap: 1.2cqw;
+  font-family: var(--font-mono);
+  font-size: max(7px, 3.4cqw);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.rec { left: 4cqw; color: var(--color-bone); }
+.ratio { right: 4cqw; color: var(--color-muted); }
+.play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -35% -50%;
+  border-style: solid;
+  border-width: 4.5cqw 0 4.5cqw 7.5cqw;
+  border-color: transparent transparent transparent rgb(237 234 228 / 0.85);
+}
+.scrub {
+  position: absolute;
+  left: 4cqw;
+  right: 4cqw;
+  bottom: 5cqw;
+  height: 1px;
+  background: rgb(237 234 228 / 0.2);
+}
+.scrub span {
+  position: absolute;
+  inset: 0;
+  background: var(--color-bone);
+  transform-origin: left;
+  animation: seg1 var(--cycle) linear infinite;
+  animation-delay: var(--d);
+}
+
+/* 03 · Tráfico */
+.chart {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 22%;
+  bottom: 30%;
+  display: flex;
+  align-items: flex-end;
+  gap: 3cqw;
+  border-bottom: 1px solid rgb(237 234 228 / 0.3);
+}
+.chart .g {
+  flex: 1;
+  background: var(--fill-strong);
+  transform-origin: bottom;
+}
+.chart .g:last-of-type { background: rgb(237 234 228 / 0.7); }
+.trend {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.trend path {
+  fill: none;
+  stroke: var(--color-bone);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+  animation: draw var(--cycle) var(--ease-cut) infinite;
+  animation-delay: var(--d);
+}
+@keyframes draw {
+  0%, 6% { stroke-dashoffset: 1; }
+  22%, 100% { stroke-dashoffset: 0; }
+}
+.arrow {
+  position: absolute;
+  right: 10%;
+  top: 7%;
+  width: 11cqw;
+  height: 11cqw;
+  color: var(--color-bone);
+}
+.labelArrow {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+}
+
+/* Barra de planos (tipo «historias») */
+.segs {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 6%;
+  display: flex;
+  gap: 2cqw;
+}
+.segs > span {
+  position: relative;
+  flex: 1;
+  height: 1px;
+  background: rgb(237 234 228 / 0.2);
+}
+.segs > span > span {
+  position: absolute;
+  inset: 0;
+  background: var(--color-bone);
+  transform-origin: left;
+  animation: var(--cycle) linear infinite;
+}
+.seg1 { animation-name: seg1 !important; }
+.seg2 { animation-name: seg2 !important; }
+.seg3 { animation-name: seg3 !important; }
+@keyframes seg1 {
+  0% { transform: scaleX(0); }
+  33.333%, 100% { transform: scaleX(1); }
+}
+@keyframes seg2 {
+  0%, 33.333% { transform: scaleX(0); }
+  66.666%, 100% { transform: scaleX(1); }
+}
+@keyframes seg3 {
+  0%, 66.666% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+/* Movimiento reducido: plano 01 fijo y completo */
+@media (prefers-reduced-motion: reduce) {
+  .root *,
+  .root path {
+    animation: none !important;
+  }
+  .s1 { opacity: 1; }
+  .seg1 { transform: scaleX(1); }
+  .segs > span > span:not(.seg1) { transform: scaleX(0); }
+  .trend path { stroke-dashoffset: 0; }
+}

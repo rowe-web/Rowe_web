@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<title>ROWE — Direcciones de arte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Inter+Tight:wght@300;400;500&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#1F1E1C;-webkit-font-smoothing:antialiased}
+a{color:#EDEAE4;text-decoration:none}a:hover{color:#FFFFFF}
+@keyframes rec{0%,100%{opacity:1}50%{opacity:.22}}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-22px,12px)}40%{transform:translate(14px,-18px)}60%{transform:translate(-8px,24px)}80%{transform:translate(18px,6px)}100%{transform:translate(0,0)}}
+@keyframes drawy{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@keyframes drawx{0%{transform:scaleX(0);transform-origin:left}45%{transform:scaleX(1);transform-origin:left}55%{transform:scaleX(1);transform-origin:right}100%{transform:scaleX(0);transform-origin:right}}
+@keyframes pulse{0%{transform:translate(-50%,-50%) scale(1);opacity:.7}100%{transform:translate(-50%,-50%) scale(2.2);opacity:0}}
+</style>
+</helmet>
+<section data-screen-label="Turno 2 — Nuevas escenas" style="padding:120px 120px 0;display:flex;flex-direction:column;gap:28px;width:max-content;font-family:'Inter Tight',sans-serif;color:#EDEAE4">
+  <div style="font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Turno 2 · Mezcla de 1a + 1b + 1c</div>
+  <div style="font-family:'Instrument Serif',serif;font-size:72px;line-height:0.95">Presupuesto, Hablemos <em>y panel</em></div>
+  <div style="display:flex;gap:16px">
+    <a href="ROWE Presupuesto.dc.html" style="border:1px solid rgba(237,234,228,0.3);border-radius:999px;padding:14px 24px;font-size:17px">Escenas 09 + 10 — Presupuesto y Hablemos →</a>
+    <a href="ROWE Admin.dc.html" style="border:1px solid rgba(237,234,228,0.3);border-radius:999px;padding:14px 24px;font-size:17px">Panel de administración →</a>
+  </div>
+</section>
+<section data-screen-label="Turno 1 — Direcciones" style="padding:120px 120px 240px;display:flex;flex-direction:column;gap:120px;width:max-content;font-family:'Inter Tight',sans-serif;color:#EDEAE4">
+  <div style="display:flex;flex-direction:column;gap:24px;max-width:980px">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">ROWE — Web &amp; Audiovisual · Turno 1</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:88px;line-height:0.95;letter-spacing:-0.01em">Tres direcciones para el Hero <em>y la Escena 01</em></div>
+    <div style="font-size:19px;line-height:1.6;color:#8A8780;max-width:760px;text-wrap:pretty">Misma paleta, tipografía y concepto. Cambia la puesta en escena: <a href="#1a" style="color:#EDEAE4;border-bottom:1px solid rgba(237,234,228,0.3)">1a</a> Sala de cine, <a href="#1b" style="color:#EDEAE4;border-bottom:1px solid rgba(237,234,228,0.3)">1b</a> Mesa de montaje, <a href="#1c" style="color:#EDEAE4;border-bottom:1px solid rgba(237,234,228,0.3)">1c</a> Editorial. Cada una incluye Hero y Escena 01 en desktop y móvil, botones y cursor. Imágenes y vídeos son placeholders para sustituir.</div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:200px;align-items:flex-start">
+
+    <!-- ============ 1a SALA DE CINE ============ -->
+    <div id="1a" style="display:flex;flex-direction:column;gap:56px;width:1890px">
+      <div style="display:flex;align-items:flex-end;gap:28px;border-bottom:1px solid rgba(237,234,228,0.14);padding-bottom:28px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;color:#0A0A0A;background:#EDEAE4;padding:6px 12px">1a</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:72px;line-height:0.9">Sala de cine</div>
+        <div style="font-size:17px;line-height:1.5;color:#8A8780;max-width:640px;padding-bottom:6px">Negro absoluto y la pantalla como único foco. Vídeo en letterbox 2.39:1, titular serif centrado; todo lo demás se retira.</div>
+      </div>
+
+      <div style="display:flex;gap:60px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Hero · Desktop 1440</div>
+          <div data-screen-label="1a Hero desktop" style="position:relative;width:1440px;height:900px;background:#0A0A0A;overflow:hidden">
+            <div style="position:absolute;left:0;right:0;top:149px;height:602px;overflow:hidden">
+              <div style="position:absolute;inset:0;background-color:#171615;background-image:radial-gradient(ellipse 55% 75% at 24% 42%, rgba(237,234,228,0.10), rgba(237,234,228,0) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.03) 0px, rgba(237,234,228,0.03) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 14px)"></div>
+              <div style="position:absolute;inset:0;background:rgba(10,10,10,0.5)"></div>
+              <div style="position:absolute;left:86px;top:32px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Escena 00 — Hero</div>
+              <div style="position:absolute;left:86px;bottom:30px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">[ Vídeo · Showreel en loop · 2.39:1 · sustituir ]</div>
+              <div style="position:absolute;right:86px;bottom:30px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Sonido off</div>
+              <div style="position:absolute;left:24px;top:24px;width:24px;height:24px;border-left:1px solid rgba(237,234,228,0.8);border-top:1px solid rgba(237,234,228,0.8)"></div>
+              <div style="position:absolute;right:24px;top:24px;width:24px;height:24px;border-right:1px solid rgba(237,234,228,0.8);border-top:1px solid rgba(237,234,228,0.8)"></div>
+              <div style="position:absolute;left:24px;bottom:24px;width:24px;height:24px;border-left:1px solid rgba(237,234,228,0.8);border-bottom:1px solid rgba(237,234,228,0.8)"></div>
+              <div style="position:absolute;right:24px;bottom:24px;width:24px;height:24px;border-right:1px solid rgba(237,234,228,0.8);border-bottom:1px solid rgba(237,234,228,0.8)"></div>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+                <div style="font-family:'Instrument Serif',serif;font-size:128px;line-height:0.95;letter-spacing:-0.015em;text-align:center;color:#EDEAE4">Que te vean.<br>Que confíen.<br>Que te <em>elijan.</em></div>
+              </div>
+              <div style="position:absolute;left:1060px;top:440px;display:flex;align-items:center;gap:8px;background:#EDEAE4;color:#0A0A0A;border-radius:999px;padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase">▶ Showreel</div>
+            </div>
+            <div style="position:absolute;left:86px;right:86px;top:0;height:149px;display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px"><img src="assets/rowe-logo-blanco.png" alt="ROWE" style="height:20px;display:block"><div data-rec="1" style="width:8px;height:8px;border-radius:50%;background:#FF3B1F;animation:rec 1.6s ease-in-out infinite"></div></div>
+              <div data-tc="1" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;color:#8A8780">00:00:12:08</div>
+              <div style="display:flex;align-items:center;gap:28px;font-size:14px"><div>Menú</div><div style="border:1px solid rgba(237,234,228,0.3);border-radius:999px;padding:10px 20px">Hablemos</div></div>
+            </div>
+            <div style="position:absolute;left:410px;width:620px;top:770px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px">
+              <div style="font-size:15px;line-height:1.6;color:#8A8780">Estudio boutique de web y audiovisual para empresas y negocios que quieren verse profesionales en internet y conseguir más clientes.</div>
+              <div style="display:flex;align-items:center;gap:32px">
+                <div style="height:46px;display:flex;align-items:center;padding:0 26px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:14px;font-weight:500">Pide tu propuesta</div>
+                <div style="display:flex;gap:10px;font-size:14px;padding-bottom:3px;border-bottom:1px solid rgba(237,234,228,0.3)"><span>Ver proyectos</span><span>→</span></div>
+              </div>
+            </div>
+            <div style="position:absolute;left:86px;bottom:36px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;line-height:1.8;color:#8A8780">RO — RODAJE<br>WE — WEB</div>
+            <div style="position:absolute;right:86px;bottom:36px;display:flex;align-items:flex-end;gap:12px"><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Desliza</div><div style="width:1px;height:40px;background:#EDEAE4;animation:drawy 2.4s cubic-bezier(0.76,0,0.24,1) infinite"></div></div>
+            <div data-grain="1" style="position:absolute;inset:-60px;pointer-events:none;z-index:40;opacity:0.07;animation:grain 1s steps(5) infinite"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Hero · Móvil 390</div>
+          <div data-screen-label="1a Hero móvil" style="position:relative;width:390px;height:844px;background:#0A0A0A;overflow:hidden">
+            <div style="position:absolute;left:20px;right:20px;top:0;height:64px;display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:9px"><img src="assets/rowe-logo-blanco.png" alt="ROWE" style="height:15px;display:block"><div data-rec="1" style="width:6px;height:6px;border-radius:50%;background:#FF3B1F;animation:rec 1.6s ease-in-out infinite"></div></div>
+              <div style="height:44px;display:flex;align-items:center;font-size:15px">Menú</div>
+            </div>
+            <div style="position:absolute;left:20px;right:20px;top:132px;font-family:'Instrument Serif',serif;font-size:54px;line-height:0.95;text-align:center;letter-spacing:-0.01em">Que te vean.<br>Que confíen.<br>Que te <em>elijan.</em></div>
+            <div style="position:absolute;left:0;right:0;top:330px;height:163px;overflow:hidden">
+              <div style="position:absolute;inset:0;background-color:#171615;background-image:radial-gradient(ellipse 55% 75% at 24% 42%, rgba(237,234,228,0.10), rgba(237,234,228,0) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.03) 0px, rgba(237,234,228,0.03) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 14px)"></div>
+              <div style="position:absolute;inset:0;background:rgba(10,10,10,0.3)"></div>
+              <div style="position:absolute;left:10px;top:10px;width:14px;height:14px;border-left:1px solid rgba(237,234,228,0.7);border-top:1px solid rgba(237,234,228,0.7)"></div>
+              <div style="position:absolute;right:10px;top:10px;width:14px;height:14px;border-right:1px solid rgba(237,234,228,0.7);border-top:1px solid rgba(237,234,228,0.7)"></div>
+              <div style="position:absolute;left:10px;bottom:10px;width:14px;height:14px;border-left:1px solid rgba(237,234,228,0.7);border-bottom:1px solid rgba(237,234,228,0.7)"></div>
+              <div style="position:absolute;right:10px;bottom:10px;width:14px;height:14px;border-right:1px solid rgba(237,234,228,0.7);border-bottom:1px solid rgba(237,234,228,0.7)"></div>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">[ Showreel · 2.39:1 ]</div>
+              <div style="position:absolute;right:16px;bottom:14px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Sonido off</div>
+            </div>
+            <div style="position:absolute;left:28px;right:28px;top:524px;font-size:15px;line-height:1.6;color:#8A8780;text-align:center">Estudio boutique de web y audiovisual para empresas y negocios que quieren verse profesionales en internet y conseguir más clientes.</div>
+            <div style="position:absolute;left:20px;right:20px;top:660px;display:flex;flex-direction:column;align-items:center;gap:18px">
+              <div style="align-self:stretch;height:52px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:15px;font-weight:500">Pide tu propuesta</div>
+              <div style="display:flex;gap:10px;font-size:15px;padding-bottom:3px;border-bottom:1px solid rgba(237,234,228,0.3)"><span>Ver proyectos</span><span>→</span></div>
+            </div>
+            <div style="position:absolute;left:20px;bottom:24px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;line-height:1.8;color:#8A8780">RO — RODAJE<br>WE — WEB</div>
+            <div style="position:absolute;right:20px;bottom:24px;display:flex;align-items:flex-end;gap:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Desliza</div><div style="width:1px;height:32px;background:#EDEAE4;animation:drawy 2.4s cubic-bezier(0.76,0,0.24,1) infinite"></div></div>
+            <div data-grain="1" style="position:absolute;inset:-60px;pointer-events:none;z-index:40;opacity:0.07;animation:grain 1s steps(5) infinite"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:60px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Escena 01 · Desktop 1440 · revelado a mitad de scroll · hover en «RO»</div>
+          <div data-screen-label="1a Escena 01 desktop" style="position:relative;width:1440px;height:900px;background:#0A0A0A;overflow:hidden">
+            <div style="position:absolute;left:0;right:0;top:96px;display:flex;flex-direction:column;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase"><div style="color:#8A8780">Escena 01 — El estudio</div><div style="color:#4A4844">00:00:14:02</div></div>
+            <div style="position:absolute;left:180px;width:1080px;top:200px;font-family:'Instrument Serif',serif;font-size:58px;line-height:1.08;text-align:center;letter-spacing:-0.01em;text-wrap:pretty"><span style="color:#EDEAE4">Somos ROWE. Un estudio pequeño a propósito. Rodamos los vídeos que hacen que se fijen en ti</span> <span style="color:#4A4844">y construimos la web que hace que te elijan. Sin intermediarios, sin plantillas, sin procesos eternos.</span></div>
+            <div style="position:absolute;left:0;right:0;top:620px;display:flex;justify-content:center;align-items:flex-start;gap:40px;font-family:'Instrument Serif',serif">
+              <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 18px">
+                <div style="font-size:120px;line-height:0.9;background-color:#2B2A27;background-image:radial-gradient(ellipse at 30% 40%, rgba(237,234,228,0.6), rgba(237,234,228,0.1) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.14) 0px, rgba(237,234,228,0.14) 2px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 9px);-webkit-background-clip:text;background-clip:text;color:transparent">RO</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#EDEAE4">Rodaje</div>
+                <div style="position:absolute;left:0;top:0;width:14px;height:14px;border-left:1px solid rgba(237,234,228,0.7);border-top:1px solid rgba(237,234,228,0.7)"></div>
+                <div style="position:absolute;right:0;top:0;width:14px;height:14px;border-right:1px solid rgba(237,234,228,0.7);border-top:1px solid rgba(237,234,228,0.7)"></div>
+                <div style="position:absolute;left:0;bottom:0;width:14px;height:14px;border-left:1px solid rgba(237,234,228,0.7);border-bottom:1px solid rgba(237,234,228,0.7)"></div>
+                <div style="position:absolute;right:0;bottom:0;width:14px;height:14px;border-right:1px solid rgba(237,234,228,0.7);border-bottom:1px solid rgba(237,234,228,0.7)"></div>
+              </div>
+              <div style="font-size:72px;line-height:1.5;color:#4A4844;padding-top:8px">+</div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 18px"><div style="font-size:120px;line-height:0.9">WE</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Web</div></div>
+              <div style="font-size:72px;line-height:1.5;color:#4A4844;padding-top:8px">=</div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 18px"><div style="font-size:120px;line-height:0.9;font-style:italic">ROWE</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Web &amp; Audiovisual</div></div>
+            </div>
+            <div style="position:absolute;left:0;right:0;top:830px;display:flex;justify-content:center;gap:56px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><div><span style="color:#EDEAE4">2</span> disciplinas</div><div><span style="color:#EDEAE4">1</span> equipo</div><div><span style="color:#EDEAE4">0</span> plantillas</div></div>
+            <div data-grain="1" style="position:absolute;inset:-60px;pointer-events:none;z-index:40;opacity:0.07;animation:grain 1s steps(5) infinite"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Escena 01 · Móvil 390</div>
+          <div data-screen-label="1a Escena 01 móvil" style="position:relative;width:390px;height:844px;background:#0A0A0A;overflow:hidden">
+            <div style="position:absolute;left:0;right:0;top:64px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Escena 01 — El estudio</div>
+            <div style="position:absolute;left:24px;right:24px;top:116px;font-family:'Instrument Serif',serif;font-size:33px;line-height:1.1;text-align:center;text-wrap:pretty"><span style="color:#EDEAE4">Somos ROWE. Un estudio pequeño a propósito. Rodamos los vídeos que hacen que se fijen en ti</span> <span style="color:#4A4844">y construimos la web que hace que te elijan. Sin intermediarios, sin plantillas, sin procesos eternos.</span></div>
+            <div style="position:absolute;left:0;right:0;top:536px;display:flex;flex-direction:column;align-items:center;gap:18px;font-family:'Instrument Serif',serif">
+              <div style="display:flex;align-items:flex-start;gap:20px">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="font-size:68px;line-height:0.9;background-color:#2B2A27;background-image:radial-gradient(ellipse at 30% 40%, rgba(237,234,228,0.6), rgba(237,234,228,0.1) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.14) 0px, rgba(237,234,228,0.14) 2px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 9px);-webkit-background-clip:text;background-clip:text;color:transparent">RO</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#EDEAE4">Rodaje</div></div>
+                <div style="font-size:44px;line-height:1.3;color:#4A4844">+</div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><div style="font-size:68px;line-height:0.9">WE</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Web</div></div>
+              </div>
+              <div style="font-size:68px;line-height:0.9;font-style:italic">ROWE</div>
+            </div>
+            <div style="position:absolute;left:0;right:0;top:770px;display:flex;justify-content:center;gap:20px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><div><span style="color:#EDEAE4">2</span> disciplinas</div><div><span style="color:#EDEAE4">1</span> equipo</div><div><span style="color:#EDEAE4">0</span> plantillas</div></div>
+            <div data-grain="1" style="position:absolute;inset:-60px;pointer-events:none;z-index:40;opacity:0.07;animation:grain 1s steps(5) infinite"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Botones y cursor</div>
+        <div data-screen-label="1a Componentes" style="background:#0A0A0A;padding:56px 64px 64px;display:grid;grid-template-columns:900px minmax(0,1fr);gap:80px">
+          <div style="display:flex;flex-direction:column;gap:44px">
+            <div style="display:flex;gap:36px;align-items:flex-start">
+              <div style="display:flex;flex-direction:column;gap:14px"><div style="height:52px;display:flex;align-items:center;padding:0 30px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:15px;font-weight:500">Pide tu propuesta</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Primario · default</div></div>
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="position:relative;height:52px;display:flex;align-items:center;padding:0 30px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:15px;font-weight:500;overflow:hidden">
+                  <div style="position:absolute;left:28%;top:85%;width:150px;height:150px;border-radius:50%;background:#FFFFFF;transform:translate(-50%,-50%)"></div>
+                  <div style="position:relative;height:20px;line-height:20px;overflow:hidden"><div style="transform:translateY(-10px)">Pide tu propuesta</div><div style="transform:translateY(-10px)">Pide tu propuesta</div></div>
+                  <div style="position:absolute;left:28%;top:85%;width:6px;height:6px;border-radius:50%;background:#0A0A0A;transform:translate(-50%,-50%)"></div>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Hover · relleno + rodillo</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="position:relative">
+                  <div style="position:absolute;inset:0;border:1px dashed rgba(237,234,228,0.25);border-radius:999px"></div>
+                  <div style="position:relative;transform:translate(5px,-4px);height:52px;display:flex;align-items:center;padding:0 30px;border-radius:999px;background:#FFFFFF;color:#0A0A0A;font-size:15px;font-weight:500">Pide tu propuesta</div>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Hover · final, magnético ±6px</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px"><div style="height:52px;display:flex;align-items:center;padding:0 30px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:15px;font-weight:500;outline:2px solid #EDEAE4;outline-offset:4px">Pide tu propuesta</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Focus · 2px, offset 4px</div></div>
+            </div>
+            <div style="display:flex;gap:44px;align-items:flex-start">
+              <div style="display:flex;flex-direction:column;gap:14px"><div style="height:52px;display:flex;align-items:center;gap:12px;padding:0 26px;border-radius:999px;border:1px solid rgba(237,234,228,0.3);font-size:15px"><div style="width:8px;height:8px;border-radius:50%;background:#FF3B1F"></div>Pide tu propuesta</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">REC · default</div></div>
+              <div style="display:flex;flex-direction:column;gap:14px"><div style="height:52px;display:flex;align-items:center;gap:12px;padding:0 26px;border-radius:999px;border:1px solid rgba(237,234,228,0.7);background:#121212;font-size:15px"><div style="position:relative;width:8px;height:8px"><div style="position:absolute;inset:0;border-radius:50%;background:#FF3B1F"></div><div style="position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;border:1px solid #FF3B1F;animation:pulse 1.4s cubic-bezier(0.22,1,0.36,1) infinite"></div></div>Pide tu propuesta</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">REC · hover, el punto late</div></div>
+              <div style="display:flex;flex-direction:column;gap:14px;padding-top:14px"><div style="display:flex;gap:10px;font-size:15px;padding-bottom:4px;border-bottom:1px solid rgba(237,234,228,0.3)"><span>Ver proyectos</span><span>→</span></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780;padding-top:12px">Secundario · default</div></div>
+              <div style="display:flex;flex-direction:column;gap:14px;padding-top:14px"><div style="position:relative;display:flex;gap:10px;font-size:15px;padding-bottom:4px;border-bottom:1px solid rgba(237,234,228,0.3)"><span>Ver proyectos</span><span style="transform:translateX(6px)">→</span><div style="position:absolute;left:0;bottom:-1px;width:62%;height:1px;background:#EDEAE4"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780;padding-top:12px">Secundario · hover</div></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,156px);gap:22px 16px;align-content:start">
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;background:#EDEAE4;transform:translate(-50%,-50%)"></div><div style="position:absolute;left:44%;top:44%;width:32px;height:32px;border-radius:50%;border:1px solid #EDEAE4;transform:translate(-50%,-50%)"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Base · lerp</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden;isolation:isolate"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px">Proyectos</div><div style="position:absolute;left:50%;top:50%;width:64px;height:64px;border-radius:50%;background:#EDEAE4;mix-blend-mode:difference;transform:translate(-50%,-50%)"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Enlace</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;overflow:hidden;background-color:#171615;background-image:repeating-linear-gradient(135deg, rgba(237,234,228,0.04) 0px, rgba(237,234,228,0.04) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 10px)"><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#EDEAE4;color:#0A0A0A;border-radius:999px;padding:8px 14px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;white-space:nowrap">▶ Ver</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Vídeo · ❚❚ Pausa</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;overflow:hidden;background-color:#171615;background-image:repeating-linear-gradient(135deg, rgba(237,234,228,0.04) 0px, rgba(237,234,228,0.04) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 10px)"><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#EDEAE4;color:#0A0A0A;border-radius:999px;padding:8px 14px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;white-space:nowrap">Ver proyecto</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Proyecto</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#EDEAE4;color:#0A0A0A;border-radius:999px;padding:8px 14px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;white-space:nowrap">Arrastra ←→</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Carrusel</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:16px;right:16px;top:42px;font-family:'Instrument Serif',serif;font-size:22px;line-height:1.1;color:#8A8780">Somos ROWE. Un estudio</div><div style="position:absolute;left:62%;top:40px;width:1px;height:28px;background:#EDEAE4"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Texto</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:50%;top:50%;width:6px;height:6px;border-radius:50%;background:#EDEAE4;transform:translate(-50%,-50%)"></div><div style="position:absolute;left:50%;top:50%;width:26px;height:26px;border-radius:50%;border:1px solid #EDEAE4;transform:translate(-50%,-50%)"></div><div style="position:absolute;left:50%;top:50%;width:26px;height:26px;border-radius:50%;border:1px solid #EDEAE4;animation:pulse 1.2s cubic-bezier(0.22,1,0.36,1) infinite"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Clic · pulso</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;background:#FF3B1F;transform:translate(-50%,-50%)"></div><div style="position:absolute;left:44%;top:44%;width:32px;height:32px;border-radius:50%;border:1px solid #EDEAE4;transform:translate(-50%,-50%)"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Modo REC · CTA final</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 1b MESA DE MONTAJE ============ -->
+    <div id="1b" style="display:flex;flex-direction:column;gap:56px;width:1890px">
+      <div style="display:flex;align-items:flex-end;gap:28px;border-bottom:1px solid rgba(237,234,228,0.14);padding-bottom:28px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;color:#0A0A0A;background:#EDEAE4;padding:6px 12px">1b</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:72px;line-height:0.9">Mesa de <em>montaje</em></div>
+        <div style="font-size:17px;line-height:1.5;color:#8A8780;max-width:680px;padding-bottom:6px">La sala de edición, reinterpretada. Visor con marcas de encuadre, timecode protagonista y una línea de tiempo con las dos pistas del estudio: RO y WE. Usa el titular alternativo.</div>
+      </div>
+
+      <div style="display:flex;gap:60px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Hero · Desktop 1440</div>
+          <div data-screen-label="1b Hero desktop" style="position:relative;width:1440px;height:900px;background:#0A0A0A;overflow:hidden">
+            <div style="position:absolute;left:0;right:0;top:0;height:64px;border-bottom:1px solid rgba(237,234,228,0.10);display:flex;align-items:center;justify-content:space-between;padding:0 86px">
+              <div style="display:flex;align-items:center;gap:20px"><div style="display:flex;align-items:center;gap:12px"><img src="assets/rowe-logo-blanco.png" alt="ROWE" style="height:18px;display:block"><div data-rec="1" style="width:8px;height:8px;border-radius:50%;background:#FF3B1F;animation:rec 1.6s ease-in-out infinite"></div></div><div style="width:1px;height:18px;background:rgba(237,234,228,0.10)"></div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Web &amp; Audiovisual</div></div>
+              <div style="display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;letter-spacing:0.12em"><span style="font-size:10px;color:#8A8780">TC</span><span data-tc="1" style="font-size:14px;color:#EDEAE4">00:00:12:08</span></div>
+              <div style="display:flex;align-items:center;gap:28px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase"><div>Menú</div><div style="border:1px solid rgba(237,234,228,0.3);border-radius:2px;padding:10px 16px">Hablemos</div></div>
+            </div>
+            <div style="position:absolute;left:86px;top:112px;display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Escena 00</span><span style="width:24px;height:1px;background:rgba(237,234,228,0.3)"></span><span>Hero</span></div>
+            <div style="position:absolute;left:86px;top:140px;width:580px;font-size:80px;line-height:0.95;letter-spacing:-0.03em;font-weight:300">Rodamos tu<br><em style="font-family:'Instrument Serif',serif;font-size:94px;letter-spacing:-0.01em">historia.</em><br>Construimos<br>tu <em style="font-family:'Instrument Serif',serif;font-size:94px;letter-spacing:-0.01em">web.</em></div>
+            <div style="position:absolute;left:86px;top:540px;width:440px;font-size:16px;line-height:1.6;color:#8A8780">Estudio boutique de web y audiovisual para empresas y negocios que quieren verse profesionales en internet y conseguir más clientes.</div>
+            <div style="position:absolute;left:86px;top:632px;display:flex;align-items:center;gap:28px">
+              <div style="height:46px;display:flex;align-items:center;padding:0 22px;border-radius:2px;background:#EDEAE4;color:#0A0A0A;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;font-weight:500">Pide tu propuesta</div>
+              <div style="display:flex;gap:10px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid rgba(237,234,228,0.3)"><span>Ver proyectos</span><span>→</span></div>
+            </div>
+            <div style="position:absolute;left:700px;top:112px;width:654px;height:368px;overflow:hidden;outline:1px solid rgba(237,234,228,0.10)">
+              <div style="position:absolute;inset:0;background-color:#171615;background-image:radial-gradient(ellipse 55% 75% at 30% 42%, rgba(237,234,228,0.11), rgba(237,234,228,0) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.03) 0px, rgba(237,234,228,0.03) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 14px)"></div>
+              <div style="position:absolute;inset:0;background:rgba(10,10,10,0.25)"></div>
+              <div style="position:absolute;left:0;right:0;top:47px;border-top:1px dashed rgba(237,234,228,0.22)"></div>
+              <div style="position:absolute;left:0;right:0;top:321px;border-top:1px dashed rgba(237,234,228,0.22)"></div>
+              <div style="position:absolute;left:319px;top:183px;width:16px;height:1px;background:rgba(237,234,228,0.5)"></div>
+              <div style="position:absolute;left:326px;top:176px;width:1px;height:16px;background:rgba(237,234,228,0.5)"></div>
+              <div style="position:absolute;left:14px;top:14px;width:22px;height:22px;border-left:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div>
+              <div style="position:absolute;right:14px;top:14px;width:22px;height:22px;border-right:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div>
+              <div style="position:absolute;left:14px;bottom:14px;width:22px;height:22px;border-left:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div>
+              <div style="position:absolute;right:14px;bottom:14px;width:22px;height:22px;border-right:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div>
+              <div style="position:absolute;left:46px;top:18px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#EDEAE4">PGM — Showreel_v12</div>
+              <div style="position:absolute;right:46px;top:18px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">2.39:1 · 25 fps</div>
+              <div style="position:absolute;left:46px;bottom:18px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">[ Vídeo · sustituir ]</div>
+              <div data-tc="1" style="position:absolute;right:46px;bottom:18px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;color:#EDEAE4">00:00:12:08</div>
+              <div style="position:absolute;left:440px;top:230px;background:#EDEAE4;color:#0A0A0A;border-radius:2px;padding:9px 14px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase">▶ Showreel</div>
+            </div>
+            <div style="position:absolute;left:700px;top:496px;width:654px;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#4A4844"><span>In 00:00:00:00</span><span>Out 00:01:24:00</span><span>Sonido off · R</span></div>
+            <div style="position:absolute;left:0;right:0;top:690px;bottom:0;background:#121212;border-top:1px solid rgba(237,234,228,0.10)">
+              <div style="position:absolute;left:0;right:0;top:0;height:28px;border-bottom:1px solid rgba(237,234,228,0.10)">
+                <div style="position:absolute;left:86px;top:0;line-height:28px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Secuencia · Home</div>
+                <div style="position:absolute;left:230px;top:0;height:28px;border-left:1px solid rgba(237,234,228,0.10);padding-left:6px;line-height:28px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;color:#4A4844">00:00</div>
+                <div style="position:absolute;left:380px;top:0;height:28px;border-left:1px solid rgba(237,234,228,0.10);padding-left:6px;line-height:28px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;color:#4A4844">00:05</div>
+                <div style="position:absolute;left:530px;top:0;height:28px;border-left:1px solid rgba(237,234,228,0.10);padding-left:6px;line-height:28px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;color:#4A4844">00:10</div>
+                <div style="position:absolute;left:680px;top:0;height:28px;border-left:1px solid rgba(237,234,228,0.10);padding-left:6px;line-height:28px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;color:#4A4844">00:15</div>
+                <div style="position:absolute;left:830px;top:0;height:28px;border-left:1px solid rgba(237,234,228,0.10);padding-left:6px;line-height:28px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;color:#4A4844">00:20</div>
+                <div style="position:absolute;left:980px;top:0;height:28px;border-left:1px solid rgba(237,234,228,0.10);padding-left:6px;line-height:28px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;color:#4A4844">00:25</div>
+                <div style="position:absolute;right:86px;top:0;height:28px;display:flex;align-items:center;gap:10px"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Desliza</span><span style="width:40px;height:1px;background:#EDEAE4;animation:drawx 2.4s cubic-bezier(0.76,0,0.24,1) infinite"></span></div>
+              </div>
+              <div style="position:absolute;left:0;right:0;top:28px;height:66px;border-bottom:1px solid rgba(237,234,228,0.10)">
+                <div style="position:absolute;left:86px;top:0;height:66px;display:flex;flex-direction:column;justify-content:center;gap:3px;font-family:'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase"><span style="font-size:12px">RO</span><span style="font-size:9px;color:#8A8780">Rodaje</span></div>
+                <div style="position:absolute;left:232px;top:9px;width:228px;height:48px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.14);border-radius:2px;display:flex;align-items:center;gap:10px;overflow:hidden"><div style="width:52px;height:100%;background-color:#242321;background-image:repeating-linear-gradient(135deg, rgba(237,234,228,0.06) 0px, rgba(237,234,228,0.06) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 6px)"></div><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#EDEAE4">Showreel_v12</span></div>
+                <div style="position:absolute;left:464px;top:9px;width:200px;height:48px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.14);border-radius:2px;display:flex;align-items:center;gap:10px;overflow:hidden"><div style="width:52px;height:100%;background-color:#242321;background-image:repeating-linear-gradient(135deg, rgba(237,234,228,0.06) 0px, rgba(237,234,228,0.06) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 6px)"></div><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Clinica_Mar</span></div>
+                <div style="position:absolute;left:668px;top:9px;width:250px;height:48px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.14);border-radius:2px;display:flex;align-items:center;gap:10px;overflow:hidden"><div style="width:52px;height:100%;background-color:#242321;background-image:repeating-linear-gradient(135deg, rgba(237,234,228,0.06) 0px, rgba(237,234,228,0.06) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 6px)"></div><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Brasa_reel_15s</span></div>
+                <div style="position:absolute;left:922px;top:9px;width:170px;height:48px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.14);border-radius:2px;display:flex;align-items:center;gap:10px;overflow:hidden"><div style="width:52px;height:100%;background-color:#242321;background-image:repeating-linear-gradient(135deg, rgba(237,234,228,0.06) 0px, rgba(237,234,228,0.06) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 6px)"></div><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Opticas_Luz</span></div>
+              </div>
+              <div style="position:absolute;left:0;right:0;top:94px;height:66px;border-bottom:1px solid rgba(237,234,228,0.10)">
+                <div style="position:absolute;left:86px;top:0;height:66px;display:flex;flex-direction:column;justify-content:center;gap:3px;font-family:'JetBrains Mono',monospace;letter-spacing:0.12em;text-transform:uppercase"><span style="font-size:12px">WE</span><span style="font-size:9px;color:#8A8780">Web</span></div>
+                <div style="position:absolute;left:232px;top:9px;width:180px;height:48px;border:1px solid rgba(237,234,228,0.3);border-radius:2px;display:flex;align-items:center;padding-left:12px;box-sizing:border-box;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#EDEAE4">Home.html</div>
+                <div style="position:absolute;left:416px;top:9px;width:210px;height:48px;border:1px solid rgba(237,234,228,0.14);border-radius:2px;display:flex;align-items:center;padding-left:12px;box-sizing:border-box;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Servicios</div>
+                <div style="position:absolute;left:630px;top:9px;width:240px;height:48px;border:1px solid rgba(237,234,228,0.14);border-radius:2px;display:flex;align-items:center;padding-left:12px;box-sizing:border-box;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Proyectos</div>
+                <div style="position:absolute;left:874px;top:9px;width:160px;height:48px;border:1px solid rgba(237,234,228,0.14);border-radius:2px;display:flex;align-items:center;padding-left:12px;box-sizing:border-box;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Contacto</div>
+              </div>
+              <div style="position:absolute;left:0;right:0;top:160px;bottom:0">
+                <div style="position:absolute;left:86px;top:0;bottom:0;display:flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">A1 · Ambiente</div>
+                <div style="position:absolute;left:232px;right:86px;top:50%;height:1px;background:rgba(237,234,228,0.14)"></div>
+              </div>
+              <div style="position:absolute;left:620px;top:0;bottom:0;width:1px;background:#EDEAE4"></div>
+              <div style="position:absolute;left:615px;top:0;width:11px;height:11px;background:#EDEAE4"></div>
+            </div>
+            <div data-grain="1" style="position:absolute;inset:-60px;pointer-events:none;z-index:40;opacity:0.07;animation:grain 1s steps(5) infinite"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Hero · Móvil 390</div>
+          <div data-screen-label="1b Hero móvil" style="position:relative;width:390px;height:844px;background:#0A0A0A;overflow:hidden">
+            <div style="position:absolute;left:0;right:0;top:0;height:56px;border-bottom:1px solid rgba(237,234,228,0.10);display:flex;align-items:center;justify-content:space-between;padding:0 20px">
+              <div style="display:flex;align-items:center;gap:9px"><img src="assets/rowe-logo-blanco.png" alt="ROWE" style="height:14px;display:block"><div data-rec="1" style="width:6px;height:6px;border-radius:50%;background:#FF3B1F;animation:rec 1.6s ease-in-out infinite"></div></div>
+              <div style="height:44px;display:flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase">Menú</div>
+            </div>
+            <div style="position:absolute;left:0;right:0;top:57px;height:219px;overflow:hidden">
+              <div style="position:absolute;inset:0;background-color:#171615;background-image:radial-gradient(ellipse 55% 75% at 30% 42%, rgba(237,234,228,0.11), rgba(237,234,228,0) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.03) 0px, rgba(237,234,228,0.03) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 14px)"></div>
+              <div style="position:absolute;left:0;right:0;top:28px;border-top:1px dashed rgba(237,234,228,0.22)"></div>
+              <div style="position:absolute;left:0;right:0;top:191px;border-top:1px dashed rgba(237,234,228,0.22)"></div>
+              <div style="position:absolute;left:10px;top:10px;width:14px;height:14px;border-left:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div>
+              <div style="position:absolute;right:10px;top:10px;width:14px;height:14px;border-right:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div>
+              <div style="position:absolute;left:10px;bottom:10px;width:14px;height:14px;border-left:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div>
+              <div style="position:absolute;right:10px;bottom:10px;width:14px;height:14px;border-right:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div>
+              <div style="position:absolute;left:32px;top:10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#EDEAE4">PGM — Showreel</div>
+              <div data-tc="1" style="position:absolute;right:32px;bottom:10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;color:#EDEAE4">00:00:12:08</div>
+              <div style="position:absolute;left:32px;bottom:10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Sonido off</div>
+            </div>
+            <div style="position:absolute;left:20px;top:300px;display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Escena 00</span><span style="width:18px;height:1px;background:rgba(237,234,228,0.3)"></span><span>Hero</span></div>
+            <div style="position:absolute;left:20px;right:20px;top:322px;font-size:50px;line-height:0.95;letter-spacing:-0.03em;font-weight:300">Rodamos tu<br><em style="font-family:'Instrument Serif',serif;font-size:58px;letter-spacing:-0.01em">historia.</em><br>Construimos<br>tu <em style="font-family:'Instrument Serif',serif;font-size:58px;letter-spacing:-0.01em">web.</em></div>
+            <div style="position:absolute;left:20px;right:20px;top:574px;font-size:15px;line-height:1.6;color:#8A8780">Estudio boutique de web y audiovisual para empresas y negocios que quieren verse profesionales en internet y conseguir más clientes.</div>
+            <div style="position:absolute;left:20px;right:20px;top:682px;display:flex;align-items:center;gap:20px">
+              <div style="flex:1;height:52px;display:flex;align-items:center;justify-content:center;border-radius:2px;background:#EDEAE4;color:#0A0A0A;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;font-weight:500">Pide tu propuesta</div>
+              <div style="height:44px;display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase"><span style="border-bottom:1px solid rgba(237,234,228,0.3);padding-bottom:3px">Proyectos</span><span>→</span></div>
+            </div>
+            <div style="position:absolute;left:0;right:0;top:744px;bottom:0;background:#121212;border-top:1px solid rgba(237,234,228,0.10)">
+              <div style="position:absolute;left:0;right:0;top:0;height:50px;border-bottom:1px solid rgba(237,234,228,0.10)">
+                <div style="position:absolute;left:20px;top:0;line-height:50px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em">RO</div>
+                <div style="position:absolute;left:62px;top:9px;width:120px;height:32px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.14);border-radius:2px"></div>
+                <div style="position:absolute;left:186px;top:9px;width:90px;height:32px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.14);border-radius:2px"></div>
+                <div style="position:absolute;left:280px;top:9px;width:110px;height:32px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.14);border-radius:2px"></div>
+              </div>
+              <div style="position:absolute;left:0;right:0;top:50px;height:50px">
+                <div style="position:absolute;left:20px;top:0;line-height:50px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em">WE</div>
+                <div style="position:absolute;left:62px;top:9px;width:96px;height:32px;border:1px solid rgba(237,234,228,0.3);border-radius:2px"></div>
+                <div style="position:absolute;left:162px;top:9px;width:130px;height:32px;border:1px solid rgba(237,234,228,0.14);border-radius:2px"></div>
+                <div style="position:absolute;left:296px;top:9px;width:94px;height:32px;border:1px solid rgba(237,234,228,0.14);border-radius:2px"></div>
+              </div>
+              <div style="position:absolute;left:150px;top:0;bottom:0;width:1px;background:#EDEAE4"></div>
+            </div>
+            <div data-grain="1" style="position:absolute;inset:-60px;pointer-events:none;z-index:40;opacity:0.07;animation:grain 1s steps(5) infinite"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:60px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Escena 01 · Desktop 1440 · el cursor de revelado es el cabezal · hover en «RO»</div>
+          <div data-screen-label="1b Escena 01 desktop" style="position:relative;width:1440px;height:900px;background:#0A0A0A;overflow:hidden">
+            <div style="position:absolute;left:0;right:0;top:0;height:56px;border-bottom:1px solid rgba(237,234,228,0.10);display:flex;align-items:center;justify-content:space-between;padding:0 86px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase"><div style="display:flex;align-items:center;gap:12px;color:#8A8780"><span>Escena 01</span><span style="width:24px;height:1px;background:rgba(237,234,228,0.3)"></span><span>El estudio</span></div><div style="color:#EDEAE4">00:00:14:02</div></div>
+            <div style="position:absolute;left:86px;top:140px;width:760px;font-size:46px;line-height:1.18;letter-spacing:-0.015em;font-weight:300;text-wrap:pretty"><span style="color:#EDEAE4">Somos ROWE. Un estudio pequeño a propósito. Rodamos los vídeos que hacen que se fijen en ti</span><span style="display:inline-block;width:2px;height:0.9em;background:#EDEAE4;vertical-align:-0.12em;margin:0 6px"></span><span style="color:#4A4844">y construimos la web que hace que te elijan. Sin intermediarios, sin plantillas, sin procesos eternos.</span></div>
+            <div style="position:absolute;left:86px;top:660px;width:760px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid rgba(237,234,228,0.10);border-bottom:1px solid rgba(237,234,228,0.10)">
+              <div style="padding:22px 0;display:flex;flex-direction:column;gap:8px;border-right:1px solid rgba(237,234,228,0.10)"><div style="font-family:'JetBrains Mono',monospace;font-size:44px;line-height:1">2</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Disciplinas</div></div>
+              <div style="padding:22px 0 22px 24px;display:flex;flex-direction:column;gap:8px;border-right:1px solid rgba(237,234,228,0.10)"><div style="font-family:'JetBrains Mono',monospace;font-size:44px;line-height:1">1</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Equipo</div></div>
+              <div style="padding:22px 0 22px 24px;display:flex;flex-direction:column;gap:8px"><div style="font-family:'JetBrains Mono',monospace;font-size:44px;line-height:1">0</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Plantillas</div></div>
+            </div>
+            <div style="position:absolute;left:940px;top:140px;width:414px;display:flex;flex-direction:column">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780;padding-bottom:14px">Mezcla</div>
+              <div style="display:flex;align-items:center;gap:24px;border-top:1px solid rgba(237,234,228,0.10);padding:16px 0">
+                <div style="width:90px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;line-height:1.7"><div style="color:#EDEAE4">V1</div><div style="color:#8A8780">Rodaje</div></div>
+                <div style="position:relative;padding:6px 14px">
+                  <div style="font-family:'Instrument Serif',serif;font-size:112px;line-height:0.9;background-color:#2B2A27;background-image:radial-gradient(ellipse at 30% 40%, rgba(237,234,228,0.6), rgba(237,234,228,0.1) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.14) 0px, rgba(237,234,228,0.14) 2px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 9px);-webkit-background-clip:text;background-clip:text;color:transparent">RO</div>
+                  <div style="position:absolute;left:0;top:0;width:14px;height:14px;border-left:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div>
+                  <div style="position:absolute;right:0;top:0;width:14px;height:14px;border-right:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div>
+                  <div style="position:absolute;left:0;bottom:0;width:14px;height:14px;border-left:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div>
+                  <div style="position:absolute;right:0;bottom:0;width:14px;height:14px;border-right:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:24px;border-top:1px solid rgba(237,234,228,0.10);padding:16px 0">
+                <div style="width:90px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;line-height:1.7"><div style="color:#EDEAE4">V2</div><div style="color:#8A8780">Web</div></div>
+                <div style="padding:6px 14px;font-family:'Instrument Serif',serif;font-size:112px;line-height:0.9">WE</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:24px;border-top:1px solid #EDEAE4;padding:16px 0">
+                <div style="width:90px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;line-height:1.7"><div style="color:#EDEAE4">Master</div><div style="color:#8A8780">= ROWE</div></div>
+                <div style="padding:6px 14px;font-family:'Instrument Serif',serif;font-size:112px;line-height:0.9;font-style:italic">ROWE</div>
+              </div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#4A4844;line-height:1.7;padding-top:12px">Hover «RO»: vídeo de rodaje en la máscara<br>Hover «WE»: web en movimiento</div>
+            </div>
+            <div data-grain="1" style="position:absolute;inset:-60px;pointer-events:none;z-index:40;opacity:0.07;animation:grain 1s steps(5) infinite"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Escena 01 · Móvil 390</div>
+          <div data-screen-label="1b Escena 01 móvil" style="position:relative;width:390px;height:844px;background:#0A0A0A;overflow:hidden">
+            <div style="position:absolute;left:0;right:0;top:0;height:48px;border-bottom:1px solid rgba(237,234,228,0.10);display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase"><span style="color:#8A8780">Escena 01 — El estudio</span><span>00:00:14:02</span></div>
+            <div style="position:absolute;left:20px;right:20px;top:80px;font-size:28px;line-height:1.2;letter-spacing:-0.015em;font-weight:300"><span style="color:#EDEAE4">Somos ROWE. Un estudio pequeño a propósito. Rodamos los vídeos que hacen que se fijen en ti</span><span style="display:inline-block;width:2px;height:0.9em;background:#EDEAE4;vertical-align:-0.12em;margin:0 5px"></span><span style="color:#4A4844">y construimos la web que hace que te elijan. Sin intermediarios, sin plantillas, sin procesos eternos.</span></div>
+            <div style="position:absolute;left:20px;right:20px;top:446px;display:flex;flex-direction:column">
+              <div style="display:flex;align-items:center;gap:20px;border-top:1px solid rgba(237,234,228,0.10);padding:10px 0"><div style="width:60px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">V1 Rodaje</div><div style="font-family:'Instrument Serif',serif;font-size:64px;line-height:0.95;background-color:#2B2A27;background-image:radial-gradient(ellipse at 30% 40%, rgba(237,234,228,0.6), rgba(237,234,228,0.1) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.14) 0px, rgba(237,234,228,0.14) 2px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 9px);-webkit-background-clip:text;background-clip:text;color:transparent">RO</div></div>
+              <div style="display:flex;align-items:center;gap:20px;border-top:1px solid rgba(237,234,228,0.10);padding:10px 0"><div style="width:60px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">V2 Web</div><div style="font-family:'Instrument Serif',serif;font-size:64px;line-height:0.95">WE</div></div>
+              <div style="display:flex;align-items:center;gap:20px;border-top:1px solid #EDEAE4;padding:10px 0"><div style="width:60px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Master</div><div style="font-family:'Instrument Serif',serif;font-size:64px;line-height:0.95;font-style:italic">ROWE</div></div>
+            </div>
+            <div style="position:absolute;left:20px;right:20px;top:730px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid rgba(237,234,228,0.10)">
+              <div style="padding:16px 0;display:flex;flex-direction:column;gap:6px;border-right:1px solid rgba(237,234,228,0.10)"><div style="font-family:'JetBrains Mono',monospace;font-size:28px;line-height:1">2</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Disciplinas</div></div>
+              <div style="padding:16px 0 16px 14px;display:flex;flex-direction:column;gap:6px;border-right:1px solid rgba(237,234,228,0.10)"><div style="font-family:'JetBrains Mono',monospace;font-size:28px;line-height:1">1</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Equipo</div></div>
+              <div style="padding:16px 0 16px 14px;display:flex;flex-direction:column;gap:6px"><div style="font-family:'JetBrains Mono',monospace;font-size:28px;line-height:1">0</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Plantillas</div></div>
+            </div>
+            <div data-grain="1" style="position:absolute;inset:-60px;pointer-events:none;z-index:40;opacity:0.07;animation:grain 1s steps(5) infinite"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Botones y cursor</div>
+        <div data-screen-label="1b Componentes" style="background:#0A0A0A;padding:56px 64px 64px;display:grid;grid-template-columns:900px minmax(0,1fr);gap:80px">
+          <div style="display:flex;flex-direction:column;gap:44px">
+            <div style="display:flex;gap:36px;align-items:flex-start">
+              <div style="display:flex;flex-direction:column;gap:14px"><div style="height:48px;display:flex;align-items:center;padding:0 24px;border-radius:2px;background:#EDEAE4;color:#0A0A0A;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;font-weight:500">Pide tu propuesta</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Primario · default</div></div>
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="position:relative;height:48px;display:flex;align-items:center;padding:0 24px;border-radius:2px;background:#EDEAE4;color:#0A0A0A;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;font-weight:500;overflow:hidden">
+                  <div style="position:absolute;left:30%;top:90%;width:150px;height:150px;border-radius:50%;background:#FFFFFF;transform:translate(-50%,-50%)"></div>
+                  <div style="position:relative;height:18px;line-height:18px;overflow:hidden"><div style="transform:translateY(-9px)">Pide tu propuesta</div><div style="transform:translateY(-9px)">Pide tu propuesta</div></div>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Hover · relleno + rodillo</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="position:relative;padding:6px">
+                  <div style="position:absolute;left:0;top:0;width:10px;height:10px;border-left:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div>
+                  <div style="position:absolute;right:0;top:0;width:10px;height:10px;border-right:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div>
+                  <div style="position:absolute;left:0;bottom:0;width:10px;height:10px;border-left:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div>
+                  <div style="position:absolute;right:0;bottom:0;width:10px;height:10px;border-right:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div>
+                  <div style="height:48px;display:flex;align-items:center;padding:0 24px;border-radius:2px;background:#FFFFFF;color:#0A0A0A;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;font-weight:500">Pide tu propuesta</div>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Hover · final + encuadre</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px"><div style="height:48px;display:flex;align-items:center;padding:0 24px;border-radius:2px;background:#EDEAE4;color:#0A0A0A;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;font-weight:500;outline:2px solid #EDEAE4;outline-offset:4px">Pide tu propuesta</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Focus · 2px, offset 4px</div></div>
+            </div>
+            <div style="display:flex;gap:44px;align-items:flex-start">
+              <div style="display:flex;flex-direction:column;gap:14px"><div style="height:48px;display:flex;align-items:center;gap:12px;padding:0 22px;border-radius:2px;border:1px solid rgba(237,234,228,0.3);font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase"><div style="width:8px;height:8px;border-radius:50%;background:#FF3B1F"></div>Pide tu propuesta</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">REC · default</div></div>
+              <div style="display:flex;flex-direction:column;gap:14px"><div style="height:48px;display:flex;align-items:center;gap:12px;padding:0 22px;border-radius:2px;border:1px solid rgba(237,234,228,0.7);background:#121212;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase"><div style="position:relative;width:8px;height:8px"><div style="position:absolute;inset:0;border-radius:50%;background:#FF3B1F"></div><div style="position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;border:1px solid #FF3B1F;animation:pulse 1.4s cubic-bezier(0.22,1,0.36,1) infinite"></div></div>Pide tu propuesta</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">REC · hover</div></div>
+              <div style="display:flex;flex-direction:column;gap:14px;padding-top:14px"><div style="display:flex;gap:10px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid rgba(237,234,228,0.3)"><span>Ver proyectos</span><span>→</span></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780;padding-top:12px">Secundario · default</div></div>
+              <div style="display:flex;flex-direction:column;gap:14px;padding-top:14px"><div style="position:relative;display:flex;gap:10px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid rgba(237,234,228,0.3)"><span>Ver proyectos</span><span style="transform:translateX(6px)">→</span><div style="position:absolute;left:0;bottom:-1px;width:62%;height:1px;background:#EDEAE4"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780;padding-top:12px">Secundario · hover</div></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,156px);gap:22px 16px;align-content:start">
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:50%;top:50%;width:4px;height:4px;background:#EDEAE4;transform:translate(-50%,-50%)"></div><div style="position:absolute;left:50%;top:50%;width:30px;height:30px;transform:translate(-50%,-50%)"><div style="position:absolute;left:0;top:0;width:8px;height:8px;border-left:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div><div style="position:absolute;right:0;top:0;width:8px;height:8px;border-right:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div><div style="position:absolute;left:0;bottom:0;width:8px;height:8px;border-left:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div><div style="position:absolute;right:0;bottom:0;width:8px;height:8px;border-right:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Base · visor</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase">Proyectos</div><div style="position:absolute;left:50%;top:50%;width:104px;height:44px;transform:translate(-50%,-50%)"><div style="position:absolute;left:0;top:0;width:8px;height:8px;border-left:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div><div style="position:absolute;right:0;top:0;width:8px;height:8px;border-right:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div><div style="position:absolute;left:0;bottom:0;width:8px;height:8px;border-left:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div><div style="position:absolute;right:0;bottom:0;width:8px;height:8px;border-right:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Enlace · encuadra</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;overflow:hidden;background-color:#171615;background-image:repeating-linear-gradient(135deg, rgba(237,234,228,0.04) 0px, rgba(237,234,228,0.04) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 10px)"><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#EDEAE4;color:#0A0A0A;border-radius:2px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;white-space:nowrap">▶ Ver · 00:12</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Vídeo · ❚❚ Pausa</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;overflow:hidden;background-color:#171615;background-image:repeating-linear-gradient(135deg, rgba(237,234,228,0.04) 0px, rgba(237,234,228,0.04) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 10px)"><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#EDEAE4;color:#0A0A0A;border-radius:2px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;white-space:nowrap">Ver proyecto</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Proyecto</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#EDEAE4;color:#0A0A0A;border-radius:2px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;white-space:nowrap">Arrastra ←→</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Carrusel</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:16px;right:16px;top:44px;font-size:18px;font-weight:300;color:#8A8780">Somos ROWE. Un</div><div style="position:absolute;left:58%;top:40px;width:1px;height:28px;background:#EDEAE4"></div><div style="position:absolute;left:calc(58% - 4px);top:40px;width:9px;height:1px;background:#EDEAE4"></div><div style="position:absolute;left:calc(58% - 4px);top:67px;width:9px;height:1px;background:#EDEAE4"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Texto</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:50%;top:50%;width:4px;height:4px;background:#EDEAE4;transform:translate(-50%,-50%)"></div><div style="position:absolute;left:50%;top:50%;width:20px;height:20px;transform:translate(-50%,-50%)"><div style="position:absolute;left:0;top:0;width:6px;height:6px;border-left:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div><div style="position:absolute;right:0;top:0;width:6px;height:6px;border-right:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div><div style="position:absolute;left:0;bottom:0;width:6px;height:6px;border-left:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div><div style="position:absolute;right:0;bottom:0;width:6px;height:6px;border-right:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Clic · enfoca</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:50%;background:#FF3B1F;transform:translate(-50%,-50%)"></div><div style="position:absolute;left:50%;top:50%;width:30px;height:30px;transform:translate(-50%,-50%)"><div style="position:absolute;left:0;top:0;width:8px;height:8px;border-left:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div><div style="position:absolute;right:0;top:0;width:8px;height:8px;border-right:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div><div style="position:absolute;left:0;bottom:0;width:8px;height:8px;border-left:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div><div style="position:absolute;right:0;bottom:0;width:8px;height:8px;border-right:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Modo REC · CTA final</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 1c EDITORIAL ============ -->
+    <div id="1c" style="display:flex;flex-direction:column;gap:56px;width:1890px">
+      <div style="display:flex;align-items:flex-end;gap:28px;border-bottom:1px solid rgba(237,234,228,0.14);padding-bottom:28px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:500;color:#0A0A0A;background:#EDEAE4;padding:6px 12px">1c</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:72px;line-height:0.9"><em>Editorial</em></div>
+        <div style="font-size:17px;line-height:1.5;color:#8A8780;max-width:640px;padding-bottom:6px">La tipografía manda. Titulares enormes que mezclan sans y serif itálica, fotografía en recortes y mucho espacio negativo, como una revista de cine.</div>
+      </div>
+
+      <div style="display:flex;gap:60px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Hero · Desktop 1440</div>
+          <div data-screen-label="1c Hero desktop" style="position:relative;width:1440px;height:900px;background:#0A0A0A;overflow:hidden">
+            <div style="position:absolute;left:86px;right:86px;top:0;height:96px;display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px"><img src="assets/rowe-logo-blanco.png" alt="ROWE" style="height:20px;display:block"><div data-rec="1" style="width:8px;height:8px;border-radius:50%;background:#FF3B1F;animation:rec 1.6s ease-in-out infinite"></div></div>
+              <div data-tc="1" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;color:#8A8780">00:00:12:08</div>
+              <div style="display:flex;align-items:center;gap:28px;font-size:14px"><div>Menú</div><div style="border:1px solid rgba(237,234,228,0.3);border-radius:999px;padding:10px 20px">Hablemos</div></div>
+            </div>
+            <div style="position:absolute;left:86px;right:86px;top:112px;padding-bottom:12px;border-bottom:1px solid rgba(237,234,228,0.10);display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Escena 00</span><span>Web &amp; Audiovisual</span><span>[Ciudad, Provincia]</span><span>2026</span></div>
+            <div style="position:absolute;left:1096px;top:172px;width:258px;height:322px;overflow:hidden">
+              <div style="position:absolute;inset:0;background-color:#1A1917;background-image:radial-gradient(ellipse 70% 60% at 25% 35%, rgba(237,234,228,0.12), rgba(237,234,228,0) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.03) 0px, rgba(237,234,228,0.03) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 12px)"></div>
+              <div style="position:absolute;right:14px;bottom:14px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">[ Foto 4:5 ]</div>
+            </div>
+            <div style="position:absolute;left:1096px;width:258px;text-align:right;top:150px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Fig. 01 — Rodaje en clínica</div>
+            <div style="position:absolute;left:86px;top:160px;font-size:168px;line-height:0.92;letter-spacing:-0.045em;font-weight:300;white-space:nowrap">
+              <div>Que te vean.</div>
+              <div style="padding-left:270px">Que <em style="font-family:'Instrument Serif',serif;font-size:184px;letter-spacing:-0.015em">confíen.</em></div>
+              <div>Que te <em style="font-family:'Instrument Serif',serif;font-size:184px;letter-spacing:-0.015em">elijan.</em></div>
+            </div>
+            <div style="position:absolute;left:86px;top:676px;width:440px;display:flex;flex-direction:column;gap:26px">
+              <div style="font-size:17px;line-height:1.55;color:#8A8780">Estudio boutique de web y audiovisual para empresas y negocios que quieren verse profesionales en internet y conseguir más clientes.</div>
+              <div style="display:flex;align-items:center;gap:28px">
+                <div style="height:48px;display:flex;align-items:center;padding:0 26px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:14px;font-weight:500">Pide tu propuesta</div>
+                <div style="display:flex;gap:10px;font-size:14px;padding-bottom:3px;border-bottom:1px solid rgba(237,234,228,0.3)"><span>Ver proyectos</span><span>→</span></div>
+              </div>
+            </div>
+            <div style="position:absolute;left:640px;top:680px;height:166px;display:flex;flex-direction:column;justify-content:space-between">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;line-height:1.8;color:#8A8780">RO — RODAJE<br>WE — WEB</div>
+              <div style="display:flex;align-items:flex-end;gap:12px"><div style="width:1px;height:40px;background:#EDEAE4;animation:drawy 2.4s cubic-bezier(0.76,0,0.24,1) infinite"></div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Desliza</div></div>
+            </div>
+            <div style="position:absolute;left:960px;top:680px;width:394px;height:165px;overflow:hidden">
+              <div style="position:absolute;inset:0;background-color:#171615;background-image:radial-gradient(ellipse 55% 75% at 30% 42%, rgba(237,234,228,0.10), rgba(237,234,228,0) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.03) 0px, rgba(237,234,228,0.03) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 12px)"></div>
+              <div style="position:absolute;left:10px;top:10px;width:16px;height:16px;border-left:1px solid rgba(237,234,228,0.8);border-top:1px solid rgba(237,234,228,0.8)"></div>
+              <div style="position:absolute;right:10px;top:10px;width:16px;height:16px;border-right:1px solid rgba(237,234,228,0.8);border-top:1px solid rgba(237,234,228,0.8)"></div>
+              <div style="position:absolute;left:10px;bottom:10px;width:16px;height:16px;border-left:1px solid rgba(237,234,228,0.8);border-bottom:1px solid rgba(237,234,228,0.8)"></div>
+              <div style="position:absolute;right:10px;bottom:10px;width:16px;height:16px;border-right:1px solid rgba(237,234,228,0.8);border-bottom:1px solid rgba(237,234,228,0.8)"></div>
+              <div style="position:absolute;left:180px;top:62px;background:#EDEAE4;color:#0A0A0A;border-radius:999px;padding:6px 16px 7px;font-family:'Instrument Serif',serif;font-style:italic;font-size:18px">▶ Showreel</div>
+            </div>
+            <div style="position:absolute;left:960px;top:856px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Fig. 02 — Showreel 2026 · 2.39:1 · sustituir</div>
+            <div data-grain="1" style="position:absolute;inset:-60px;pointer-events:none;z-index:40;opacity:0.07;animation:grain 1s steps(5) infinite"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Hero · Móvil 390</div>
+          <div data-screen-label="1c Hero móvil" style="position:relative;width:390px;height:844px;background:#0A0A0A;overflow:hidden">
+            <div style="position:absolute;left:20px;right:20px;top:0;height:64px;display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:9px"><img src="assets/rowe-logo-blanco.png" alt="ROWE" style="height:15px;display:block"><div data-rec="1" style="width:6px;height:6px;border-radius:50%;background:#FF3B1F;animation:rec 1.6s ease-in-out infinite"></div></div>
+              <div style="height:44px;display:flex;align-items:center;font-size:15px">Menú</div>
+            </div>
+            <div style="position:absolute;left:20px;right:20px;top:72px;padding-bottom:10px;border-bottom:1px solid rgba(237,234,228,0.10);display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Escena 00</span><span>Web &amp; Audiovisual</span></div>
+            <div style="position:absolute;left:20px;top:122px;font-size:56px;line-height:0.94;letter-spacing:-0.045em;font-weight:300;white-space:nowrap">
+              <div>Que te vean.</div>
+              <div style="padding-left:36px">Que <em style="font-family:'Instrument Serif',serif;font-size:62px;letter-spacing:-0.01em">confíen.</em></div>
+              <div>Que te <em style="font-family:'Instrument Serif',serif;font-size:62px;letter-spacing:-0.01em">elijan.</em></div>
+            </div>
+            <div style="position:absolute;left:20px;width:186px;top:324px;font-size:14px;line-height:1.55;color:#8A8780">Estudio boutique de web y audiovisual para empresas y negocios que quieren verse profesionales en internet y conseguir más clientes.</div>
+            <div style="position:absolute;right:20px;top:328px;width:140px;height:175px;overflow:hidden">
+              <div style="position:absolute;inset:0;background-color:#1A1917;background-image:radial-gradient(ellipse 70% 60% at 25% 35%, rgba(237,234,228,0.12), rgba(237,234,228,0) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.03) 0px, rgba(237,234,228,0.03) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 12px)"></div>
+              <div style="position:absolute;left:10px;bottom:10px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">[ Foto 4:5 ]</div>
+            </div>
+            <div style="position:absolute;right:20px;top:512px;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Fig. 01</div>
+            <div style="position:absolute;left:20px;right:20px;top:600px;display:flex;flex-direction:column;align-items:flex-start;gap:16px">
+              <div style="align-self:stretch;height:52px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:15px;font-weight:500">Pide tu propuesta</div>
+              <div style="height:44px;display:flex;align-items:center;gap:10px;font-size:15px"><span style="border-bottom:1px solid rgba(237,234,228,0.3);padding-bottom:3px">Ver proyectos</span><span>→</span></div>
+            </div>
+            <div style="position:absolute;left:20px;bottom:24px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;line-height:1.8;color:#8A8780">RO — RODAJE<br>WE — WEB</div>
+            <div style="position:absolute;right:20px;bottom:24px;display:flex;align-items:flex-end;gap:10px"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Desliza</div><div style="width:1px;height:32px;background:#EDEAE4;animation:drawy 2.4s cubic-bezier(0.76,0,0.24,1) infinite"></div></div>
+            <div data-grain="1" style="position:absolute;inset:-60px;pointer-events:none;z-index:40;opacity:0.07;animation:grain 1s steps(5) infinite"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:60px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Escena 01 · Desktop 1440 · revelado a mitad de scroll · hover en «RO»</div>
+          <div data-screen-label="1c Escena 01 desktop" style="position:relative;width:1440px;height:900px;background:#0A0A0A;overflow:hidden">
+            <div style="position:absolute;left:86px;right:86px;top:72px;padding-bottom:12px;border-bottom:1px solid rgba(237,234,228,0.10);display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Escena 01 — El estudio</span><span>00:00:14:02</span></div>
+            <div style="position:absolute;left:86px;top:150px;width:860px;font-family:'Instrument Serif',serif;font-size:58px;line-height:1.06;letter-spacing:-0.01em;text-wrap:pretty"><span style="color:#EDEAE4">Somos ROWE. Un estudio pequeño <em>a propósito.</em> Rodamos los vídeos que hacen que <em>se fijen en ti</em></span> <span style="color:#4A4844">y construimos la web que hace que <em>te elijan.</em> Sin intermediarios, sin plantillas, sin procesos eternos.</span></div>
+            <div style="position:absolute;left:86px;top:740px;width:860px;padding-top:20px;border-top:1px solid rgba(237,234,228,0.10);display:flex;gap:64px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><div><span style="color:#EDEAE4">2</span>&#160; disciplinas</div><div><span style="color:#EDEAE4">1</span>&#160; equipo</div><div><span style="color:#EDEAE4">0</span>&#160; plantillas</div></div>
+            <div style="position:absolute;left:1010px;top:150px;width:344px;display:flex;flex-direction:column;gap:28px">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="position:relative;align-self:flex-start;padding:4px 10px">
+                  <div style="font-family:'Instrument Serif',serif;font-size:240px;line-height:0.8;letter-spacing:-0.02em;background-color:#2B2A27;background-image:radial-gradient(ellipse at 30% 40%, rgba(237,234,228,0.6), rgba(237,234,228,0.1) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.14) 0px, rgba(237,234,228,0.14) 2px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 9px);-webkit-background-clip:text;background-clip:text;color:transparent">RO</div>
+                  <div style="position:absolute;left:0;top:0;width:16px;height:16px;border-left:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div>
+                  <div style="position:absolute;right:0;top:0;width:16px;height:16px;border-right:1px solid #EDEAE4;border-top:1px solid #EDEAE4"></div>
+                  <div style="position:absolute;left:0;bottom:0;width:16px;height:16px;border-left:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div>
+                  <div style="position:absolute;right:0;bottom:0;width:16px;height:16px;border-right:1px solid #EDEAE4;border-bottom:1px solid #EDEAE4"></div>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#EDEAE4">RO — Rodaje</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;padding-left:10px">
+                <div style="font-family:'Instrument Serif',serif;font-size:240px;line-height:0.8;letter-spacing:-0.02em;font-style:italic">WE</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">WE — Web</div>
+              </div>
+              <div style="padding-left:10px;display:flex;align-items:baseline;gap:14px"><span style="font-family:'Instrument Serif',serif;font-size:44px;color:#4A4844">=</span><span style="font-family:'Instrument Serif',serif;font-size:44px">ROWE</span></div>
+            </div>
+            <div data-grain="1" style="position:absolute;inset:-60px;pointer-events:none;z-index:40;opacity:0.07;animation:grain 1s steps(5) infinite"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Escena 01 · Móvil 390</div>
+          <div data-screen-label="1c Escena 01 móvil" style="position:relative;width:390px;height:844px;background:#0A0A0A;overflow:hidden">
+            <div style="position:absolute;left:20px;right:20px;top:56px;padding-bottom:10px;border-bottom:1px solid rgba(237,234,228,0.10);display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Escena 01 — El estudio</span><span>00:00:14:02</span></div>
+            <div style="position:absolute;left:20px;right:20px;top:100px;font-family:'Instrument Serif',serif;font-size:33px;line-height:1.08;text-wrap:pretty"><span style="color:#EDEAE4">Somos ROWE. Un estudio pequeño <em>a propósito.</em> Rodamos los vídeos que hacen que <em>se fijen en ti</em></span> <span style="color:#4A4844">y construimos la web que hace que <em>te elijan.</em> Sin intermediarios, sin plantillas, sin procesos eternos.</span></div>
+            <div style="position:absolute;left:20px;right:20px;top:500px;display:flex;justify-content:space-between;align-items:flex-start">
+              <div style="display:flex;flex-direction:column;gap:8px"><div style="font-family:'Instrument Serif',serif;font-size:118px;line-height:0.8;letter-spacing:-0.02em;background-color:#2B2A27;background-image:radial-gradient(ellipse at 30% 40%, rgba(237,234,228,0.6), rgba(237,234,228,0.1) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.14) 0px, rgba(237,234,228,0.14) 2px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 9px);-webkit-background-clip:text;background-clip:text;color:transparent">RO</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#EDEAE4">RO — Rodaje</div></div>
+              <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end"><div style="font-family:'Instrument Serif',serif;font-size:118px;line-height:0.8;letter-spacing:-0.02em;font-style:italic">WE</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">WE — Web</div></div>
+            </div>
+            <div style="position:absolute;left:20px;top:666px;display:flex;align-items:baseline;gap:10px;font-family:'Instrument Serif',serif;font-size:34px"><span style="color:#4A4844">=</span><span>ROWE</span></div>
+            <div style="position:absolute;left:20px;right:20px;top:760px;padding-top:14px;border-top:1px solid rgba(237,234,228,0.10);display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><div><span style="color:#EDEAE4">2</span> disciplinas</div><div><span style="color:#EDEAE4">1</span> equipo</div><div><span style="color:#EDEAE4">0</span> plantillas</div></div>
+            <div data-grain="1" style="position:absolute;inset:-60px;pointer-events:none;z-index:40;opacity:0.07;animation:grain 1s steps(5) infinite"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Botones y cursor</div>
+        <div data-screen-label="1c Componentes" style="background:#0A0A0A;padding:56px 64px 64px;display:grid;grid-template-columns:900px minmax(0,1fr);gap:80px">
+          <div style="display:flex;flex-direction:column;gap:44px">
+            <div style="display:flex;gap:36px;align-items:flex-start">
+              <div style="display:flex;flex-direction:column;gap:14px"><div style="height:52px;display:flex;align-items:center;padding:0 30px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:15px;font-weight:500">Pide tu propuesta</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Primario · default</div></div>
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="position:relative;height:52px;display:flex;align-items:center;padding:0 30px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:15px;font-weight:500;overflow:hidden">
+                  <div style="position:absolute;left:28%;top:85%;width:150px;height:150px;border-radius:50%;background:#FFFFFF;transform:translate(-50%,-50%)"></div>
+                  <div style="position:relative;height:22px;line-height:22px;overflow:hidden"><div style="transform:translateY(-11px)">Pide tu propuesta</div><div style="transform:translateY(-11px);font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;font-size:19px">Pide tu propuesta</div></div>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Hover · rodillo sans → serif</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div style="position:relative">
+                  <div style="position:absolute;inset:0;border:1px dashed rgba(237,234,228,0.25);border-radius:999px"></div>
+                  <div style="position:relative;transform:translate(5px,-4px);height:52px;display:flex;align-items:center;padding:0 30px;border-radius:999px;background:#FFFFFF;color:#0A0A0A;font-family:'Instrument Serif',serif;font-style:italic;font-size:19px">Pide tu propuesta</div>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Hover · final, magnético</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:14px"><div style="height:52px;display:flex;align-items:center;padding:0 30px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:15px;font-weight:500;outline:2px solid #EDEAE4;outline-offset:4px">Pide tu propuesta</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Focus · 2px, offset 4px</div></div>
+            </div>
+            <div style="display:flex;gap:44px;align-items:flex-start">
+              <div style="display:flex;flex-direction:column;gap:14px"><div style="height:52px;display:flex;align-items:center;gap:12px;padding:0 26px;border-radius:999px;border:1px solid rgba(237,234,228,0.3);font-size:15px"><div style="width:8px;height:8px;border-radius:50%;background:#FF3B1F"></div>Pide tu propuesta</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">REC · default</div></div>
+              <div style="display:flex;flex-direction:column;gap:14px"><div style="height:52px;display:flex;align-items:center;gap:12px;padding:0 26px;border-radius:999px;border:1px solid rgba(237,234,228,0.7);background:#121212;font-family:'Instrument Serif',serif;font-style:italic;font-size:19px"><div style="position:relative;width:8px;height:8px"><div style="position:absolute;inset:0;border-radius:50%;background:#FF3B1F"></div><div style="position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;border:1px solid #FF3B1F;animation:pulse 1.4s cubic-bezier(0.22,1,0.36,1) infinite"></div></div>Pide tu propuesta</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">REC · hover</div></div>
+              <div style="display:flex;flex-direction:column;gap:14px;padding-top:14px"><div style="display:flex;gap:10px;font-size:15px;padding-bottom:4px;border-bottom:1px solid rgba(237,234,228,0.3)"><span>Ver proyectos</span><span>→</span></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780;padding-top:12px">Secundario · default</div></div>
+              <div style="display:flex;flex-direction:column;gap:14px;padding-top:14px"><div style="position:relative;display:flex;gap:10px;font-size:15px;padding-bottom:4px;border-bottom:1px solid rgba(237,234,228,0.3)"><span>Ver proyectos</span><span style="transform:translateX(6px)">→</span><div style="position:absolute;left:0;bottom:-1px;width:62%;height:1px;background:#EDEAE4"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780;padding-top:12px">Secundario · hover</div></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,156px);gap:22px 16px;align-content:start">
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;background:#EDEAE4;transform:translate(-50%,-50%)"></div><div style="position:absolute;left:44%;top:44%;width:32px;height:32px;border-radius:50%;border:1px solid #EDEAE4;transform:translate(-50%,-50%)"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Base · lerp</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden;isolation:isolate"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:28px">Estudio</div><div style="position:absolute;left:50%;top:50%;width:72px;height:72px;border-radius:50%;background:#EDEAE4;mix-blend-mode:difference;transform:translate(-50%,-50%)"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Enlace · difference</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;overflow:hidden;background-color:#171615;background-image:repeating-linear-gradient(135deg, rgba(237,234,228,0.04) 0px, rgba(237,234,228,0.04) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 10px)"><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#EDEAE4;color:#0A0A0A;border-radius:999px;padding:5px 16px 6px;font-family:'Instrument Serif',serif;font-style:italic;font-size:18px;white-space:nowrap">▶ Ver</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Vídeo · ❚❚ Pausa</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;overflow:hidden;background-color:#171615;background-image:repeating-linear-gradient(135deg, rgba(237,234,228,0.04) 0px, rgba(237,234,228,0.04) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 10px)"><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#EDEAE4;color:#0A0A0A;border-radius:999px;padding:5px 16px 6px;font-family:'Instrument Serif',serif;font-style:italic;font-size:18px;white-space:nowrap">Ver proyecto</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Proyecto</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#EDEAE4;color:#0A0A0A;border-radius:999px;padding:5px 16px 6px;font-family:'Instrument Serif',serif;font-style:italic;font-size:18px;white-space:nowrap">Arrastra ←→</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Carrusel</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:16px;right:16px;top:42px;font-family:'Instrument Serif',serif;font-size:22px;line-height:1.1;color:#8A8780">Somos ROWE. Un estudio</div><div style="position:absolute;left:62%;top:40px;width:1px;height:28px;background:#EDEAE4"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Texto</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:50%;top:50%;width:6px;height:6px;border-radius:50%;background:#EDEAE4;transform:translate(-50%,-50%)"></div><div style="position:absolute;left:50%;top:50%;width:26px;height:26px;border-radius:50%;border:1px solid #EDEAE4;transform:translate(-50%,-50%)"></div><div style="position:absolute;left:50%;top:50%;width:26px;height:26px;border-radius:50%;border:1px solid #EDEAE4;animation:pulse 1.2s cubic-bezier(0.22,1,0.36,1) infinite"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Clic · pulso</div></div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="position:relative;height:120px;background:#121212;overflow:hidden"><div style="position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;background:#FF3B1F;transform:translate(-50%,-50%)"></div><div style="position:absolute;left:44%;top:44%;width:32px;height:32px;border-radius:50%;border:1px solid #EDEAE4;transform:translate(-50%,-50%)"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Modo REC · CTA final</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;grain&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Película&quot;},&quot;recBlink&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Película&quot;},&quot;liveTimecode&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Película&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() {
+    this.t0 = performance.now();
+    const p = n => String(n).padStart(2, '0');
+    this.iv = setInterval(() => {
+      if (this.props.liveTimecode === false) return;
+      const f = Math.floor((performance.now() - this.t0) / 40) + 308;
+      const tc = `${p(Math.floor(f / 90000))}:${p(Math.floor(f / 1500) % 60)}:${p(Math.floor(f / 25) % 60)}:${p(f % 25)}`;
+      document.querySelectorAll('[data-tc]').forEach(el => { el.textContent = tc; });
+    }, 40);
+    this.apply();
+  }
+  componentDidUpdate() { this.apply(); }
+  componentWillUnmount() { clearInterval(this.iv); }
+  apply() {
+    const noise = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
+    const g = this.props.grain ?? true;
+    document.querySelectorAll('[data-grain]').forEach(el => { el.style.backgroundImage = noise; el.style.display = g ? 'block' : 'none'; });
+    const b = this.props.recBlink ?? true;
+    document.querySelectorAll('[data-rec]').forEach(el => { el.style.animationPlayState = b ? 'running' : 'paused'; });
+  }
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

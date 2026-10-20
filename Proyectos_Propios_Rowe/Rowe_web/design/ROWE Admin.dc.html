@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>ROWE — Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Inter+Tight:wght@300;400;500&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0A0A0A;color:#EDEAE4;-webkit-font-smoothing:antialiased}
+a{color:#EDEAE4;text-decoration:none}a:hover{color:#FFFFFF}
+input::placeholder,textarea::placeholder{color:#6B6862}
+@keyframes rec{0%,100%{opacity:1}50%{opacity:.22}}
+@keyframes skel{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes modalIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:{{ pageBg }};display:flex;align-items:center;justify-content:center;font-family:'Inter Tight',sans-serif;color:#EDEAE4">
+<div style="position:relative;width:{{ appW }};height:{{ appH }};background:#0A0A0A;overflow:hidden;border:{{ appBorder }};border-radius:{{ appRadius }};display:flex">
+
+  <sc-if value="{{ showLogin }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;background:#0A0A0A;overflow:auto">
+      <div style="width:min(380px,100%);display:flex;flex-direction:column;gap:28px;animation:fadeUp .6s both">
+        <div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:12px"><img src="assets/rowe-logo-blanco.png" alt="ROWE" style="height:20px;display:block"><span style="width:8px;height:8px;border-radius:50%;background:#FF3B1F;animation:rec 1.6s ease-in-out infinite"></span></div><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Panel</span></div>
+        <div style="font-family:'Instrument Serif',serif;font-size:46px;line-height:0.95">Bienvenido <em>de nuevo.</em></div>
+        <sc-if value="{{ forgotSent }}" hint-placeholder-val="{{ false }}"><div style="border:1px solid rgba(237,234,228,0.2);border-radius:8px;padding:14px 16px;font-size:14px;line-height:1.5;color:#EDEAE4">Te hemos enviado un enlace para crear una contraseña nueva. Revisa tu bandeja de entrada.</div></sc-if>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <label style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Email</span><input value="{{ loginEmail }}" onChange="{{ onLoginEmail }}" type="email" style="box-sizing:border-box;width:100%;height:48px;background:#1A1A1A;border:1px solid {{ loginBd }};border-radius:6px;color:#EDEAE4;padding:0 14px;font-family:'Inter Tight',sans-serif;font-size:15px;outline:none" style-focus="border-color:#EDEAE4"></label>
+          <label style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Contraseña</span><input value="{{ loginPass }}" onChange="{{ onLoginPass }}" type="password" placeholder="••••••••" style="box-sizing:border-box;width:100%;height:48px;background:#1A1A1A;border:1px solid {{ loginBd }};border-radius:6px;color:#EDEAE4;padding:0 14px;font-family:'Inter Tight',sans-serif;font-size:15px;outline:none" style-focus="border-color:#EDEAE4"></label>
+          <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#FF3B1F">Email o contraseña incorrectos. Inténtalo de nuevo.</div></sc-if>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <button onClick="{{ toggleRemember }}" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;min-height:44px;font-size:14px;color:#8A8780"><span style="width:18px;height:18px;box-sizing:border-box;border:1px solid {{ remBd }};background:{{ remBg }};border-radius:4px;color:#0A0A0A;font-size:12px;display:flex;align-items:center;justify-content:center">{{ remMark }}</span>Recordarme</button>
+            <button onClick="{{ forgot }}" style="all:unset;cursor:pointer;font-size:14px;color:#EDEAE4;border-bottom:1px solid rgba(237,234,228,0.3)">¿Has olvidado tu contraseña?</button>
+          </div>
+        </div>
+        <button onClick="{{ doLogin }}" style="all:unset;cursor:pointer;box-sizing:border-box;height:50px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .2s" style-hover="background:#FFFFFF" style-active="transform:scale(0.98)">{{ loginLabel }}</button>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#6B6862">rowe-web.es · Acceso restringido</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showSidebar }}" hint-placeholder-val="{{ false }}">
+    <aside style="width:248px;flex:none;border-right:1px solid rgba(237,234,228,0.08);display:flex;flex-direction:column;padding:20px 14px;box-sizing:border-box;gap:22px;overflow-y:auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 10px 8px"><div style="display:flex;align-items:center;gap:10px"><img src="assets/rowe-logo-blanco.png" alt="ROWE" style="height:16px;display:block"><span style="width:7px;height:7px;border-radius:50%;background:#FF3B1F;animation:rec 1.6s ease-in-out infinite"></span></div><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Panel</span></div>
+      <sc-for list="{{ navGroups }}" as="g" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#6B6862;padding:0 12px 8px">{{ g.label }}</div>
+          <sc-for list="{{ g.items }}" as="n" hint-placeholder-count="3">
+            <button onClick="{{ n.on }}" style="all:unset;cursor:pointer;box-sizing:border-box;height:40px;padding:0 12px;border-radius:6px;display:flex;align-items:center;gap:12px;font-size:14px;background:{{ n.bg }};color:{{ n.fg }};transition:background .2s, color .2s" style-hover="color:#EDEAE4">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ n.d }}"></path></svg>
+              <span style="flex:1">{{ n.label }}</span>
+              <sc-if value="{{ n.hasBadge }}"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;min-width:20px;height:20px;padding:0 6px;box-sizing:border-box;border-radius:999px;background:#EDEAE4;color:#0A0A0A;display:flex;align-items:center;justify-content:center">{{ n.badge }}</span></sc-if>
+            </button>
+          </sc-for>
+        </div>
+      </sc-for>
+      <div style="margin-top:auto;display:flex;flex-direction:column;gap:14px;border-top:1px solid rgba(237,234,228,0.08);padding-top:16px">
+        <a href="ROWE Presupuesto.dc.html" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:40px;border:1px solid rgba(237,234,228,0.14);border-radius:6px;font-size:14px" style-hover="border-color:#EDEAE4">Ver web <span>↗</span></a>
+        <div style="display:flex;align-items:center;gap:10px;padding:0 4px"><span style="width:34px;height:34px;border-radius:50%;background:#1A1A1A;border:1px solid rgba(237,234,228,0.14);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px">AR</span><div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:13px">Admin ROWE</span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.08em;color:#8A8780;text-transform:uppercase">Administrador</span></div><button onClick="{{ logout }}" style="all:unset;cursor:pointer;font-size:13px;color:#8A8780;min-height:36px" style-hover="color:#EDEAE4">Salir</button></div>
+      </div>
+    </aside>
+  </sc-if>
+
+  <sc-if value="{{ showApp }}" hint-placeholder-val="{{ false }}">
+    <main style="flex:1;min-width:0;display:flex;flex-direction:column;position:relative">
+      <div style="height:64px;flex:none;border-bottom:1px solid rgba(237,234,228,0.08);padding:0 {{ pad }};display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div style="display:flex;align-items:center;gap:14px;min-width:0">
+          <sc-if value="{{ isMobile }}"><button onClick="{{ openDrawer }}" style="all:unset;cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center;margin-left:-10px"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M2 4h12 M2 8h12 M2 12h12"></path></svg></button></sc-if>
+          <div style="display:flex;flex-direction:column;min-width:0"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Panel / {{ crumb }}</span><span style="font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ title }}</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <sc-if value="{{ dirtyDesk }}"><span style="display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#EDEAE4"><span style="width:7px;height:7px;border-radius:50%;border:1px solid #EDEAE4;box-sizing:border-box"></span>Cambios sin publicar</span></sc-if>
+          <sc-if value="{{ canUndo }}"><button onClick="{{ undo }}" title="Deshacer" style="all:unset;cursor:pointer;height:36px;padding:0 12px;border-radius:999px;display:flex;align-items:center;gap:6px;font-size:13px;color:#8A8780" style-hover="color:#EDEAE4">↶ <span style="display:{{ deskInline }}">Deshacer</span></button></sc-if>
+          <button onClick="{{ preview }}" style="all:unset;cursor:pointer;height:36px;padding:0 14px;border-radius:999px;border:1px solid rgba(237,234,228,0.18);display:{{ deskFlex }};align-items:center;font-size:13px" style-hover="border-color:#EDEAE4">Vista previa</button>
+          <button onClick="{{ publish }}" style="all:unset;cursor:pointer;height:36px;padding:0 16px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;display:flex;align-items:center;font-size:13px;font-weight:500;opacity:{{ pubOpacity }};transition:opacity .3s, background .2s" style-hover="background:#FFFFFF">Publicar</button>
+        </div>
+      </div>
+
+      <div style="flex:1;overflow-y:auto;padding:{{ pad }};padding-bottom:{{ padBottom }};box-sizing:border-box">
+        <sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:16px;max-width:1240px">
+            <div style="width:240px;height:36px;border-radius:6px;background:#161616;animation:skel 1.2s ease-in-out infinite"></div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px"><div style="height:110px;border-radius:8px;background:#121212;animation:skel 1.2s ease-in-out infinite"></div><div style="height:110px;border-radius:8px;background:#121212;animation:skel 1.2s ease-in-out .1s infinite"></div><div style="height:110px;border-radius:8px;background:#121212;animation:skel 1.2s ease-in-out .2s infinite"></div></div>
+            <div style="height:320px;border-radius:8px;background:#121212;animation:skel 1.2s ease-in-out .3s infinite"></div>
+          </div>
+        </sc-if>
+
+        <!-- DASHBOARD -->
+        <sc-if value="{{ scr.dashboard }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:24px;max-width:1240px;animation:fadeUp .45s both">
+            <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px"><div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Jueves, 15 de octubre</span><div style="font-family:'Instrument Serif',serif;font-size:44px;line-height:1">Hola, <em>Admin.</em></div></div></div>
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 28px;border:1px solid rgba(237,234,228,0.10);border-radius:8px;padding:16px 20px;background:#121212">
+              <span style="display:flex;align-items:center;gap:8px;font-size:14px"><span style="width:8px;height:8px;border-radius:50%;background:#EDEAE4"></span>Web publicada</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.08em;color:#8A8780">rowe-web.es</span>
+              <span style="font-size:14px;color:#8A8780">Último cambio hace 2 h · Admin</span>
+              <sc-if value="{{ dirty }}"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase">Tienes cambios sin publicar</span></sc-if>
+              <a href="ROWE Presupuesto.dc.html" target="_blank" style="margin-left:auto;font-size:14px;border-bottom:1px solid rgba(237,234,228,0.3)">Ver web ↗</a>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+              <sc-for list="{{ dashKpis }}" as="k" hint-placeholder-count="4">
+                <button onClick="{{ k.on }}" style="all:unset;cursor:pointer;box-sizing:border-box;border:1px solid rgba(237,234,228,0.10);border-radius:8px;padding:18px 20px;display:flex;flex-direction:column;gap:10px;background:#121212;transition:border-color .2s" style-hover="border-color:rgba(237,234,228,0.35)"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">{{ k.label }}</span><span style="font-size:38px;font-weight:300;letter-spacing:-0.02em;line-height:1">{{ k.value }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.06em;color:#8A8780">{{ k.delta }}</span></button>
+              </sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">
+              <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;display:flex;flex-direction:column">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid rgba(237,234,228,0.08)"><span style="font-size:15px">Últimos mensajes</span><button onClick="{{ goLeads }}" style="all:unset;cursor:pointer;font-size:13px;color:#8A8780" style-hover="color:#EDEAE4">Ver todos →</button></div>
+                <sc-for list="{{ recentLeads }}" as="l" hint-placeholder-count="3">
+                  <button onClick="{{ l.on }}" style="all:unset;cursor:pointer;box-sizing:border-box;padding:14px 20px;border-bottom:1px solid rgba(237,234,228,0.06);display:flex;align-items:center;gap:14px" style-hover="background:#161616">
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px"><span style="font-size:15px">{{ l.name }} <span style="color:#8A8780">· {{ l.company }}</span></span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.06em;color:#8A8780;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ l.service }} · {{ l.budget }}</span></div>
+                    <span style="display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:{{ l.stFg }}"><span style="width:7px;height:7px;box-sizing:border-box;border-radius:50%;background:{{ l.stDot }};border:1px solid {{ l.stBd }}"></span>{{ l.stLabel }}</span>
+                  </button>
+                </sc-for>
+              </div>
+              <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;display:flex;flex-direction:column">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid rgba(237,234,228,0.08)"><span style="font-size:15px">Últimos cambios</span><button onClick="{{ goHistory }}" style="all:unset;cursor:pointer;font-size:13px;color:#8A8780" style-hover="color:#EDEAE4">Historial →</button></div>
+                <sc-for list="{{ recentHist }}" as="h" hint-placeholder-count="4">
+                  <div style="padding:14px 20px;border-bottom:1px solid rgba(237,234,228,0.06);display:flex;gap:14px;align-items:baseline"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8A8780;width:54px;flex:none">{{ h.time }}</span><span style="flex:1;font-size:14px;line-height:1.45">{{ h.text }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#8A8780">{{ h.who }}</span></div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Accesos rápidos</span>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+                <sc-for list="{{ quick }}" as="q" hint-placeholder-count="4">
+                  <button onClick="{{ q.on }}" style="all:unset;cursor:pointer;box-sizing:border-box;border:1px solid rgba(237,234,228,0.10);border-radius:8px;padding:18px 20px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;transition:border-color .2s, background .2s" style-hover="border-color:rgba(237,234,228,0.35);background:#121212"><div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:15px">{{ q.title }}</span><span style="font-size:13px;color:#8A8780;line-height:1.45">{{ q.desc }}</span></div><span>→</span></button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- LEADS -->
+        <sc-if value="{{ scr.leads }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;max-width:1240px;animation:fadeUp .45s both">
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-family:'Instrument Serif',serif;font-size:40px;line-height:1">Mensajes</div><span style="font-size:14px;color:#8A8780">Solicitudes del formulario y del configurador de presupuesto.</span></div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+              <div style="display:flex;flex-wrap:wrap;border:1px solid rgba(237,234,228,0.14);border-radius:999px;padding:3px;gap:2px"><sc-for list="{{ stFilters }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.on }}" style="all:unset;cursor:pointer;height:34px;padding:0 14px;border-radius:999px;display:flex;align-items:center;gap:8px;font-size:13px;background:{{ o.bg }};color:{{ o.fg }};transition:background .25s, color .25s">{{ o.label }}<span style="font-family:'JetBrains Mono',monospace;font-size:10px;opacity:0.7">{{ o.count }}</span></button></sc-for></div>
+              <div style="display:flex;flex-wrap:wrap;border:1px solid rgba(237,234,228,0.14);border-radius:999px;padding:3px;gap:2px"><sc-for list="{{ svFilters }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.on }}" style="all:unset;cursor:pointer;height:34px;padding:0 14px;border-radius:999px;display:flex;align-items:center;font-size:13px;background:{{ o.bg }};color:{{ o.fg }};transition:background .25s, color .25s">{{ o.label }}</button></sc-for></div>
+              <input value="{{ leadQ }}" onChange="{{ onLeadQ }}" placeholder="Buscar por nombre o negocio" style="flex:1 1 200px;box-sizing:border-box;height:42px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:999px;color:#EDEAE4;padding:0 18px;font-family:'Inter Tight',sans-serif;font-size:14px;outline:none" style-focus="border-color:#EDEAE4">
+            </div>
+            <div style="display:grid;grid-template-columns:{{ leadsCols }};gap:16px;align-items:start">
+              <sc-if value="{{ showLeadList }}">
+                <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;overflow:hidden">
+                  <sc-for list="{{ leadRows }}" as="l" hint-placeholder-count="5">
+                    <button onClick="{{ l.on }}" style="all:unset;cursor:pointer;box-sizing:border-box;width:100%;padding:16px 18px;border-bottom:1px solid rgba(237,234,228,0.06);display:flex;gap:14px;align-items:flex-start;background:{{ l.bg }};transition:background .2s" style-hover="background:#181818">
+                      <span style="width:7px;height:7px;margin-top:7px;flex:none;box-sizing:border-box;border-radius:50%;background:{{ l.stDot }};border:1px solid {{ l.stBd }}"></span>
+                      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">
+                        <div style="display:flex;justify-content:space-between;gap:10px"><span style="font-size:15px;font-weight:{{ l.weight }}">{{ l.name }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8A8780;white-space:nowrap">{{ l.date }}</span></div>
+                        <span style="font-size:13px;color:#8A8780">{{ l.company }} · {{ l.sector }}</span>
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.06em;color:#8A8780;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ l.service }} · {{ l.budget }}</span>
+                      </div>
+                    </button>
+                  </sc-for>
+                  <sc-if value="{{ leadsEmpty }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding:48px 24px;display:flex;flex-direction:column;align-items:flex-start;gap:12px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">0 resultados</span><div style="font-family:'Instrument Serif',serif;font-size:30px;line-height:1">Nada por <em>aquí.</em></div><p style="margin:0;font-size:14px;line-height:1.55;color:#8A8780;max-width:36ch">No hay solicitudes con estos filtros. Cuando alguien rellene el formulario, aparecerá en esta bandeja.</p><button onClick="{{ clearLeadFilters }}" style="all:unset;cursor:pointer;height:38px;padding:0 16px;border-radius:999px;border:1px solid rgba(237,234,228,0.2);font-size:13px;display:flex;align-items:center" style-hover="border-color:#EDEAE4">Quitar filtros</button></div>
+                  </sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{ showLeadDetail }}">
+                <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;padding:clamp(18px,2.4vw,28px);display:flex;flex-direction:column;gap:22px;animation:fadeIn .3s both">
+                  <sc-if value="{{ isMobile }}"><button onClick="{{ backLeads }}" style="all:unset;cursor:pointer;font-size:14px;color:#8A8780;min-height:36px">← Mensajes</button></sc-if>
+                  <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;align-items:flex-start">
+                    <div style="display:flex;flex-direction:column;gap:6px"><div style="font-family:'Instrument Serif',serif;font-size:34px;line-height:1">{{ lead.name }}</div><span style="font-size:14px;color:#8A8780">{{ lead.company }} · {{ lead.sector }}</span></div>
+                    <div style="display:flex;border:1px solid rgba(237,234,228,0.14);border-radius:999px;padding:3px;gap:2px"><sc-for list="{{ leadStatusOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.on }}" style="all:unset;cursor:pointer;height:32px;padding:0 12px;border-radius:999px;display:flex;align-items:center;font-size:12px;background:{{ o.bg }};color:{{ o.fg }};transition:background .25s, color .25s">{{ o.label }}</button></sc-for></div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:rgba(237,234,228,0.08);border:1px solid rgba(237,234,228,0.08)">
+                    <div style="background:#121212;padding:14px;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Servicio</span><span style="font-size:14px">{{ lead.service }}</span></div>
+                    <div style="background:#121212;padding:14px;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Presupuesto</span><span style="font-size:14px">{{ lead.budget }}</span></div>
+                    <div style="background:#121212;padding:14px;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Origen</span><span style="font-size:14px">{{ lead.origin }}</span></div>
+                    <div style="background:#121212;padding:14px;display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Recibido</span><span style="font-size:14px">{{ lead.date }}</span></div>
+                  </div>
+                  <sc-if value="{{ lead.hasItems }}"><div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Configuración elegida</span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.04em;line-height:1.8">{{ lead.items }}</span></div></sc-if>
+                  <div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Mensaje</span><p style="margin:0;font-size:15px;line-height:1.6;max-width:62ch">{{ lead.msgText }}</p></div>
+                  <div style="display:flex;flex-direction:column;border-top:1px solid rgba(237,234,228,0.08)">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(237,234,228,0.08)"><span style="font-size:14px">{{ lead.email }}</span><button onClick="{{ copyLeadEmail }}" style="all:unset;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780;min-height:32px" style-hover="color:#EDEAE4">Copiar</button></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(237,234,228,0.08)"><span style="font-size:14px">{{ lead.phoneText }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">WhatsApp ↗</span></div>
+                  </div>
+                  <div style="display:flex;flex-wrap:wrap;gap:10px">
+                    <a href="{{ lead.mailto }}" style="height:42px;padding:0 20px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;display:flex;align-items:center;font-size:14px;font-weight:500" style-hover="background:#FFFFFF;color:#0A0A0A">Responder por email</a>
+                    <button onClick="{{ markContacted }}" style="all:unset;cursor:pointer;height:42px;padding:0 18px;border-radius:999px;border:1px solid rgba(237,234,228,0.2);display:flex;align-items:center;font-size:14px" style-hover="border-color:#EDEAE4">Marcar como contactado</button>
+                  </div>
+                  <label style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Notas internas · solo las ve el equipo</span><textarea rows="3" placeholder="Ej. Llamar el lunes por la mañana." style="box-sizing:border-box;width:100%;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:12px 14px;font-family:'Inter Tight',sans-serif;font-size:14px;line-height:1.5;outline:none;resize:vertical" style-focus="border-color:#EDEAE4"></textarea></label>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- STATS -->
+        <sc-if value="{{ scr.stats }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;max-width:1240px;animation:fadeUp .45s both">
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:14px"><div style="display:flex;flex-direction:column;gap:6px"><div style="font-family:'Instrument Serif',serif;font-size:40px;line-height:1">Estadísticas</div><span style="font-size:14px;color:#8A8780">Cómo llega la gente a la web y cuántos acaban contactando.</span></div>
+              <div style="display:flex;border:1px solid rgba(237,234,228,0.14);border-radius:999px;padding:3px;gap:2px"><sc-for list="{{ rangeOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.on }}" style="all:unset;cursor:pointer;height:34px;padding:0 14px;border-radius:999px;display:flex;align-items:center;font-size:13px;background:{{ o.bg }};color:{{ o.fg }};transition:background .25s, color .25s">{{ o.label }}</button></sc-for></div></div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+              <sc-for list="{{ statKpis }}" as="k" hint-placeholder-count="4"><div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;padding:18px 20px;display:flex;flex-direction:column;gap:10px;background:#121212"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">{{ k.label }}</span><span style="font-size:34px;font-weight:300;letter-spacing:-0.02em;line-height:1">{{ k.value }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8A8780">{{ k.delta }}</span></div></sc-for>
+            </div>
+            <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;padding:20px;display:flex;flex-direction:column;gap:18px">
+              <div style="display:flex;justify-content:space-between"><span style="font-size:15px">Visitas</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Pasa el ratón por cada barra</span></div>
+              <div style="height:220px;display:flex;align-items:stretch;gap:clamp(4px,1vw,12px)">
+                <sc-for list="{{ bars }}" as="b" hint-placeholder-count="7">
+                  <div title="{{ b.tip }}" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;border-bottom:1px solid rgba(237,234,228,0.10)"><div style="height:{{ b.h }};background:#4A4844;transition:height .7s cubic-bezier(0.76,0,0.24,1), background .2s" style-hover="background:#EDEAE4"></div></div>
+                    <span style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:9px;color:#8A8780">{{ b.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">
+              <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;padding:20px;display:flex;flex-direction:column;gap:16px">
+                <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:15px">Ecosistema</span><span style="font-size:13px;color:#8A8780">Del vídeo al contacto.</span></div>
+                <sc-for list="{{ funnel }}" as="f" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between;font-size:14px"><span>{{ f.label }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ f.value }} <span style="color:#8A8780">· {{ f.pct }}</span></span></div><div style="height:6px;background:#1A1A1A;border-radius:3px;overflow:hidden"><div style="height:100%;width:{{ f.w }};background:#EDEAE4;border-radius:3px;transition:width .7s cubic-bezier(0.76,0,0.24,1)"></div></div></div></sc-for>
+              </div>
+              <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;padding:20px;display:flex;flex-direction:column;gap:16px">
+                <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:15px">De dónde llegan</span><span style="font-size:13px;color:#8A8780">Origen de las visitas.</span></div>
+                <sc-for list="{{ sources }}" as="f" hint-placeholder-count="5"><div style="display:flex;align-items:center;gap:12px"><span style="width:90px;font-size:14px">{{ f.label }}</span><div style="flex:1;height:6px;background:#1A1A1A;border-radius:3px;overflow:hidden"><div style="height:100%;width:{{ f.w }};background:#8A8780;border-radius:3px"></div></div><span style="width:40px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px">{{ f.pct }}</span></div></sc-for>
+              </div>
+            </div>
+            <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;overflow:hidden">
+              <div style="padding:16px 20px;border-bottom:1px solid rgba(237,234,228,0.08);font-size:15px">Páginas más vistas</div>
+              <sc-for list="{{ topPages }}" as="p" hint-placeholder-count="5"><div style="display:flex;align-items:center;gap:16px;padding:12px 20px;border-bottom:1px solid rgba(237,234,228,0.06)"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8780;width:140px;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.path }}</span><span style="flex:1;font-size:14px;min-width:0">{{ p.name }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ p.visits }}</span></div></sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- TEXTS -->
+        <sc-if value="{{ scr.texts }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;max-width:1240px;animation:fadeUp .45s both">
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-family:'Instrument Serif',serif;font-size:40px;line-height:1">Textos y escenas</div><span style="font-size:14px;color:#8A8780">Muestra, oculta, reordena y edita cada escena de la home.</span></div>
+            <div style="display:grid;grid-template-columns:{{ textCols }};gap:16px;align-items:start">
+              <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;overflow:hidden">
+                <sc-for list="{{ sceneRows }}" as="r" hint-placeholder-count="10">
+                  <div style="display:flex;align-items:center;gap:8px;padding:6px 8px 6px 12px;border-bottom:1px solid rgba(237,234,228,0.06);background:{{ r.bg }};transition:background .2s">
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6B6862;letter-spacing:-0.1em;cursor:grab">⋮⋮</span>
+                    <button onClick="{{ r.sel }}" style="all:unset;cursor:pointer;flex:1;min-width:0;min-height:40px;display:flex;align-items:center;gap:10px;opacity:{{ r.op }}"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8A8780">{{ r.num }}</span><span style="font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</span></button>
+                    <button onClick="{{ r.up }}" title="Subir" style="all:unset;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#8A8780;border-radius:4px" style-hover="background:#1F1F1F;color:#EDEAE4">↑</button>
+                    <button onClick="{{ r.down }}" title="Bajar" style="all:unset;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#8A8780;border-radius:4px" style-hover="background:#1F1F1F;color:#EDEAE4">↓</button>
+                    <button onClick="{{ r.toggle }}" title="Mostrar / ocultar" style="all:unset;cursor:pointer;flex:none;width:36px;height:20px;border-radius:999px;position:relative;box-sizing:border-box;border:1px solid {{ r.swBd }};background:{{ r.swBg }};transition:background .3s"><span style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:{{ r.knob }};transform:translateX({{ r.knobX }});transition:transform .3s cubic-bezier(0.76,0,0.24,1)"></span></button>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;padding:clamp(18px,2.4vw,28px);display:flex;flex-direction:column;gap:22px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap"><div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Escena {{ sc.num }}</span><div style="font-family:'Instrument Serif',serif;font-size:32px;line-height:1">{{ sc.name }}</div></div><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:{{ sc.visColor }}">{{ sc.visLabel }}</span></div>
+                <label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Titular</span><span style="color:{{ sc.titleWarn }}">{{ sc.titleCount }} / 60</span></span><input value="{{ sc.title }}" onChange="{{ onSceneTitle }}" style="box-sizing:border-box;width:100%;height:46px;background:#1A1A1A;border:1px solid {{ sc.titleBd }};border-radius:6px;color:#EDEAE4;padding:0 14px;font-family:'Inter Tight',sans-serif;font-size:16px;outline:none" style-focus="border-color:#EDEAE4"><span style="font-size:12px;color:#8A8780">Recomendado: menos de 60 caracteres. Frases cortas, sin tecnicismos.</span></label>
+                <label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Texto</span><span style="color:{{ sc.textWarn }}">{{ sc.textCount }} / 220</span></span><textarea value="{{ sc.text }}" onChange="{{ onSceneText }}" rows="3" style="box-sizing:border-box;width:100%;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:12px 14px;font-family:'Inter Tight',sans-serif;font-size:15px;line-height:1.55;outline:none;resize:vertical" style-focus="border-color:#EDEAE4"></textarea></label>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+                  <label style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Texto del botón</span><input value="{{ sc.cta }}" onChange="{{ onSceneCta }}" placeholder="Sin botón" style="box-sizing:border-box;width:100%;height:44px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:0 14px;font-family:'Inter Tight',sans-serif;font-size:15px;outline:none" style-focus="border-color:#EDEAE4"></label>
+                  <label style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Enlace</span><input value="{{ sc.link }}" onChange="{{ onSceneLink }}" placeholder="#contacto" style="box-sizing:border-box;width:100%;height:44px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:0 14px;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none" style-focus="border-color:#EDEAE4"></label>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+                  <button onClick="{{ fakeUpload }}" style="all:unset;cursor:pointer;box-sizing:border-box;height:96px;border:1px dashed rgba(237,234,228,0.25);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:0 12px" style-hover="border-color:#EDEAE4;background:#161616"><span style="font-size:14px">Vídeo de fondo</span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#8A8780">hero_showreel_v12.mp4 · Cambiar</span></button>
+                  <button onClick="{{ fakeUpload }}" style="all:unset;cursor:pointer;box-sizing:border-box;height:96px;border:1px dashed rgba(237,234,228,0.25);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:0 12px" style-hover="border-color:#EDEAE4;background:#161616"><span style="font-size:14px">Imagen de reserva</span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#8A8780">Se ve mientras carga el vídeo</span></button>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Vista previa en vivo</span><div style="display:flex;border:1px solid rgba(237,234,228,0.14);border-radius:999px;padding:3px;gap:2px"><sc-for list="{{ pvOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.on }}" style="all:unset;cursor:pointer;height:30px;padding:0 12px;border-radius:999px;display:flex;align-items:center;font-size:12px;background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button></sc-for></div></div>
+                  <div style="background:#050505;border:1px solid rgba(237,234,228,0.08);border-radius:6px;padding:20px;display:flex;justify-content:center">
+                    <div style="width:{{ pvW }};max-width:100%;aspect-ratio:{{ pvAR }};background:#0A0A0A;border:1px solid rgba(237,234,228,0.10);box-sizing:border-box;padding:{{ pvPad }};display:flex;flex-direction:column;justify-content:center;gap:12px;overflow:hidden;transition:width .5s cubic-bezier(0.76,0,0.24,1)">
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Escena {{ sc.num }} — {{ sc.name }}</span>
+                      <div style="font-family:'Instrument Serif',serif;font-size:{{ pvSize }};line-height:0.95;text-wrap:balance">{{ sc.title }}</div>
+                      <div style="font-size:11px;line-height:1.5;color:#8A8780;max-width:46ch;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ sc.text }}</div>
+                      <sc-if value="{{ sc.hasCta }}"><span style="align-self:flex-start;height:26px;padding:0 12px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:11px;display:flex;align-items:center">{{ sc.cta }}</span></sc-if>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;border-top:1px solid rgba(237,234,228,0.08);padding-top:18px">
+                  <button onClick="{{ saveDraft }}" style="all:unset;cursor:pointer;height:40px;padding:0 18px;border-radius:999px;border:1px solid rgba(237,234,228,0.2);display:flex;align-items:center;font-size:14px" style-hover="border-color:#EDEAE4">Guardar borrador</button>
+                  <button onClick="{{ preview }}" style="all:unset;cursor:pointer;height:40px;padding:0 14px;display:flex;align-items:center;font-size:14px;color:#8A8780" style-hover="color:#EDEAE4">Vista previa</button>
+                  <button onClick="{{ publish }}" style="all:unset;cursor:pointer;height:40px;padding:0 20px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;display:flex;align-items:center;font-size:14px;font-weight:500" style-hover="background:#FFFFFF">Publicar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- PROJECTS LIST -->
+        <sc-if value="{{ scr.projList }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;max-width:1240px;animation:fadeUp .45s both">
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:14px"><div style="display:flex;flex-direction:column;gap:6px"><div style="font-family:'Instrument Serif',serif;font-size:40px;line-height:1">Proyectos</div><span style="font-size:14px;color:#8A8780">Tu portfolio. Lo publicado aparece en la escena 07 y en /proyectos.</span></div><button onClick="{{ newProject }}" style="all:unset;cursor:pointer;height:42px;padding:0 20px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500" style-hover="background:#FFFFFF">+ Nuevo proyecto</button></div>
+            <div style="display:flex;flex-wrap:wrap;border:1px solid rgba(237,234,228,0.14);border-radius:999px;padding:3px;gap:2px;width:fit-content;max-width:100%"><sc-for list="{{ projFilters }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.on }}" style="all:unset;cursor:pointer;height:34px;padding:0 14px;border-radius:999px;display:flex;align-items:center;font-size:13px;background:{{ o.bg }};color:{{ o.fg }};transition:background .25s, color .25s">{{ o.label }}</button></sc-for></div>
+            <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;overflow:hidden">
+              <sc-for list="{{ projRows }}" as="p" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:16px;padding:12px 16px;border-bottom:1px solid rgba(237,234,228,0.06);flex-wrap:wrap" style-hover="background:#161616">
+                  <div style="width:72px;height:48px;flex:none;border-radius:4px;background-color:#1C1B19;background-image:repeating-linear-gradient(135deg, rgba(237,234,228,0.05) 0px, rgba(237,234,228,0.05) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 7px)"></div>
+                  <button onClick="{{ p.edit }}" style="all:unset;cursor:pointer;flex:1 1 200px;min-width:0;display:flex;flex-direction:column;gap:4px"><span style="font-size:15px">{{ p.title }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.06em;color:#8A8780">{{ p.cat }} · {{ p.sector }} · {{ p.year }}</span></button>
+                  <span style="display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:{{ p.stFg }};width:100px"><span style="width:7px;height:7px;box-sizing:border-box;border-radius:50%;background:{{ p.stDot }};border:1px solid {{ p.stBd }}"></span>{{ p.stLabel }}</span>
+                  <button onClick="{{ p.feat }}" style="all:unset;cursor:pointer;height:30px;padding:0 12px;border-radius:999px;border:1px solid {{ p.featBd }};background:{{ p.featBg }};color:{{ p.featFg }};font-size:12px;display:flex;align-items:center;transition:background .25s">Destacado</button>
+                  <button onClick="{{ p.edit }}" style="all:unset;cursor:pointer;font-size:13px;color:#8A8780;min-height:36px;display:flex;align-items:center" style-hover="color:#EDEAE4">Editar →</button>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- PROJECT EDITOR -->
+        <sc-if value="{{ scr.projEdit }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;max-width:1240px;animation:fadeUp .45s both">
+            <button onClick="{{ backProjects }}" style="all:unset;cursor:pointer;font-size:14px;color:#8A8780;min-height:32px;align-self:flex-start" style-hover="color:#EDEAE4">← Proyectos</button>
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:14px"><div style="font-family:'Instrument Serif',serif;font-size:40px;line-height:1">{{ pe.titleShown }}</div>
+              <div style="display:flex;border:1px solid rgba(237,234,228,0.14);border-radius:999px;padding:3px;gap:2px"><sc-for list="{{ peStatus }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.on }}" style="all:unset;cursor:pointer;height:32px;padding:0 14px;border-radius:999px;display:flex;align-items:center;font-size:13px;background:{{ o.bg }};color:{{ o.fg }};transition:background .25s, color .25s">{{ o.label }}</button></sc-for></div></div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;align-items:start">
+              <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;padding:22px;display:flex;flex-direction:column;gap:18px">
+                <label style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Título</span><input value="{{ pe.title }}" onChange="{{ onPeTitle }}" placeholder="Nombre del proyecto" style="box-sizing:border-box;width:100%;height:44px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:0 14px;font-family:'Inter Tight',sans-serif;font-size:15px;outline:none" style-focus="border-color:#EDEAE4"></label>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px">
+                  <label style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Cliente</span><input defaultValue="{{ pe.client }}" onInput="{{ markDirty }}" style="box-sizing:border-box;width:100%;height:44px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:0 14px;font-family:'Inter Tight',sans-serif;font-size:15px;outline:none" style-focus="border-color:#EDEAE4"></label>
+                  <label style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Sector</span><input defaultValue="{{ pe.sector }}" onInput="{{ markDirty }}" style="box-sizing:border-box;width:100%;height:44px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:0 14px;font-family:'Inter Tight',sans-serif;font-size:15px;outline:none" style-focus="border-color:#EDEAE4"></label>
+                  <label style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Año</span><input defaultValue="{{ pe.year }}" onInput="{{ markDirty }}" style="box-sizing:border-box;width:100%;height:44px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:0 14px;font-family:'JetBrains Mono',monospace;font-size:14px;outline:none" style-focus="border-color:#EDEAE4"></label>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Categoría</span><div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ peCats }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.on }}" style="all:unset;cursor:pointer;height:36px;padding:0 14px;border-radius:999px;border:1px solid {{ o.bd }};display:flex;align-items:center;font-size:13px;background:{{ o.bg }};color:{{ o.fg }};transition:background .25s, color .25s">{{ o.label }}</button></sc-for></div></div>
+                <sc-for list="{{ peLong }}" as="f" hint-placeholder-count="3"><label style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">{{ f.label }}</span><textarea defaultValue="{{ f.v }}" onInput="{{ markDirty }}" rows="3" style="box-sizing:border-box;width:100%;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:12px 14px;font-family:'Inter Tight',sans-serif;font-size:14px;line-height:1.55;outline:none;resize:vertical" style-focus="border-color:#EDEAE4"></textarea></label></sc-for>
+                <div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Resultado en cifras</span><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px"><sc-for list="{{ peNums }}" as="n" hint-placeholder-count="3"><div style="display:flex;flex-direction:column;gap:6px"><input defaultValue="{{ n.v }}" onInput="{{ markDirty }}" style="box-sizing:border-box;width:100%;height:44px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:0 12px;font-family:'Instrument Serif',serif;font-size:22px;outline:none" style-focus="border-color:#EDEAE4"><input defaultValue="{{ n.l }}" onInput="{{ markDirty }}" style="box-sizing:border-box;width:100%;height:34px;background:transparent;border:none;border-bottom:1px solid rgba(237,234,228,0.14);color:#8A8780;padding:0;font-family:'Inter Tight',sans-serif;font-size:12px;outline:none"></div></sc-for></div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;padding:22px;display:flex;flex-direction:column;gap:14px">
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Portada · 2.39:1</span>
+                  <button onClick="{{ fakeUpload }}" style="all:unset;cursor:pointer;box-sizing:border-box;width:100%;aspect-ratio:2.39/1;border-radius:6px;background-color:#1C1B19;background-image:repeating-linear-gradient(135deg, rgba(237,234,228,0.05) 0px, rgba(237,234,228,0.05) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 10px);display:flex;align-items:flex-end;padding:12px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#8A8780" style-hover="outline:1px solid #EDEAE4">portada.jpg · Cambiar</button>
+                  <div style="display:flex;justify-content:space-between"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Galería</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#8A8780">Arrastra para reordenar</span></div>
+                  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px">
+                    <sc-for list="{{ peGallery }}" as="g" hint-placeholder-count="5"><div style="position:relative;aspect-ratio:4/5;border-radius:4px;background-color:#1C1B19;background-image:repeating-linear-gradient(135deg, rgba(237,234,228,0.05) 0px, rgba(237,234,228,0.05) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 7px);cursor:grab"><span style="position:absolute;left:6px;top:6px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#8A8780">{{ g.n }}</span></div></sc-for>
+                    <button onClick="{{ fakeUpload }}" style="all:unset;cursor:pointer;aspect-ratio:4/5;border-radius:4px;border:1px dashed rgba(237,234,228,0.25);display:flex;align-items:center;justify-content:center;font-size:20px;color:#8A8780" style-hover="border-color:#EDEAE4;color:#EDEAE4">+</button>
+                  </div>
+                </div>
+                <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;padding:22px;display:flex;flex-direction:column;gap:14px">
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">SEO de este proyecto</span>
+                  <label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;justify-content:space-between;font-size:13px;color:#8A8780"><span>Título en Google</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:{{ pe.seoWarn }}">{{ pe.seoCount }} / 60</span></span><input value="{{ pe.seo }}" onChange="{{ onPeSeo }}" style="box-sizing:border-box;width:100%;height:44px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:0 14px;font-family:'Inter Tight',sans-serif;font-size:14px;outline:none" style-focus="border-color:#EDEAE4"></label>
+                  <label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;color:#8A8780">Enlace a la web del cliente</span><input defaultValue="https://" onInput="{{ markDirty }}" style="box-sizing:border-box;width:100%;height:44px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:0 14px;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none" style-focus="border-color:#EDEAE4"></label>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center">
+                  <button onClick="{{ deleteProject }}" style="all:unset;cursor:pointer;font-size:14px;color:#8A8780;min-height:40px" style-hover="color:#FF3B1F">Eliminar proyecto</button>
+                  <div style="display:flex;gap:10px"><button onClick="{{ saveDraft }}" style="all:unset;cursor:pointer;height:40px;padding:0 18px;border-radius:999px;border:1px solid rgba(237,234,228,0.2);display:flex;align-items:center;font-size:14px" style-hover="border-color:#EDEAE4">Guardar borrador</button><button onClick="{{ publish }}" style="all:unset;cursor:pointer;height:40px;padding:0 20px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;display:flex;align-items:center;font-size:14px;font-weight:500" style-hover="background:#FFFFFF">Publicar</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- PRICES -->
+        <sc-if value="{{ scr.prices }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;max-width:1240px;animation:fadeUp .45s both">
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-family:'Instrument Serif',serif;font-size:40px;line-height:1">Precios del configurador</div><span style="font-size:14px;color:#8A8780">Estos rangos alimentan la escena «Tu presupuesto». Los cambios se aplican al publicar.</span></div>
+            <div style="display:grid;grid-template-columns:{{ priceCols }};gap:16px;align-items:start">
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <sc-for list="{{ priceGroups }}" as="g" hint-placeholder-count="5">
+                  <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;overflow:hidden">
+                    <div style="display:flex;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(237,234,228,0.08)"><span style="font-size:15px">{{ g.name }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Mín · Máx</span></div>
+                    <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="3">
+                      <div style="display:flex;flex-direction:column;gap:6px;padding:10px 18px;border-bottom:1px solid rgba(237,234,228,0.06)">
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                          <span style="flex:1 1 160px;font-size:14px">{{ r.name }}</span>
+                          <input value="{{ r.min }}" onChange="{{ r.onMin }}" inputmode="numeric" style="box-sizing:border-box;width:96px;height:38px;background:#1A1A1A;border:1px solid {{ r.bd }};border-radius:6px;color:#EDEAE4;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;text-align:right" style-focus="border-color:#EDEAE4">
+                          <input value="{{ r.max }}" onChange="{{ r.onMax }}" inputmode="numeric" style="box-sizing:border-box;width:96px;height:38px;background:#1A1A1A;border:1px solid {{ r.bd }};border-radius:6px;color:#EDEAE4;padding:0 10px;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;text-align:right" style-focus="border-color:#EDEAE4">
+                          <span style="width:52px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#8A8780">{{ r.unit }}</span>
+                        </div>
+                        <sc-if value="{{ r.err }}"><span style="font-size:12px;color:#FF3B1F">El mínimo no puede ser mayor que el máximo.</span></sc-if>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="position:sticky;top:0;border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;padding:22px;display:flex;flex-direction:column;gap:20px">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Simulación en vivo</span>
+                <sc-for list="{{ sims }}" as="m" hint-placeholder-count="2">
+                  <div style="display:flex;flex-direction:column;gap:6px;padding-bottom:18px;border-bottom:1px solid rgba(237,234,228,0.08)"><span style="font-size:13px;color:#8A8780;line-height:1.45">{{ m.desc }}</span><span style="font-family:'Instrument Serif',serif;font-size:34px;line-height:1">{{ m.range }}</span><span style="font-size:13px;color:#8A8780">{{ m.monthly }}</span></div>
+                </sc-for>
+                <span style="font-size:13px;line-height:1.5;color:#8A8780">Así lo verá un cliente en la web con esas opciones marcadas.</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- MEDIA -->
+        <sc-if value="{{ scr.media }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:18px;max-width:1240px;animation:fadeUp .45s both">
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:14px"><div style="display:flex;flex-direction:column;gap:6px"><div style="font-family:'Instrument Serif',serif;font-size:40px;line-height:1">Biblioteca de medios</div><span style="font-size:14px;color:#8A8780">{{ mediaCount }} archivos · 214 MB de 2 GB</span></div><button onClick="{{ startUpload }}" style="all:unset;cursor:pointer;height:42px;padding:0 20px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;display:flex;align-items:center;font-size:14px;font-weight:500" style-hover="background:#FFFFFF">Subir archivos</button></div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+              <input value="{{ mediaQ }}" onChange="{{ onMediaQ }}" placeholder="Buscar archivo" style="flex:1 1 200px;box-sizing:border-box;height:42px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:999px;color:#EDEAE4;padding:0 18px;font-family:'Inter Tight',sans-serif;font-size:14px;outline:none" style-focus="border-color:#EDEAE4">
+              <div style="display:flex;border:1px solid rgba(237,234,228,0.14);border-radius:999px;padding:3px;gap:2px"><sc-for list="{{ mediaTypes }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.on }}" style="all:unset;cursor:pointer;height:34px;padding:0 14px;border-radius:999px;display:flex;align-items:center;font-size:13px;background:{{ o.bg }};color:{{ o.fg }};transition:background .25s, color .25s">{{ o.label }}</button></sc-for></div>
+            </div>
+            <button onClick="{{ startUpload }}" style="all:unset;cursor:pointer;box-sizing:border-box;border:1px dashed rgba(237,234,228,0.25);border-radius:8px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center" style-hover="border-color:#EDEAE4;background:#121212">
+              <span style="font-size:15px">Arrastra imágenes o vídeos aquí, o haz clic para elegir</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#8A8780">JPG · PNG · WEBP · MP4 · máx. 20 MB</span>
+              <sc-if value="{{ uploading }}"><div style="width:min(420px,100%);display:flex;flex-direction:column;gap:6px;margin-top:6px"><div style="height:3px;background:#1A1A1A;border-radius:2px;overflow:hidden"><div style="height:100%;width:{{ upPct }};background:#EDEAE4;transition:width .12s linear"></div></div><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.08em;color:#8A8780">Subiendo rodaje_brasa_04.mp4 · {{ upPct }}</span></div></sc-if>
+            </button>
+            <div style="display:grid;grid-template-columns:{{ mediaCols }};gap:16px;align-items:start">
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">
+                <sc-for list="{{ mediaTiles }}" as="m" hint-placeholder-count="8">
+                  <button onClick="{{ m.on }}" style="all:unset;cursor:pointer;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;padding:8px;border-radius:8px;border:1px solid {{ m.bd }};background:#121212;transition:border-color .2s" style-hover="border-color:rgba(237,234,228,0.4)">
+                    <div style="position:relative;aspect-ratio:4/3;border-radius:4px;background-color:#1C1B19;background-image:radial-gradient(ellipse at 30% 40%, rgba(237,234,228,0.08), rgba(237,234,228,0) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.05) 0px, rgba(237,234,228,0.05) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 8px)"><sc-if value="{{ m.isVideo }}"><span style="position:absolute;left:8px;bottom:8px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#EDEAE4">▶ {{ m.dur }}</span></sc-if></div>
+                    <span style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.06em;color:#8A8780">{{ m.size }} · {{ m.usesLabel }}</span>
+                  </button>
+                </sc-for>
+                <sc-if value="{{ mediaEmpty }}" hint-placeholder-val="{{ false }}"><div style="grid-column:1/-1;padding:40px 0;display:flex;flex-direction:column;gap:8px"><div style="font-family:'Instrument Serif',serif;font-size:28px">Sin <em>resultados.</em></div><span style="font-size:14px;color:#8A8780">Prueba con otro nombre o quita el filtro de tipo.</span></div></sc-if>
+              </div>
+              <sc-if value="{{ hasMediaSel }}">
+                <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;padding:18px;display:flex;flex-direction:column;gap:16px;animation:fadeIn .3s both">
+                  <div style="aspect-ratio:4/3;border-radius:4px;background-color:#1C1B19;background-image:radial-gradient(ellipse at 30% 40%, rgba(237,234,228,0.1), rgba(237,234,228,0) 70%), repeating-linear-gradient(135deg, rgba(237,234,228,0.05) 0px, rgba(237,234,228,0.05) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 8px)"></div>
+                  <span style="font-size:15px;word-break:break-all">{{ ms.name }}</span>
+                  <div style="display:flex;flex-direction:column;border-top:1px solid rgba(237,234,228,0.08)">
+                    <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(237,234,228,0.06);font-size:13px"><span style="color:#8A8780">Dimensiones</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ ms.dims }}</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(237,234,228,0.06);font-size:13px"><span style="color:#8A8780">Peso</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px">{{ ms.size }}</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(237,234,228,0.06);font-size:13px"><span style="color:#8A8780">Usado en</span><span style="text-align:right">{{ ms.usesText }}</span></div>
+                  </div>
+                  <label style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Texto alternativo</span><input defaultValue="{{ ms.alt }}" placeholder="Describe la imagen" style="box-sizing:border-box;width:100%;height:42px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:0 12px;font-family:'Inter Tight',sans-serif;font-size:14px;outline:none" style-focus="border-color:#EDEAE4"></label>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px"><button onClick="{{ copyUrl }}" style="all:unset;cursor:pointer;height:38px;padding:0 16px;border-radius:999px;border:1px solid rgba(237,234,228,0.2);display:flex;align-items:center;font-size:13px" style-hover="border-color:#EDEAE4">Copiar URL</button><button onClick="{{ deleteMedia }}" style="all:unset;cursor:pointer;height:38px;padding:0 12px;display:flex;align-items:center;font-size:13px;color:#8A8780" style-hover="color:#FF3B1F">Eliminar</button></div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- USERS -->
+        <sc-if value="{{ scr.users }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;max-width:1040px;animation:fadeUp .45s both">
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:14px"><div style="display:flex;flex-direction:column;gap:6px"><div style="font-family:'Instrument Serif',serif;font-size:40px;line-height:1">Usuarios</div><span style="font-size:14px;color:#8A8780">Quién puede entrar al panel y qué puede tocar.</span></div><button onClick="{{ openInvite }}" style="all:unset;cursor:pointer;height:42px;padding:0 20px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;display:flex;align-items:center;font-size:14px;font-weight:500" style-hover="background:#FFFFFF">Invitar usuario</button></div>
+            <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;overflow:hidden">
+              <sc-for list="{{ userRows }}" as="u" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid rgba(237,234,228,0.06);flex-wrap:wrap">
+                  <span style="width:38px;height:38px;flex:none;border-radius:50%;background:#1A1A1A;border:1px solid rgba(237,234,228,0.14);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px">{{ u.init }}</span>
+                  <div style="flex:1 1 200px;min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-size:15px">{{ u.name }}</span><span style="font-size:13px;color:#8A8780;overflow:hidden;text-overflow:ellipsis">{{ u.email }}</span></div>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:6px 10px;border-radius:999px;border:1px solid rgba(237,234,228,0.18)">{{ u.role }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8A8780;width:96px">{{ u.last }}</span>
+                  <button onClick="{{ u.toggle }}" style="all:unset;cursor:pointer;font-size:13px;color:#8A8780;min-height:36px" style-hover="color:#EDEAE4">Cambiar rol</button>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+              <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;padding:18px 20px;display:flex;flex-direction:column;gap:8px"><span style="font-size:15px">Administrador</span><span style="font-size:13px;line-height:1.55;color:#8A8780">Todo: textos, proyectos, medios, precios, usuarios y publicación.</span></div>
+              <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;padding:18px 20px;display:flex;flex-direction:column;gap:8px"><span style="font-size:15px">Editor</span><span style="font-size:13px;line-height:1.55;color:#8A8780">Textos, proyectos y medios. Guarda borradores; un administrador publica. No ve precios ni usuarios.</span></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- HISTORY -->
+        <sc-if value="{{ scr.history }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;max-width:960px;animation:fadeUp .45s both">
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-family:'Instrument Serif',serif;font-size:40px;line-height:1">Historial</div><span style="font-size:14px;color:#8A8780">Cada cambio queda registrado. Puedes restaurar cualquier versión anterior.</span></div>
+            <div style="display:flex;flex-wrap:wrap;border:1px solid rgba(237,234,228,0.14);border-radius:999px;padding:3px;gap:2px;width:fit-content;max-width:100%"><sc-for list="{{ histFilters }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.on }}" style="all:unset;cursor:pointer;height:34px;padding:0 14px;border-radius:999px;display:flex;align-items:center;font-size:13px;background:{{ o.bg }};color:{{ o.fg }};transition:background .25s, color .25s">{{ o.label }}</button></sc-for></div>
+            <sc-for list="{{ histGroups }}" as="g" hint-placeholder-count="2">
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">{{ g.day }}</span>
+                <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;overflow:hidden">
+                  <sc-for list="{{ g.items }}" as="h" hint-placeholder-count="3">
+                    <div style="display:flex;gap:16px;padding:16px 18px;border-bottom:1px solid rgba(237,234,228,0.06);align-items:flex-start;flex-wrap:wrap">
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8780;width:44px;flex:none;padding-top:2px">{{ h.time }}</span>
+                      <div style="flex:1 1 240px;min-width:0;display:flex;flex-direction:column;gap:8px">
+                        <span style="font-size:14px;line-height:1.5"><span style="color:#8A8780">{{ h.who }} ·</span> {{ h.text }}</span>
+                        <sc-if value="{{ h.hasDiff }}"><div style="display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:#0A0A0A;border-radius:6px;font-size:13px;line-height:1.5"><span style="color:#6B6862;text-decoration:line-through">{{ h.from }}</span><span>{{ h.to }}</span></div></sc-if>
+                      </div>
+                      <button onClick="{{ h.restore }}" style="all:unset;cursor:pointer;height:32px;padding:0 12px;border-radius:999px;border:1px solid rgba(237,234,228,0.18);display:flex;align-items:center;font-size:12px" style-hover="border-color:#EDEAE4">Restaurar</button>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- SETTINGS -->
+        <sc-if value="{{ scr.settings }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:20px;max-width:1040px;animation:fadeUp .45s both">
+            <div style="display:flex;flex-direction:column;gap:6px"><div style="font-family:'Instrument Serif',serif;font-size:40px;line-height:1">Ajustes</div><span style="font-size:14px;color:#8A8780">Datos de contacto, SEO general y textos legales.</span></div>
+            <div style="display:flex;flex-wrap:wrap;border:1px solid rgba(237,234,228,0.14);border-radius:999px;padding:3px;gap:2px;width:fit-content;max-width:100%"><sc-for list="{{ setTabs }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.on }}" style="all:unset;cursor:pointer;height:34px;padding:0 14px;border-radius:999px;display:flex;align-items:center;font-size:13px;background:{{ o.bg }};color:{{ o.fg }};transition:background .25s, color .25s">{{ o.label }}</button></sc-for></div>
+            <sc-if value="{{ tabContact }}">
+              <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;padding:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px 18px;animation:fadeIn .3s both">
+                <sc-for list="{{ contactFields }}" as="f" hint-placeholder-count="10"><label style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">{{ f.label }}</span><input defaultValue="{{ f.v }}" onInput="{{ markDirty }}" style="box-sizing:border-box;width:100%;height:44px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:0 14px;font-family:'Inter Tight',sans-serif;font-size:14px;outline:none" style-focus="border-color:#EDEAE4"></label></sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ tabSeo }}">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;align-items:start;animation:fadeIn .3s both">
+                <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;padding:22px;display:flex;flex-direction:column;gap:16px">
+                  <label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Título de la home</span><span style="color:{{ seoTWarn }}">{{ seoTCount }} / 60</span></span><input value="{{ seoTitle }}" onChange="{{ onSeoTitle }}" style="box-sizing:border-box;width:100%;height:44px;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:0 14px;font-family:'Inter Tight',sans-serif;font-size:14px;outline:none" style-focus="border-color:#EDEAE4"></label>
+                  <label style="display:flex;flex-direction:column;gap:8px"><span style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780"><span>Descripción</span><span style="color:{{ seoDWarn }}">{{ seoDCount }} / 160</span></span><textarea value="{{ seoDesc }}" onChange="{{ onSeoDesc }}" rows="3" style="box-sizing:border-box;width:100%;background:#1A1A1A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;color:#EDEAE4;padding:12px 14px;font-family:'Inter Tight',sans-serif;font-size:14px;line-height:1.5;outline:none;resize:vertical" style-focus="border-color:#EDEAE4"></textarea><span style="font-size:12px;color:#8A8780">Recomendado: entre 120 y 160 caracteres.</span></label>
+                  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px"><button onClick="{{ fakeUpload }}" style="all:unset;cursor:pointer;box-sizing:border-box;height:88px;border:1px dashed rgba(237,234,228,0.25);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:13px" style-hover="border-color:#EDEAE4">Imagen para compartir<span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#8A8780">1200 × 630</span></button><button onClick="{{ fakeUpload }}" style="all:unset;cursor:pointer;box-sizing:border-box;height:88px;border:1px dashed rgba(237,234,228,0.25);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:13px" style-hover="border-color:#EDEAE4">Favicon<span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#8A8780">512 × 512</span></button></div>
+                </div>
+                <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;padding:22px;display:flex;flex-direction:column;gap:12px">
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Así se verá en Google</span>
+                  <div style="background:#EDEAE4;color:#1A1A1A;border-radius:6px;padding:16px 18px;display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;color:#4A4844">rowe-web.es</span><span style="font-size:18px;color:#1F3A8A;line-height:1.3">{{ seoTitle }}</span><span style="font-size:13px;line-height:1.5;color:#4A4844">{{ seoDesc }}</span></div>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ tabLegal }}">
+              <div style="display:flex;flex-direction:column;gap:16px;animation:fadeIn .3s both">
+                <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;overflow:hidden">
+                  <sc-for list="{{ legalRows }}" as="l" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid rgba(237,234,228,0.06)"><span style="flex:1;font-size:15px">{{ l.name }}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8A8780">{{ l.date }}</span><button onClick="{{ preview }}" style="all:unset;cursor:pointer;font-size:13px;color:#8A8780;min-height:36px" style-hover="color:#EDEAE4">Editar →</button></div></sc-for>
+                </div>
+                <div style="border:1px solid rgba(237,234,228,0.10);border-radius:8px;background:#121212;padding:20px;display:flex;flex-direction:column;gap:16px">
+                  <button onClick="{{ toggleCookies }}" style="all:unset;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:14px"><div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:15px">Banner de cookies</span><span style="font-size:13px;color:#8A8780">Se muestra en la primera visita.</span></div><span style="flex:none;width:44px;height:26px;border-radius:999px;position:relative;box-sizing:border-box;border:1px solid {{ ckBd }};background:{{ ckBg }};transition:background .3s"><span style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:{{ ckKnob }};transform:translateX({{ ckX }});transition:transform .3s cubic-bezier(0.76,0,0.24,1)"></span></span></button>
+                  <sc-if value="{{ cookies }}"><div style="background:#0A0A0A;border:1px solid rgba(237,234,228,0.10);border-radius:6px;padding:16px 18px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px"><span style="font-size:13px;line-height:1.5;color:#8A8780;max-width:46ch">Usamos cookies para medir visitas y mejorar la web. Tú decides.</span><div style="display:flex;gap:8px"><span style="height:32px;padding:0 14px;border-radius:999px;border:1px solid rgba(237,234,228,0.2);font-size:12px;display:flex;align-items:center">Configurar</span><span style="height:32px;padding:0 14px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;font-size:12px;display:flex;align-items:center">Aceptar</span></div></div></sc-if>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ isMobile }}">
+        <nav style="position:absolute;left:0;right:0;bottom:0;height:68px;background:rgba(10,10,10,0.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(237,234,228,0.08);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));z-index:20">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.on }}" style="all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:10px;color:{{ t.fg }};position:relative"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.d }}"></path></svg>{{ t.label }}<sc-if value="{{ t.hasBadge }}"><span style="position:absolute;top:10px;left:calc(50% + 6px);width:7px;height:7px;border-radius:50%;background:#EDEAE4"></span></sc-if></button></sc-for>
+        </nav>
+      </sc-if>
+    </main>
+  </sc-if>
+
+  <sc-if value="{{ drawer }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;z-index:60;background:#0A0A0A;display:flex;flex-direction:column;animation:fadeIn .25s both">
+      <div style="height:64px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(237,234,228,0.08)"><div style="display:flex;align-items:center;gap:10px"><img src="assets/rowe-logo-blanco.png" alt="ROWE" style="height:15px;display:block"><span style="width:6px;height:6px;border-radius:50%;background:#FF3B1F"></span></div><button onClick="{{ closeDrawer }}" style="all:unset;cursor:pointer;min-height:44px;font-size:14px;display:flex;align-items:center">Cerrar</button></div>
+      <div style="flex:1;overflow-y:auto;padding:12px 16px 24px;display:flex;flex-direction:column">
+        <sc-for list="{{ navFlat }}" as="n" hint-placeholder-count="10"><button onClick="{{ n.on }}" style="all:unset;cursor:pointer;min-height:54px;display:flex;align-items:center;gap:14px;border-bottom:1px solid rgba(237,234,228,0.06);font-size:18px;color:{{ n.fg }}"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ n.d }}"></path></svg><span style="flex:1">{{ n.label }}</span><sc-if value="{{ n.hasBadge }}"><span style="font-family:'JetBrains Mono',monospace;font-size:11px">{{ n.badge }}</span></sc-if></button></sc-for>
+        <button onClick="{{ logout }}" style="all:unset;cursor:pointer;min-height:54px;display:flex;align-items:center;font-size:15px;color:#8A8780;margin-top:12px">Salir</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasConfirm }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ cancelConfirm }}" style="position:absolute;inset:0;z-index:80;background:rgba(10,10,10,0.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s both">
+      <div onClick="{{ stop }}" style="width:min(440px,100%);background:#121212;border:1px solid rgba(237,234,228,0.14);border-radius:10px;padding:26px;display:flex;flex-direction:column;gap:14px;animation:modalIn .35s cubic-bezier(0.22,1,0.36,1) both">
+        <div style="font-family:'Instrument Serif',serif;font-size:30px;line-height:1.05">{{ cf.title }}</div>
+        <p style="margin:0;font-size:14px;line-height:1.55;color:#8A8780">{{ cf.body }}</p>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px"><button onClick="{{ cancelConfirm }}" style="all:unset;cursor:pointer;height:40px;padding:0 16px;border-radius:999px;display:flex;align-items:center;font-size:14px;color:#8A8780" style-hover="color:#EDEAE4">Cancelar</button><button onClick="{{ okConfirm }}" style="all:unset;cursor:pointer;height:40px;padding:0 20px;border-radius:999px;background:{{ cf.bg }};color:{{ cf.fg }};display:flex;align-items:center;font-size:14px;font-weight:500">{{ cf.cta }}</button></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ inviteOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeInvite }}" style="position:absolute;inset:0;z-index:80;background:rgba(10,10,10,0.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s both">
+      <div onClick="{{ stop }}" style="width:min(460px,100%);background:#121212;border:1px solid rgba(237,234,228,0.14);border-radius:10px;padding:26px;display:flex;flex-direction:column;gap:18px;animation:modalIn .35s cubic-bezier(0.22,1,0.36,1) both">
+        <div style="font-family:'Instrument Serif',serif;font-size:30px;line-height:1">Invitar <em>usuario</em></div>
+        <label style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Email</span><input value="{{ inviteEmail }}" onChange="{{ onInviteEmail }}" placeholder="persona@negocio.es" style="box-sizing:border-box;width:100%;height:44px;background:#1A1A1A;border:1px solid {{ inviteBd }};border-radius:6px;color:#EDEAE4;padding:0 14px;font-family:'Inter Tight',sans-serif;font-size:15px;outline:none" style-focus="border-color:#EDEAE4"></label>
+        <div style="display:flex;flex-direction:column;gap:8px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#8A8780">Rol</span><div style="display:flex;border:1px solid rgba(237,234,228,0.14);border-radius:999px;padding:3px;gap:2px;width:fit-content"><sc-for list="{{ roleOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.on }}" style="all:unset;cursor:pointer;height:34px;padding:0 16px;border-radius:999px;display:flex;align-items:center;font-size:13px;background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button></sc-for></div><span style="font-size:13px;color:#8A8780;line-height:1.5">{{ roleDesc }}</span></div>
+        <div style="display:flex;justify-content:flex-end;gap:10px"><button onClick="{{ closeInvite }}" style="all:unset;cursor:pointer;height:40px;padding:0 16px;display:flex;align-items:center;font-size:14px;color:#8A8780">Cancelar</button><button onClick="{{ sendInvite }}" style="all:unset;cursor:pointer;height:40px;padding:0 20px;border-radius:999px;background:#EDEAE4;color:#0A0A0A;display:flex;align-items:center;font-size:14px;font-weight:500">Enviar invitación</button></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="position:absolute;right:16px;bottom:{{ toastBottom }};z-index:90;display:flex;flex-direction:column;gap:8px;align-items:flex-end;pointer-events:none;max-width:calc(100% - 32px)">
+    <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="0"><div style="background:#EDEAE4;color:#0A0A0A;padding:12px 16px;border-radius:8px;font-size:13px;display:flex;align-items:center;gap:10px;animation:toastIn .35s cubic-bezier(0.22,1,0.36,1) both"><span style="width:6px;height:6px;border-radius:50%;background:#0A0A0A;flex:none"></span>{{ t.text }}</div></sc-for>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startAtLogin&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Vista&quot;},&quot;mobilePreview&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Vista&quot;}}">
+const IC = {
+  dashboard: 'M2 7.5 8 2.5l6 5V14H2z', leads: 'M2 3.5h12v9H2z M2 4l6 5 6-5', stats: 'M3 13V8 M8 13V3 M13 13V6',
+  texts: 'M3 4h10 M3 8h10 M3 12h6', projects: 'M2 2h5v5H2z M9 2h5v5H9z M2 9h5v5H2z M9 9h5v5H9z',
+  prices: 'M8 1.5v13 M11.5 4.5h-5a2 2 0 0 0 0 4h3a2 2 0 0 1 0 4h-5', media: 'M2 3h12v10H2z M2 11l4-4 3 3 2-2 3 3',
+  users: 'M8 7.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z M3 14c0-2.8 2.2-4.5 5-4.5s5 1.7 5 4.5',
+  history: 'M2.5 8a5.5 5.5 0 1 0 1.6-3.9 M2.5 2.5v2.5H5 M8 5v3.5l2 1.5', settings: 'M2 4h12 M2 8h12 M2 12h12 M5 2.5v3 M11 6.5v3 M7 10.5v3', more: 'M3 8h.01 M8 8h.01 M13 8h.01'
+};
+const NAV = [
+  { label: 'General', items: [['dashboard', 'Inicio'], ['leads', 'Mensajes'], ['stats', 'Estadísticas']] },
+  { label: 'Contenido', items: [['texts', 'Textos y escenas'], ['projects', 'Proyectos'], ['prices', 'Precios'], ['media', 'Medios']] },
+  { label: 'Equipo', items: [['users', 'Usuarios'], ['history', 'Historial'], ['settings', 'Ajustes']] }
+];
+const TITLES = { dashboard: 'Inicio', leads: 'Mensajes', stats: 'Estadísticas', texts: 'Textos y escenas', projects: 'Proyectos', prices: 'Precios', media: 'Medios', users: 'Usuarios', history: 'Historial', settings: 'Ajustes' };
+const LEADS = [
+  { id: 1, name: 'Lucía Martín', company: 'Clínica Dental Mar', sector: 'Salud', service: 'Las dos cosas', budget: '1.800 – 2.400 € + 480 – 640 €/mes', origin: 'Configurador', items: 'Web a medida · Jornada de rodaje · Reservas / citas · SEO local · 8 reels/mes', msg: 'Queremos renovar la web y empezar a publicar vídeos del equipo y de los tratamientos. Ahora casi todos los pacientes nos llegan por recomendación.', email: 'lucia@clinicamar.es', phone: '[+34 600 111 222]', date: 'Hoy · 10:42', status: 'nuevo' },
+  { id: 2, name: 'Javier Ferrer', company: 'Ferrer & Asociados', sector: 'Despacho profesional', service: 'Web', budget: '1.000 – 2.500 €', origin: 'Formulario', items: '', msg: 'Necesitamos una web sobria y clara, con las áreas de práctica y un formulario de consulta.', email: 'jferrer@ferrerasociados.es', phone: '[+34 600 333 444]', date: 'Hoy · 09:15', status: 'nuevo' },
+  { id: 3, name: 'Marta Gil', company: 'Restaurante Brasa', sector: 'Restauración', service: 'Audiovisual', budget: 'Menos de 1.000 €', origin: 'Formulario', items: '', msg: 'Buscamos reels mensuales para Instagram, sobre todo de cocina y sala.', email: 'marta@brasa.es', phone: '[+34 600 555 666]', date: 'Ayer · 18:30', status: 'contactado' },
+  { id: 4, name: 'Pablo Ortega', company: 'Estudio Pilates Norte', sector: 'Bienestar', service: 'Las dos cosas', budget: '2.050 – 2.900 €', origin: 'Configurador', items: 'Web a medida · Jornada de rodaje · Reservas / citas · Sesión de fotos', msg: '', email: 'pablo@pilatesnorte.es', phone: '', date: '13 oct · 12:04', status: 'contactado' },
+  { id: 5, name: 'Elena Ruiz', company: 'Ópticas Luz', sector: 'Comercio', service: 'Audiovisual', budget: '1.000 – 2.500 €', origin: 'Formulario', items: '', msg: 'Campaña de vídeo para la apertura de la segunda tienda.', email: 'elena@opticasluz.es', phone: '[+34 600 777 888]', date: '11 oct · 16:20', status: 'cerrado' },
+  { id: 6, name: 'Sergio Vela', company: 'Logística Vela', sector: 'Empresa B2B', service: 'Web', budget: '2.500 – 5.000 €', origin: 'Configurador', items: 'Web nueva · Hasta 10 páginas · Idiomas ×1 · SEO local · Mantenimiento', msg: 'Web corporativa en español e inglés para captar clientes B2B.', email: 's.vela@logisticavela.com', phone: '[+34 600 999 000]', date: '9 oct · 11:48', status: 'cerrado' }
+];
+const SCENES = [
+  ['Hero', 'Que te vean. Que confíen. Que te elijan.', 'Estudio boutique de web y audiovisual para empresas y negocios que quieren verse profesionales en internet y conseguir más clientes.', 'Pide tu propuesta', '#presupuesto'],
+  ['El estudio', 'Somos ROWE.', 'Un estudio pequeño a propósito. Rodamos los vídeos que hacen que se fijen en ti y construimos la web que hace que te elijan.', '', ''],
+  ['Servicios', 'Web y audiovisual.', 'Dos disciplinas, un mismo equipo.', 'Ver servicio', '/web'],
+  ['Desarrollo web', 'Webs que trabajan por ti.', 'Diseñamos y desarrollamos webs a medida, rápidas y pensadas para que quien llegue sepa en segundos qué haces y cómo contactarte.', 'Ver servicio', '/web'],
+  ['Audiovisual', 'Vídeos que paran el scroll.', 'Rodamos y editamos contenido para redes y comunicación comercial. Piezas cortas, cuidadas y pensadas para que tu cliente se quede mirando.', 'Ver servicio', '/audiovisual'],
+  ['Ecosistema', 'Uno atrae. El otro convierte.', 'Mismo equipo, misma estética, mismo mensaje. Así tu marca se ve igual de profesional en todas partes.', 'Quiero el pack completo', '#presupuesto'],
+  ['Proceso', 'Del briefing al estreno.', '', '', ''],
+  ['Proyectos', 'Trabajos recientes.', '', '¿Quieres un resultado así?', '#hablemos'],
+  ['Filosofía', 'Lo que nos diferencia.', '', '', ''],
+  ['Presupuesto', 'Calcula tu presupuesto.', 'Elige lo que necesitas y te damos un rango orientativo al momento.', 'Enviar y hablemos', '#hablemos'],
+  ['Hablemos', '¿Grabamos tu próxima escena?', 'Cuéntanos qué necesitas. Te respondemos en menos de 24 h.', 'Enviar solicitud', '']
+].map((s, i) => ({ id: 's' + i, name: s[0], title: s[1], text: s[2], cta: s[3], link: s[4], visible: true }));
+const PROJECTS = [
+  ['Clínica Dental Mar', 'Web + Audiovisual', 'Salud', 2026, 'publicado', true], ['Bufete Ferrer & Asociados', 'Web', 'Despacho profesional', 2026, 'publicado', false],
+  ['Restaurante Brasa', 'Audiovisual', 'Restauración', 2025, 'publicado', true], ['Estudio Pilates Norte', 'Web + Audiovisual', 'Bienestar', 2025, 'publicado', false],
+  ['Ópticas Luz', 'Audiovisual', 'Comercio', 2025, 'publicado', false], ['Logística Vela', 'Web', 'Empresa B2B', 2026, 'borrador', false]
+].map((p, i) => ({ id: i + 1, title: p[0], cat: p[1], sector: p[2], year: p[3], status: p[4], featured: p[5], seo: p[0] + ' — Caso de estudio · ROWE' }));
+const PGROUPS = [
+  { name: 'Tipo de proyecto', rows: [['nueva', 'Web nueva', 900, 1400, 'único'], ['rediseno', 'Rediseño', 700, 1100, 'único'], ['contenido', 'Web + contenido', 1250, 1900, 'único']] },
+  { name: 'Tamaño', rows: [['p10', 'Hasta 10 páginas', 400, 600, 'único'], ['p10p', 'Más de 10 páginas', 900, 1400, 'único']] },
+  { name: 'Funciones', rows: [['reservas', 'Reservas / citas', 300, 500, 'único'], ['tienda', 'Tienda online', 900, 1500, 'único'], ['seo', 'SEO local', 250, 400, 'único'], ['idioma', 'Idioma extra', 200, 300, 'c/u']] },
+  { name: 'Audiovisual', rows: [['reels4', '4 reels al mes', 260, 360, '/mes'], ['reels8', '8 reels al mes', 480, 640, '/mes'], ['reels12', '12 reels al mes', 680, 900, '/mes'], ['fotos', 'Sesión de fotos', 250, 400, 'único'], ['video', 'Vídeo corporativo', 600, 1100, 'único']] },
+  { name: 'Después del estreno', rows: [['mant', 'Mantenimiento', 35, 60, '/mes'], ['urgente', 'Entrega urgente', 20, 20, '%']] }
+];
+const MEDIA = [
+  ['hero_showreel_v12.mp4', 'video', '18,4 MB', '1920 × 804', '1:24', ['Hero']], ['clinica-mar-portada.jpg', 'image', '640 KB', '2400 × 1004', '', ['Proyectos · Clínica Dental Mar']],
+  ['brasa-reel-03.mp4', 'video', '9,1 MB', '1080 × 1920', '0:24', ['Audiovisual', 'Proyectos · Restaurante Brasa']], ['estudio-manos-camara.jpg', 'image', '1,2 MB', '1600 × 2000', '', ['El estudio']],
+  ['web-ferrer-mockup.png', 'image', '2,3 MB', '2880 × 1800', '', ['Proyectos · Bufete Ferrer']], ['pilates-norte-sala.jpg', 'image', '980 KB', '2400 × 1600', '', ['Proyectos · Estudio Pilates Norte']],
+  ['opticas-luz-campana.mp4', 'video', '14,7 MB', '1920 × 1080', '0:45', ['Proyectos · Ópticas Luz']], ['equipo-rowe-rodaje.jpg', 'image', '1,6 MB', '2400 × 1600', '', []],
+  ['logo-rowe-blanco.png', 'image', '18 KB', '407 × 101', '', ['Cabecera', 'Pie']], ['og-share-rowe.jpg', 'image', '210 KB', '1200 × 630', '', ['SEO']]
+].map((m, i) => ({ id: i + 1, name: m[0], type: m[1], size: m[2], dims: m[3], dur: m[4], uses: m[5] }));
+const USERS = [{ name: 'Admin ROWE', email: 'rowe.web.agency@gmail.com', role: 'Administrador', last: 'Ahora', init: 'AR' }, { name: 'Redes ROWE', email: 'rowe.web.redes@gmail.com', role: 'Editor', last: 'Ayer · 19:02', init: 'RR' }, { name: 'Contacto ROWE', email: 'rowe.web.contacto@gmail.com', role: 'Editor', last: '10 oct', init: 'CR' }];
+const HIST = [
+  { day: 'Hoy', time: '12:40', who: 'Admin', cat: 'Textos', text: 'Cambió el titular de la escena Hero', from: 'Rodamos tu historia. Construimos tu web.', to: 'Que te vean. Que confíen. Que te elijan.' },
+  { day: 'Hoy', time: '11:05', who: 'Redes', cat: 'Medios', text: 'Subió brasa-reel-03.mp4' },
+  { day: 'Hoy', time: '09:30', who: 'Admin', cat: 'Precios', text: 'Actualizó el precio de Tienda online', from: '800 – 1.400 €', to: '900 – 1.500 €' },
+  { day: 'Ayer', time: '18:12', who: 'Admin', cat: 'Proyectos', text: 'Publicó Estudio Pilates Norte' },
+  { day: 'Ayer', time: '10:47', who: 'Redes', cat: 'Textos', text: 'Editó el texto de la escena Audiovisual', from: 'Contenido para redes y comunicación comercial.', to: 'Rodamos y editamos contenido para redes y comunicación comercial.' },
+  { day: '13 oct', time: '16:20', who: 'Admin', cat: 'Proyectos', text: 'Creó el borrador Logística Vela' }
+];
+const STATS = {
+  '7d': { k: [['Visitas', '1.284', '+12 % vs. semana anterior'], ['Visitantes únicos', '942', '+8 %'], ['Tiempo medio', '1:48', '+0:12'], ['Conversión', '2,4 %', '+0,3 pts']], bars: [[142, 'L'], [168, 'M'], [201, 'X'], [188, 'J'], [236, 'V'], [171, 'S'], [178, 'D']], f: [1284, 702, 214, 31] },
+  '30d': { k: [['Visitas', '5.410', '+18 % vs. mes anterior'], ['Visitantes únicos', '3.870', '+11 %'], ['Tiempo medio', '1:41', '+0:06'], ['Conversión', '2,2 %', '+0,2 pts']], bars: [[520, '1'], [610, '4'], [580, '7'], [660, '10'], [720, '13'], [690, '16'], [810, '19'], [760, '22'], [840, '25'], [900, '28']], f: [5410, 2870, 890, 119] },
+  '12m': { k: [['Visitas', '61.200', '+64 % vs. año anterior'], ['Visitantes únicos', '42.900', '+51 %'], ['Tiempo medio', '1:37', '+0:15'], ['Conversión', '2,0 %', '+0,6 pts']], bars: [[2900, 'E'], [3100, 'F'], [3600, 'M'], [4100, 'A'], [4400, 'M'], [4300, 'J'], [3800, 'J'], [3200, 'A'], [5600, 'S'], [6200, 'O'], [0, 'N'], [0, 'D']], f: [61200, 31100, 9800, 1224] }
+};
+const fmt = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+const rng = (a, b) => `${fmt(a)} – ${fmt(b)} €`;
+const ST = {
+  nuevo: { stLabel: 'Nuevo', stFg: '#EDEAE4', stDot: '#EDEAE4', stBd: '#EDEAE4' }, contactado: { stLabel: 'Contactado', stFg: '#8A8780', stDot: 'transparent', stBd: '#8A8780' }, cerrado: { stLabel: 'Cerrado', stFg: '#6B6862', stDot: '#4A4844', stBd: '#4A4844' },
+  publicado: { stLabel: 'Publicado', stFg: '#EDEAE4', stDot: '#EDEAE4', stBd: '#EDEAE4' }, borrador: { stLabel: 'Borrador', stFg: '#8A8780', stDot: 'transparent', stBd: '#8A8780' }
+};
+
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    const prices = {}; PGROUPS.forEach(g => g.rows.forEach(r => { prices[r[0]] = { min: r[2], max: r[3] }; }));
+    this.state = { authed: !(p.startAtLogin ?? true), loginEmail: 'rowe.web.agency@gmail.com', loginPass: '', loginErr: false, loginLoading: false, remember: true, forgotSent: false,
+      screen: 'dashboard', loading: false, winW: 1440, drawer: false, dirty: false, undoStack: [], toasts: [], confirm: null,
+      leads: LEADS, stF: 'todos', svF: 'Todos', leadQ: '', selLead: 1,
+      range: '7d', scenes: SCENES, selScene: 's0', pv: 'desk',
+      projects: PROJECTS, projF: 'Todos', editProject: null,
+      prices, media: MEDIA, mediaQ: '', mediaType: 'all', mediaSel: 1, upPct: -1,
+      users: USERS, inviteOpen: false, inviteEmail: '', inviteRole: 'Editor', inviteErr: false,
+      hist: HIST, histF: 'Todo', setTab: 'contact', seoTitle: 'ROWE — Estudio de web y audiovisual', seoDesc: 'Webs a medida y vídeo para empresas y negocios que quieren verse profesionales en internet y conseguir más clientes.', cookies: true };
+  }
+  componentDidMount() {
+    this.onResize = () => this.setState({ winW: window.innerWidth }); this.onResize();
+    window.addEventListener('resize', this.onResize);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); clearInterval(this.upT); }
+  go(screen, extra) {
+    clearTimeout(this.lt);
+    this.setState({ screen, loading: true, drawer: false, editProject: null, ...(extra || {}) });
+    this.lt = setTimeout(() => this.setState({ loading: false }), 380);
+  }
+  toast(text) {
+    const id = Date.now() + Math.random();
+    this.setState(s => ({ toasts: [...s.toasts.slice(-2), { id, text }] }));
+    setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(t => t.id !== id) })), 3000);
+  }
+  snap() {
+    const now = Date.now();
+    if (now - (this.lastSnap || 0) > 1200) { this.lastSnap = now; this.setState(s => ({ undoStack: [...s.undoStack.slice(-19), { scenes: s.scenes, prices: s.prices }] })); }
+  }
+  edit(patch) { this.snap(); this.setState({ ...patch, dirty: true }); }
+  addHist(cat, text) { this.setState(s => ({ hist: [{ day: 'Hoy', time: new Date().toTimeString().slice(0, 5), who: 'Admin', cat, text }, ...s.hist] })); }
+  ask(cf) { this.setState({ confirm: cf }); }
+  seg(list, cur, fn) { return list.map(o => { const v = o.id ?? o, sel = v === cur; return { label: o.label ?? o, count: o.count ?? '', bg: sel ? '#EDEAE4' : 'transparent', fg: sel ? '#0A0A0A' : '#8A8780', bd: sel ? '#EDEAE4' : 'rgba(237,234,228,0.18)', on: () => fn(v) }; }); }
+  sw(on) { return { swBg: on ? '#EDEAE4' : 'transparent', swBd: on ? '#EDEAE4' : 'rgba(237,234,228,0.3)', knob: on ? '#0A0A0A' : '#8A8780', knobX: on ? '16px' : '0px' }; }
+
+  renderVals() {
+    const s = this.state, P = this.props;
+    const mobilePrev = !!P.mobilePreview, isMobile = mobilePrev || s.winW < 820;
+    const scr = s.authed && !s.loading ? s.screen : '';
+    const newCount = s.leads.filter(l => l.status === 'nuevo').length;
+    const navItem = ([id, label]) => { const act = s.screen === id; return { id, label, d: IC[id], bg: act ? '#1A1A1A' : 'transparent', fg: act ? '#EDEAE4' : '#8A8780', hasBadge: id === 'leads' && newCount > 0, badge: newCount, on: () => this.go(id, id === 'leads' && isMobile ? { selLead: null } : null) }; };
+    // leads
+    const leadsF = s.leads.filter(l => (s.stF === 'todos' || l.status === s.stF) && (s.svF === 'Todos' || l.service === s.svF) && (!s.leadQ || (l.name + l.company).toLowerCase().includes(s.leadQ.toLowerCase())));
+    const L = s.leads.find(l => l.id === s.selLead);
+    const lead = L ? { ...L, hasItems: !!L.items, msgText: L.msg || 'Sin mensaje. Esta solicitud llegó directamente desde el configurador.', phoneText: L.phone || 'Sin teléfono', mailto: `mailto:${L.email}?subject=${encodeURIComponent('Tu proyecto con ROWE')}` } : {};
+    const setLead = (st) => { this.setState(x => ({ leads: x.leads.map(l => l.id === s.selLead ? { ...l, status: st } : l) })); this.toast(`Marcado como ${ST[st].stLabel.toLowerCase()}`); };
+    // scenes
+    const sc0 = s.scenes.find(x => x.id === s.selScene) || s.scenes[0], scIdx = s.scenes.indexOf(sc0);
+    const upScene = (k, v) => this.edit({ scenes: s.scenes.map(x => x.id === sc0.id ? { ...x, [k]: v } : x) });
+    const move = (i, d) => { const j = i + d; if (j < 0 || j >= s.scenes.length) return; const a = s.scenes.slice(); [a[i], a[j]] = [a[j], a[i]]; this.edit({ scenes: a }); };
+    // projects
+    const pe = s.projects.find(p => p.id === s.editProject);
+    const upProj = (k, v) => this.edit({ projects: s.projects.map(p => p.id === s.editProject ? { ...p, [k]: v } : p) });
+    // prices
+    const pr = s.prices, sumR = ids => ids.reduce((a, id) => [a[0] + pr[id].min, a[1] + pr[id].max], [0, 0]).map(v => Math.round(v / 50) * 50);
+    const simA = sumR(['nueva', 'reservas', 'seo']), simB = sumR(['contenido', 'fotos']);
+    // media
+    const mediaF = s.media.filter(m => (s.mediaType === 'all' || m.type === s.mediaType) && (!s.mediaQ || m.name.toLowerCase().includes(s.mediaQ.toLowerCase())));
+    const M = s.media.find(m => m.id === s.mediaSel);
+    // stats
+    const SD = STATS[s.range], maxB = Math.max(...SD.bars.map(b => b[0]));
+    // history
+    const histF = s.hist.filter(h => s.histF === 'Todo' || h.cat === s.histF);
+    const days = [...new Set(histF.map(h => h.day))];
+    const cf = s.confirm;
+    const newProject = () => { const id = Date.now(); this.setState(x => ({ projects: [{ id, title: '', cat: 'Web', sector: '', year: 2026, status: 'borrador', featured: false, seo: '' }, ...x.projects], editProject: id, dirty: true })); };
+    const toggleScene = x => this.edit({ scenes: s.scenes.map(y => y.id === x.id ? { ...y, visible: !y.visible } : y) });
+    return {
+      pageBg: mobilePrev ? '#1F1E1C' : '#0A0A0A', appW: mobilePrev ? '390px' : '100%', appH: mobilePrev ? '844px' : '100vh', appBorder: mobilePrev ? '1px solid rgba(237,234,228,0.14)' : 'none', appRadius: mobilePrev ? '28px' : '0px',
+      showLogin: !s.authed, showApp: s.authed, showSidebar: s.authed && !isMobile, isMobile, pad: isMobile ? '16px' : '28px', padBottom: isMobile ? '96px' : '48px',
+      deskFlex: isMobile ? 'none' : 'flex', deskInline: isMobile ? 'none' : 'inline', toastBottom: isMobile ? '84px' : '20px',
+      // login
+      loginEmail: s.loginEmail, loginPass: s.loginPass, loginErr: s.loginErr, loginBd: s.loginErr ? '#FF3B1F' : 'rgba(237,234,228,0.10)', forgotSent: s.forgotSent,
+      onLoginEmail: e => this.setState({ loginEmail: e.target.value, loginErr: false }), onLoginPass: e => this.setState({ loginPass: e.target.value, loginErr: false }),
+      toggleRemember: () => this.setState({ remember: !s.remember }), remBg: s.remember ? '#EDEAE4' : 'transparent', remBd: s.remember ? '#EDEAE4' : 'rgba(237,234,228,0.4)', remMark: s.remember ? '✓' : '',
+      forgot: () => this.setState({ forgotSent: true }),
+      loginLabel: s.loginLoading ? 'Entrando…' : 'Entrar',
+      doLogin: () => { if (!s.loginEmail.includes('@') || s.loginPass.length < 4) return this.setState({ loginErr: true }); this.setState({ loginLoading: true }); setTimeout(() => { this.setState({ authed: true, loginLoading: false }); this.go('dashboard'); }, 700); },
+      logout: () => this.setState({ authed: false, drawer: false, loginPass: '' }),
+      // chrome
+      navGroups: NAV.map(g => ({ label: g.label, items: g.items.map(navItem) })), navFlat: NAV.flatMap(g => g.items.map(navItem)),
+      tabs: [['dashboard', 'Inicio'], ['leads', 'Mensajes'], ['texts', 'Contenido']].map(([id, label]) => ({ label, d: IC[id], fg: s.screen === id ? '#EDEAE4' : '#8A8780', hasBadge: id === 'leads' && newCount > 0, on: () => this.go(id, id === 'leads' ? { selLead: null } : null) })).concat([{ label: 'Más', d: IC.more, fg: '#8A8780', hasBadge: false, on: () => this.setState({ drawer: true }) }]),
+      drawer: s.drawer, openDrawer: () => this.setState({ drawer: true }), closeDrawer: () => this.setState({ drawer: false }),
+      crumb: TITLES[s.screen], title: pe && s.screen === 'projects' ? pe.title || 'Nuevo proyecto' : TITLES[s.screen],
+      dirty: s.dirty, dirtyDesk: s.dirty && !isMobile, canUndo: s.undoStack.length > 0, pubOpacity: s.dirty ? 1 : 0.4,
+      undo: () => { const st = s.undoStack[s.undoStack.length - 1]; if (!st) return; this.setState({ scenes: st.scenes, prices: st.prices, undoStack: s.undoStack.slice(0, -1) }); this.toast('Cambio deshecho'); },
+      preview: () => this.toast('Abriendo vista previa en una pestaña nueva…'),
+      saveDraft: () => { this.toast('Borrador guardado'); },
+      publish: () => { if (!s.dirty) return this.toast('No hay cambios pendientes'); this.ask({ title: '¿Publicar los cambios?', body: 'La web se actualizará al momento. Si algo no te convence, podrás restaurar la versión anterior desde el historial.', cta: 'Publicar', bg: '#EDEAE4', fg: '#0A0A0A', ok: () => { this.setState({ dirty: false }); this.addHist(TITLES[s.screen], 'Publicó cambios en ' + TITLES[s.screen]); this.toast('Publicado. La web ya muestra los cambios.'); } }); },
+      markDirty: () => !s.dirty && this.setState({ dirty: true }),
+      fakeUpload: () => this.toast('Selector de archivos · arrastra o elige desde tu equipo'),
+      loading: s.authed && s.loading,
+      scr: { dashboard: scr === 'dashboard', leads: scr === 'leads', stats: scr === 'stats', texts: scr === 'texts', projList: scr === 'projects' && !pe, projEdit: scr === 'projects' && !!pe, prices: scr === 'prices', media: scr === 'media', users: scr === 'users', history: scr === 'history', settings: scr === 'settings' },
+      // dashboard
+      dashKpis: [
+        { label: 'Visitas · 7 días', value: '1.284', delta: '+12 % vs. semana anterior', on: () => this.go('stats') },
+        { label: 'Mensajes nuevos', value: String(newCount), delta: 'Respóndelos en menos de 24 h', on: () => this.go('leads', { stF: 'nuevo' }) },
+        { label: 'Conversión', value: '2,4 %', delta: '+0,3 pts', on: () => this.go('stats') },
+        { label: 'Presupuestos calculados', value: '38', delta: '+9 esta semana', on: () => this.go('prices') }
+      ],
+      recentLeads: s.leads.slice(0, 3).map(l => ({ ...l, ...ST[l.status], on: () => this.go('leads', { selLead: l.id, stF: 'todos' }) })),
+      recentHist: s.hist.slice(0, 4), goLeads: () => this.go('leads'), goHistory: () => this.go('history'),
+      quick: [
+        { title: 'Editar el Hero', desc: 'Titular, subtítulo y vídeo de portada.', on: () => this.go('texts', { selScene: 's0' }) },
+        { title: 'Nuevo proyecto', desc: 'Añade un caso al portfolio.', on: () => { this.go('projects'); setTimeout(newProject, 0); } },
+        { title: 'Ajustar precios', desc: 'Rangos del configurador.', on: () => this.go('prices') },
+        { title: 'Subir medios', desc: 'Fotos y vídeos para la web.', on: () => this.go('media') }
+      ],
+      // leads
+      stFilters: this.seg([{ id: 'todos', label: 'Todos', count: s.leads.length }, { id: 'nuevo', label: 'Nuevos', count: newCount }, { id: 'contactado', label: 'Contactados', count: s.leads.filter(l => l.status === 'contactado').length }, { id: 'cerrado', label: 'Cerrados', count: s.leads.filter(l => l.status === 'cerrado').length }], s.stF, v => this.setState({ stF: v })),
+      svFilters: this.seg(['Todos', 'Web', 'Audiovisual', 'Las dos cosas'], s.svF, v => this.setState({ svF: v })),
+      leadQ: s.leadQ, onLeadQ: e => this.setState({ leadQ: e.target.value }),
+      leadsCols: isMobile ? 'minmax(0,1fr)' : 'minmax(0,0.85fr) minmax(0,1.15fr)',
+      showLeadList: !isMobile || !s.selLead, showLeadDetail: !!L && (!isMobile || !!s.selLead),
+      leadRows: leadsF.map(l => ({ ...l, ...ST[l.status], weight: l.status === 'nuevo' ? 500 : 400, bg: l.id === s.selLead && !isMobile ? '#1A1A1A' : 'transparent', on: () => this.setState({ selLead: l.id }) })),
+      leadsEmpty: leadsF.length === 0, clearLeadFilters: () => this.setState({ stF: 'todos', svF: 'Todos', leadQ: '' }),
+      lead, backLeads: () => this.setState({ selLead: null }),
+      leadStatusOpts: this.seg([{ id: 'nuevo', label: 'Nuevo' }, { id: 'contactado', label: 'Contactado' }, { id: 'cerrado', label: 'Cerrado' }], L && L.status, setLead),
+      markContacted: () => setLead('contactado'),
+      copyLeadEmail: () => { try { navigator.clipboard.writeText(L.email).catch(() => {}); } catch (e) {} this.toast('Email copiado'); },
+      // stats
+      rangeOpts: this.seg([{ id: '7d', label: '7 días' }, { id: '30d', label: '30 días' }, { id: '12m', label: '12 meses' }], s.range, v => this.setState({ range: v })),
+      statKpis: SD.k.map(k => ({ label: k[0], value: k[1], delta: k[2] })),
+      bars: SD.bars.map(b => ({ label: b[1], h: Math.max(1, b[0] / maxB * 100) + '%', tip: b[0] ? fmt(b[0]) + ' visitas' : 'Sin datos aún' })),
+      funnel: [['Visitas', SD.f[0]], ['Vieron un vídeo', SD.f[1]], ['Abrieron el configurador', SD.f[2]], ['Enviaron solicitud', SD.f[3]]].map(([l, v]) => ({ label: l, value: fmt(v), pct: String(Math.round(v / SD.f[0] * 1000) / 10).replace('.', ',') + ' %', w: Math.max(1.5, v / SD.f[0] * 100) + '%' })),
+      sources: [['Instagram', 38], ['Google', 31], ['Directo', 18], ['TikTok', 8], ['Otros', 5]].map(([l, p]) => ({ label: l, pct: p + ' %', w: p / 38 * 100 + '%' })),
+      topPages: [['/', 'Home'], ['/#presupuesto', 'Tu presupuesto'], ['/proyectos', 'Proyectos'], ['/web', 'Desarrollo web'], ['/audiovisual', 'Producción audiovisual']].map((p, i) => ({ path: p[0], name: p[1], visits: fmt(SD.f[0] * [0.46, 0.17, 0.14, 0.12, 0.11][i]) })),
+      // texts
+      textCols: isMobile ? 'minmax(0,1fr)' : 'minmax(280px,360px) minmax(0,1fr)',
+      sceneRows: s.scenes.map((x, i) => ({ num: String(i).padStart(2, '0'), name: x.name, bg: x.id === sc0.id ? '#1A1A1A' : 'transparent', op: x.visible ? 1 : 0.4, sel: () => this.setState({ selScene: x.id }), up: () => move(i, -1), down: () => move(i, 1), toggle: () => toggleScene(x), ...this.sw(x.visible) })),
+      sc: { ...sc0, num: String(scIdx).padStart(2, '0'), titleCount: sc0.title.length, titleWarn: sc0.title.length > 60 ? '#FF3B1F' : '#8A8780', titleBd: sc0.title.length > 60 ? '#FF3B1F' : 'rgba(237,234,228,0.10)', textCount: sc0.text.length, textWarn: sc0.text.length > 220 ? '#FF3B1F' : '#8A8780', hasCta: !!sc0.cta, visLabel: sc0.visible ? 'Visible' : 'Oculta', visColor: sc0.visible ? '#EDEAE4' : '#8A8780' },
+      onSceneTitle: e => upScene('title', e.target.value), onSceneText: e => upScene('text', e.target.value), onSceneCta: e => upScene('cta', e.target.value), onSceneLink: e => upScene('link', e.target.value),
+      pvOpts: this.seg([{ id: 'desk', label: 'Escritorio' }, { id: 'mob', label: 'Móvil' }], s.pv, v => this.setState({ pv: v })),
+      pvW: s.pv === 'desk' ? '100%' : '220px', pvAR: s.pv === 'desk' ? '16 / 9' : '9 / 16', pvPad: s.pv === 'desk' ? '6%' : '18px', pvSize: s.pv === 'desk' ? 'clamp(22px,3vw,40px)' : '26px',
+      // projects
+      newProject,
+      projFilters: this.seg(['Todos', 'Web', 'Audiovisual', 'Web + Audiovisual'], s.projF, v => this.setState({ projF: v })),
+      projRows: s.projects.filter(p => s.projF === 'Todos' || p.cat === s.projF).map(p => ({ ...p, title: p.title || 'Sin título', ...ST[p.status], featBg: p.featured ? '#EDEAE4' : 'transparent', featFg: p.featured ? '#0A0A0A' : '#8A8780', featBd: p.featured ? '#EDEAE4' : 'rgba(237,234,228,0.18)', feat: () => { this.setState(x => ({ projects: x.projects.map(q => q.id === p.id ? { ...q, featured: !q.featured } : q), dirty: true })); }, edit: () => this.setState({ editProject: p.id }) })),
+      pe: pe ? { ...pe, titleShown: pe.title || 'Nuevo proyecto', seoCount: pe.seo.length, seoWarn: pe.seo.length > 60 ? '#FF3B1F' : '#8A8780' } : {},
+      backProjects: () => this.setState({ editProject: null }),
+      peStatus: this.seg([{ id: 'borrador', label: 'Borrador' }, { id: 'publicado', label: 'Publicado' }], pe && pe.status, v => upProj('status', v)),
+      peCats: this.seg(['Web', 'Audiovisual', 'Web + Audiovisual'], pe && pe.cat, v => upProj('cat', v)),
+      onPeTitle: e => upProj('title', e.target.value), onPeSeo: e => upProj('seo', e.target.value),
+      peLong: [{ label: 'Reto', v: 'Una clínica con buena reputación local pero sin presencia digital a su altura.' }, { label: 'Solución', v: 'Web a medida con reservas online y una serie de reels del equipo en consulta.' }, { label: 'Resultado', v: 'Más citas desde la web y una imagen coherente en redes y en Google.' }],
+      peNums: [{ v: '+38 %', l: 'citas online' }, { v: '12', l: 'reels publicados' }, { v: '1,2 s', l: 'tiempo de carga' }],
+      peGallery: [1, 2, 3, 4, 5, 6, 7].map(n => ({ n: String(n).padStart(2, '0') })),
+      deleteProject: () => this.ask({ title: '¿Eliminar este proyecto?', body: 'Desaparecerá del portfolio y de la web. Esta acción no se puede deshacer.', cta: 'Eliminar', bg: '#FF3B1F', fg: '#0A0A0A', ok: () => { this.setState(x => ({ projects: x.projects.filter(p => p.id !== s.editProject), editProject: null })); this.addHist('Proyectos', 'Eliminó un proyecto'); this.toast('Proyecto eliminado'); } }),
+      // prices
+      priceCols: isMobile ? 'minmax(0,1fr)' : 'minmax(0,1fr) 320px',
+      priceGroups: PGROUPS.map(g => ({ name: g.name, rows: g.rows.map(r => { const v = pr[r[0]], err = v.min > v.max; return { name: r[1], unit: r[4], min: v.min, max: v.max, err, bd: err ? '#FF3B1F' : 'rgba(237,234,228,0.10)', onMin: e => this.edit({ prices: { ...pr, [r[0]]: { ...v, min: +e.target.value.replace(/\D/g, '') || 0 } } }), onMax: e => this.edit({ prices: { ...pr, [r[0]]: { ...v, max: +e.target.value.replace(/\D/g, '') || 0 } } }) }; }) })),
+      sims: [
+        { desc: 'Web nueva · hasta 5 páginas · reservas · SEO local', range: rng(simA[0], simA[1]), monthly: 'Pago único' },
+        { desc: 'Web + contenido · sesión de fotos · 8 reels al mes', range: rng(simB[0], simB[1]), monthly: `+ ${rng(pr.reels8.min, pr.reels8.max)}/mes` }
+      ],
+      // media
+      mediaCount: s.media.length, mediaQ: s.mediaQ, onMediaQ: e => this.setState({ mediaQ: e.target.value }),
+      mediaTypes: this.seg([{ id: 'all', label: 'Todo' }, { id: 'image', label: 'Imágenes' }, { id: 'video', label: 'Vídeos' }], s.mediaType, v => this.setState({ mediaType: v })),
+      mediaCols: isMobile || !M ? 'minmax(0,1fr)' : 'minmax(0,1fr) 300px',
+      mediaTiles: mediaF.map(m => ({ ...m, isVideo: m.type === 'video', usesLabel: m.uses.length ? `En uso · ${m.uses.length}` : 'Sin uso', bd: m.id === s.mediaSel ? '#EDEAE4' : 'rgba(237,234,228,0.08)', on: () => this.setState({ mediaSel: m.id === s.mediaSel ? null : m.id }) })),
+      mediaEmpty: mediaF.length === 0, hasMediaSel: !!M,
+      ms: M ? { ...M, usesText: M.uses.length ? M.uses.join(' · ') : 'Ningún sitio', alt: M.type === 'image' ? M.name.replace(/[-_]/g, ' ').replace(/\.\w+$/, '') : '' } : {},
+      copyUrl: () => this.toast('URL copiada'),
+      deleteMedia: () => this.ask({ title: '¿Eliminar este archivo?', body: M && M.uses.length ? `Se está usando en: ${M.uses.join(', ')}. Esos sitios se quedarán sin imagen hasta que elijas otra.` : 'No se usa en ningún sitio de la web.', cta: 'Eliminar', bg: '#FF3B1F', fg: '#0A0A0A', ok: () => { this.setState(x => ({ media: x.media.filter(m => m.id !== s.mediaSel), mediaSel: null })); this.toast('Archivo eliminado'); } }),
+      uploading: s.upPct >= 0, upPct: Math.max(0, s.upPct) + '%',
+      startUpload: () => { if (s.upPct >= 0) return; this.setState({ upPct: 0 }); clearInterval(this.upT); this.upT = setInterval(() => { const n = this.state.upPct + 4; if (n >= 100) { clearInterval(this.upT); this.setState(x => ({ upPct: -1, media: [{ id: Date.now(), name: 'rodaje_brasa_04.mp4', type: 'video', size: '11,2 MB', dims: '1080 × 1920', dur: '0:31', uses: [] }, ...x.media] })); this.addHist('Medios', 'Subió rodaje_brasa_04.mp4'); this.toast('Archivo subido'); } else this.setState({ upPct: n }); }, 60); },
+      // users
+      userRows: s.users.map((u, i) => ({ ...u, toggle: () => { const role = u.role === 'Editor' ? 'Administrador' : 'Editor'; this.setState(x => ({ users: x.users.map((v, j) => j === i ? { ...v, role } : v) })); this.toast(`${u.name} ahora es ${role.toLowerCase()}`); } })),
+      inviteOpen: s.inviteOpen, openInvite: () => this.setState({ inviteOpen: true, inviteEmail: '', inviteErr: false }), closeInvite: () => this.setState({ inviteOpen: false }),
+      inviteEmail: s.inviteEmail, onInviteEmail: e => this.setState({ inviteEmail: e.target.value, inviteErr: false }), inviteBd: s.inviteErr ? '#FF3B1F' : 'rgba(237,234,228,0.10)',
+      roleOpts: this.seg(['Editor', 'Administrador'], s.inviteRole, v => this.setState({ inviteRole: v })),
+      roleDesc: s.inviteRole === 'Editor' ? 'Puede editar textos, proyectos y medios. Un administrador publica.' : 'Acceso completo, incluidos precios, usuarios y publicación.',
+      sendInvite: () => { if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s.inviteEmail)) return this.setState({ inviteErr: true }); this.setState(x => ({ inviteOpen: false, users: [...x.users, { name: x.inviteEmail.split('@')[0], email: x.inviteEmail, role: x.inviteRole, last: 'Pendiente', init: x.inviteEmail.slice(0, 2).toUpperCase() }] })); this.toast('Invitación enviada a ' + s.inviteEmail); },
+      // history
+      histFilters: this.seg(['Todo', 'Textos', 'Proyectos', 'Precios', 'Medios'], s.histF, v => this.setState({ histF: v })),
+      histGroups: days.map(d => ({ day: d, items: histF.filter(h => h.day === d).map(h => ({ ...h, hasDiff: !!h.from, restore: () => this.ask({ title: '¿Restaurar esta versión?', body: h.from ? `Se volverá a «${h.from}». El cambio quedará pendiente de publicar.` : 'Se recuperará el estado anterior a este cambio. Quedará pendiente de publicar.', cta: 'Restaurar', bg: '#EDEAE4', fg: '#0A0A0A', ok: () => { this.setState({ dirty: true }); this.addHist(h.cat, 'Restauró: ' + h.text.toLowerCase()); this.toast('Versión restaurada · pendiente de publicar'); } }) })) })),
+      // settings
+      setTabs: this.seg([{ id: 'contact', label: 'Contacto y redes' }, { id: 'seo', label: 'SEO' }, { id: 'legal', label: 'Legal y cookies' }], s.setTab, v => this.setState({ setTab: v })),
+      tabContact: s.setTab === 'contact', tabSeo: s.setTab === 'seo', tabLegal: s.setTab === 'legal',
+      contactFields: [['Email de contacto', 'rowe.web.contacto@gmail.com'], ['Email de administración', 'rowe.web.agency@gmail.com'], ['Email de redes', 'rowe.web.redes@gmail.com'], ['Teléfono', '[+34 600 000 000]'], ['WhatsApp', '[+34 600 000 000]'], ['Dirección', '[Ciudad, Provincia]'], ['Horario', 'L–V · 9:00–18:00'], ['Instagram', '@rowe.estudio'], ['TikTok', '@rowe.estudio'], ['LinkedIn', 'linkedin.com/company/rowe'], ['YouTube', 'youtube.com/@rowe']].map(([label, v]) => ({ label, v })),
+      seoTitle: s.seoTitle, seoDesc: s.seoDesc, onSeoTitle: e => this.setState({ seoTitle: e.target.value, dirty: true }), onSeoDesc: e => this.setState({ seoDesc: e.target.value, dirty: true }),
+      seoTCount: s.seoTitle.length, seoTWarn: s.seoTitle.length > 60 ? '#FF3B1F' : '#8A8780', seoDCount: s.seoDesc.length, seoDWarn: s.seoDesc.length > 160 ? '#FF3B1F' : '#8A8780',
+      legalRows: [{ name: 'Aviso legal', date: 'Actualizado 02.09.2026' }, { name: 'Política de privacidad', date: 'Actualizado 02.09.2026' }, { name: 'Política de cookies', date: 'Actualizado 02.09.2026' }],
+      cookies: s.cookies, toggleCookies: () => this.setState({ cookies: !s.cookies, dirty: true }), ckBg: s.cookies ? '#EDEAE4' : 'transparent', ckBd: s.cookies ? '#EDEAE4' : 'rgba(237,234,228,0.3)', ckKnob: s.cookies ? '#0A0A0A' : '#8A8780', ckX: s.cookies ? '18px' : '0px',
+      // modals / toasts
+      hasConfirm: !!cf, cf: cf || {}, cancelConfirm: () => this.setState({ confirm: null }), okConfirm: () => { const ok = cf && cf.ok; this.setState({ confirm: null }); ok && ok(); },
+      stop: e => e.stopPropagation(), toasts: s.toasts
+    };
+  }
+}
+</script>
+</body>
+</html>
