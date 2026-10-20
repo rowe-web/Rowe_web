@@ -1,0 +1,313 @@
+/* Fig. 03 (Rodaje) y Fig. 04 (Web) de la Escena 02 · ilustraciones en línea animadas.
+   Paleta de la web: líneas crema sobre fondo cálido oscuro y el rojo REC como único acento.
+   Las animaciones solo corren con el marco a la vista ([data-playing], ver LoopFrame). */
+.root {
+  container-type: inline-size;
+  --bone: 237 234 228;
+}
+.root:not([data-playing]) * {
+  animation-play-state: paused !important;
+}
+.svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Trazos y rellenos */
+.line { stroke: rgb(var(--bone) / 0.62); stroke-width: 1; }
+.faint { stroke: rgb(var(--bone) / 0.24); stroke-width: 0.8; }
+.bright { stroke: rgb(var(--bone) / 0.85); stroke-width: 0.9; }
+.fill { fill: var(--color-ph-2); }
+.fillPaper { fill: #23221f; }
+.fillScreen { fill: var(--color-monitor); }
+.fillMenu { fill: var(--color-surface-2); }
+
+/* Entrada: cada línea se dibuja una vez al aparecer (retraso --i) */
+.d {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 1.4s var(--ease-cut) var(--i, 0s) forwards;
+}
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+.reveal {
+  opacity: 0;
+  animation: reveal 0.9s var(--ease-out) var(--i, 0s) forwards;
+}
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Etiqueta REC (igual que en la Fig. 01) */
+.rec {
+  position: absolute;
+  /* dentro de las marcas de encuadre (10 px del borde, 12 px de largo) */
+  top: max(15px, 6cqw);
+  left: max(27px, 9cqw);
+  display: flex;
+  align-items: center;
+  gap: 1.6cqw;
+  font-family: var(--font-mono);
+  font-size: max(7px, 3.6cqw);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-bone);
+}
+
+/* ---------------------------------------------------------------- Fig. 03 · Rodaje */
+.lampA,
+.lampB {
+  transform-box: view-box;
+  animation: sway 7s ease-in-out infinite alternate;
+}
+.lampA { transform-origin: 62px 0; }
+.lampB { transform-origin: 150px 0; animation-delay: -3.5s; }
+@keyframes sway {
+  from { transform: rotate(-2.2deg); }
+  to { transform: rotate(2.2deg); }
+}
+/* Haz de luz suave bajo cada lámpara */
+.glow {
+  fill: url(#rodaje-light);
+  opacity: 0.7;
+  animation: glow 4s ease-in-out infinite alternate;
+}
+@keyframes glow {
+  to { opacity: 1; }
+}
+.beam {
+  stroke: rgb(var(--bone) / 0.2);
+  stroke-width: 0.6;
+  stroke-dasharray: 1.5 3;
+  animation: beam 1.8s linear infinite;
+}
+@keyframes beam {
+  to { stroke-dashoffset: -9; }
+}
+.recDot {
+  fill: var(--color-rec);
+  animation: var(--animate-rec);
+}
+.mouth {
+  fill: rgb(var(--bone) / 0.75);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: talk 1.3s steps(1, end) infinite;
+}
+@keyframes talk {
+  0% { transform: scaleY(0.4); }
+  15% { transform: scaleY(1.3); }
+  28% { transform: scaleY(0.6); }
+  40% { transform: scaleY(1.5); }
+  55% { transform: scaleY(0.4); }
+  68% { transform: scaleY(1.1); }
+  85% { transform: scaleY(0.5); }
+}
+.arm {
+  transform-box: view-box;
+  transform-origin: 130px 130px;
+  animation: gesture 3.6s ease-in-out infinite;
+}
+@keyframes gesture {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-11deg); }
+  45% { transform: rotate(3deg); }
+  65% { transform: rotate(-7deg); }
+  80% { transform: rotate(1deg); }
+}
+.voice path {
+  stroke: rgb(var(--bone) / 0.5);
+  stroke-width: 0.8;
+  opacity: 0;
+  animation: voice 1.8s ease-out infinite;
+}
+.voice path:nth-child(2) { animation-delay: 0.2s; }
+.voice path:nth-child(3) { animation-delay: 0.4s; }
+@keyframes voice {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  60%, 100% { opacity: 0; }
+}
+.paper {
+  transform-box: view-box;
+  transform-origin: 37px 150px;
+  animation: paper 4s ease-in-out infinite alternate;
+}
+@keyframes paper {
+  from { transform: none; }
+  to { transform: translateY(-1.2px) rotate(-2.5deg); }
+}
+/* Pasa la hoja de la escaleta cada 6 s */
+.page {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: page 6s var(--ease-cut) infinite;
+}
+@keyframes page {
+  0%, 78% { opacity: 0; transform: none; }
+  80% { opacity: 1; transform: none; }
+  92% { opacity: 1; transform: scaleX(0); }
+  93%, 100% { opacity: 0; transform: scaleX(0); }
+}
+
+/* ---------------------------------------------------------------- Fig. 04 · Web */
+.dots circle { fill: rgb(var(--bone) / 0.22); }
+.serif {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  fill: var(--color-bone);
+}
+.italic { font-style: italic; }
+.small { font-size: 12px; }
+.logo { font-size: 9.5px; font-style: italic; }
+
+/* Ciclo de 12 s. Contenido: arriba → baja → baja más → (menú) → vuelve arriba */
+.scroll {
+  animation: scroll 12s ease-in-out infinite;
+}
+@keyframes scroll {
+  0%, 26% { transform: none; }
+  44%, 48% { transform: translateY(-95px); }
+  54%, 86% { transform: translateY(-165px); }
+  97%, 100% { transform: none; }
+}
+.thumb {
+  stroke: rgb(var(--bone) / 0.45);
+  stroke-width: 1.2;
+  animation: thumb 12s ease-in-out infinite;
+}
+@keyframes thumb {
+  0%, 26% { transform: none; }
+  44%, 48% { transform: translateY(78px); }
+  54%, 86% { transform: translateY(136px); }
+  97%, 100% { transform: none; }
+}
+.track { stroke: rgb(var(--bone) / 0.08); stroke-width: 1.2; }
+
+.btn {
+  stroke: rgb(var(--bone) / 0.85);
+  stroke-width: 0.9;
+  fill: rgb(var(--bone) / 0);
+  animation:
+    draw 1.4s var(--ease-cut) var(--i, 0s) forwards,
+    btnFill 12s var(--ease-out) infinite;
+}
+@keyframes btnFill {
+  0%, 14% { fill: rgb(var(--bone) / 0); }
+  16%, 26% { fill: rgb(var(--bone) / 1); }
+  30%, 100% { fill: rgb(var(--bone) / 0); }
+}
+.btnLabel {
+  stroke: rgb(var(--bone) / 0.85);
+  stroke-width: 1;
+  animation: btnLabel 12s var(--ease-out) infinite;
+}
+@keyframes btnLabel {
+  0%, 14% { stroke: rgb(var(--bone) / 0.85); }
+  16%, 26% { stroke: var(--color-ink); }
+  30%, 100% { stroke: rgb(var(--bone) / 0.85); }
+}
+.ripple {
+  fill: var(--color-ink);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ripple 12s ease-out infinite;
+}
+@keyframes ripple {
+  0%, 17% { opacity: 0; transform: scale(0.2); }
+  17.5% { opacity: 0.35; transform: scale(0.2); }
+  23%, 100% { opacity: 0; transform: scale(1.4); }
+}
+.steam path {
+  stroke: rgb(var(--bone) / 0.35);
+  stroke-width: 0.8;
+  animation: steam 3s ease-in-out infinite;
+}
+.steam path:nth-child(2) { animation-delay: -1s; }
+.steam path:nth-child(3) { animation-delay: -2s; }
+@keyframes steam {
+  0% { opacity: 0; transform: translateY(3px); }
+  50% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+.cardBox {
+  stroke: rgb(var(--bone) / 0.24);
+  stroke-width: 0.8;
+  animation: cardStroke 12s var(--ease-out) infinite;
+}
+@keyframes cardStroke {
+  0%, 56% { stroke: rgb(var(--bone) / 0.24); }
+  59%, 66% { stroke: rgb(var(--bone) / 0.75); }
+  70%, 100% { stroke: rgb(var(--bone) / 0.24); }
+}
+.cardHover {
+  animation: cardLift 12s var(--ease-out) infinite;
+}
+@keyframes cardLift {
+  0%, 56% { transform: none; }
+  59%, 66% { transform: translateY(-3px); }
+  70%, 100% { transform: none; }
+}
+.underline {
+  stroke: var(--color-bone);
+  stroke-width: 0.9;
+  transform-box: fill-box;
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation: underline 12s var(--ease-cut) infinite;
+}
+@keyframes underline {
+  0%, 70% { transform: scaleX(0); }
+  73%, 84% { transform: scaleX(1); }
+  87%, 100% { transform: scaleX(0); }
+}
+.menu {
+  opacity: 0;
+  animation: menu 12s var(--ease-out) infinite;
+}
+@keyframes menu {
+  0%, 72% { opacity: 0; transform: translateY(-3px); }
+  75%, 84% { opacity: 1; transform: none; }
+  87%, 100% { opacity: 0; transform: translateY(-3px); }
+}
+.cursor {
+  opacity: 0;
+  animation: cursor 12s ease-in-out infinite;
+}
+.cursorShape {
+  fill: var(--color-bone);
+  stroke: var(--color-ink);
+  stroke-width: 0.6;
+}
+@keyframes cursor {
+  0% { opacity: 0; transform: translate(160px, 215px); }
+  5% { opacity: 1; transform: translate(160px, 215px); }
+  15% { transform: translate(49px, 130px); }
+  17% { transform: translate(49px, 130px) scale(0.82); }
+  19%, 24% { transform: translate(49px, 130px); }
+  34%, 48% { transform: translate(150px, 190px); }
+  56%, 62% { transform: translate(138px, 128px); }
+  70%, 84% { transform: translate(133px, 40px); }
+  92% { opacity: 1; transform: translate(165px, 200px); }
+  96%, 100% { opacity: 0; transform: translate(160px, 215px); }
+}
+
+/* Movimiento reducido: ilustración fija, ya dibujada */
+@media (prefers-reduced-motion: reduce) {
+  .root * {
+    animation: none !important;
+  }
+  .d { stroke-dashoffset: 0; }
+  .reveal { opacity: 1; }
+  .cursor,
+  .menu,
+  .ripple,
+  .page { opacity: 0; }
+}

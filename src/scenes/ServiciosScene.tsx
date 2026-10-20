@@ -1,19 +1,20 @@
 import { Button } from "@/components/ui/Button";
 import { RichText } from "@/components/ui/RichText";
-import { MediaFrame } from "@/components/scene/MediaFrame";
+import { RodajeLoop } from "@/components/scene/RodajeLoop";
+import { WebLoop } from "@/components/scene/WebLoop";
 import { SceneHeader } from "@/components/scene/SceneHeader";
 import type { SceneProps } from "./types";
 
 /**
  * Escena 02 · Servicios — diseño nuevo siguiendo el sistema.
  * Dos «pistas» paralelas, RO (rodaje) y WE (web) — se leen en el orden de la marca —, con la misma estructura:
- * letra grande, figura, lista numerada de servicios (tabla services) y enlace.
+ * letra grande, figura animada en línea (rodaje en un restaurante / web en modo oscuro), lista numerada de servicios (tabla services) y enlace.
  * Hover (o scroll en móvil): la pista activa se ilumina y la otra se apaga.
  */
 export function ServiciosScene({ scene, site }: SceneProps) {
   const columns = [
-    { key: "RO", label: "Rodaje", discipline: "audiovisual" as const, href: "/audiovisual", word: "RO", caption: "Fig. 03 — Rodaje", textured: true },
-    { key: "WE", label: "Web", discipline: "web" as const, href: "/web", word: "WE", caption: "Fig. 04 — Web a medida", textured: false },
+    { key: "RO", label: "Rodaje", discipline: "audiovisual" as const, href: "/audiovisual", word: "RO", caption: "Fig. 03 — Rodaje", textured: true, Figure: RodajeLoop },
+    { key: "WE", label: "Web", discipline: "web" as const, href: "/web", word: "WE", caption: "Fig. 04 — Web a medida", textured: false, Figure: WebLoop },
   ];
 
   return (
@@ -55,7 +56,7 @@ export function ServiciosScene({ scene, site }: SceneProps) {
                   </span>
                 </div>
                 <figure className="w-[38%] max-w-[260px] pt-1">
-                  <MediaFrame aspect="4 / 5" placeholder="[ Foto 4:5 ]" sizes="20vw" marks={12} />
+                  <col.Figure />
                   <figcaption className="mt-2 label-mono text-[9px] text-muted">{col.caption}</figcaption>
                 </figure>
               </div>

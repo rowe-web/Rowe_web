@@ -438,3 +438,40 @@ test("menú: vista previa animada y resumen de cada sección al pasar el cursor"
   await expect(menu).toBeHidden();
   expect(errors).toEqual([]);
 });
+
+test("Escena 02: las figuras se dibujan al entrar, se reinician al salir y se vuelven a dibujar al volver", async ({ page }) => {
+  await open(page);
+  const frames = page.locator("[data-servicios] [data-loop-frame]");
+  await expect(frames).toHaveCount(2);
+  for (let i = 0; i < 2; i++) {
+    const frame = frames.nth(i);
+    // Trazo de entrada: 1 = sin dibujar, 0 = dibujado
+    const offset = () => frame.evaluate((el) => parseFloat(getComputedStyle(el.querySelector("[pathLength]")!).strokeDashoffset));
+    const top = () => frame.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+    const into = async () => jump(page, (await top()) - 120);
+
+    await jump(page, 0);
+    await expect.poll(offset).toBe(1); // antes de llegar: sin dibujar y en pausa
+    await into();
+    await expect(frame).toHaveAttribute("data-playing", "");
+    await expect.poll(offset, { timeout: 4000 }).toBe(0);
+
+    // Sale por abajo (se sigue bajando): vuelve al estado inicial
+    await jump(page, (await top()) + 3000);
+    await expect(frame).not.toHaveAttribute("data-playing");
+    await expect.poll(offset).toBe(1);
+
+    // Al volver subiendo: se dibuja otra vez desde el principio
+    await into();
+    await expect(frame).toHaveAttribute("data-playing", "");
+    expect(await offset()).toBeGreaterThan(0.5);
+    await expect.poll(offset, { timeout: 4000 }).toBe(0);
+
+    // Sale por arriba y vuelve bajando: igual
+    await jump(page, 0);
+    await expect.poll(offset).toBe(1);
+    await into();
+    await expect.poll(offset, { timeout: 4000 }).toBe(0);
+  }
+  expect(errors).toEqual([]);
+});
