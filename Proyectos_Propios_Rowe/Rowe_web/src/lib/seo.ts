@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { emptyContact, emptyLegal, fillLegal, getSetting, instagramHref, mediaUrl, type ContactSettings, type LegalSettings } from "@/lib/content/settings";
+import { emptyContact, emptyLegal, fillLegal, getSetting, instagramHref, isPlaceholderValue, mediaUrl, type ContactSettings, type LegalSettings } from "@/lib/content/settings";
 import type { Project, SiteSnapshot } from "@/lib/content/types";
 import { plainText } from "@/lib/rich-text";
 import { absoluteUrl, siteHost, siteUrl, supabaseConfig } from "@/lib/site";
@@ -75,7 +75,7 @@ export function pageMetadata(site: SiteSnapshot, slug: string, fallbackTitle: st
 // ---------------------------------------------------------------------------
 
 /** Un dato entre corchetes es provisional («[+34 600 000 000]»): no se publica en JSON-LD. */
-const real = (v: string | undefined | null) => (v && !/\[.*\]/.test(v) ? v : undefined);
+const real = (v: string | undefined | null) => (v && !isPlaceholderValue(v) ? v : undefined);
 
 export function organizationLd(site: SiteSnapshot) {
   const contact = getSetting<ContactSettings>(site, "contact", emptyContact);

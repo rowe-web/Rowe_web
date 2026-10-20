@@ -93,6 +93,15 @@ const publicText = async (request: APIRequestContext) =>
 
 const toast = (page: Page, text: string | RegExp) => expect(page.getByRole("status").filter({ hasText: text })).toBeVisible();
 
+/** Publica: si la lista de lanzamiento avisa de bloqueantes (contenido provisional real), «Publicar igualmente». */
+async function published(page: Page) {
+  const dialog = page.locator("[data-launch-dialog]");
+  const done = page.getByRole("status").filter({ hasText: "Publicado" });
+  await expect(dialog.or(done).first()).toBeVisible();
+  if (await dialog.isVisible()) await dialog.getByRole("button", { name: "Publicar igualmente" }).click();
+  await expect(done).toBeVisible();
+}
+
 async function waitFor<T>(fn: () => Promise<T | null | undefined | false>, ms = 10000): Promise<T> {
   const t0 = Date.now();
   for (;;) {
@@ -151,14 +160,14 @@ test("admin: edita, publica, la web lo muestra; restaura y vuelve a publicar", a
   const title = `Titular E2E publicado ${run}`;
   await page.locator("#sc-title").fill(title);
   await page.getByRole("button", { name: "Guardar y publicar" }).click();
-  await toast(page, "Publicado");
+  await published(page);
   await waitFor(async () => (await publicText(request)).includes(title));
 
   await db.from("scenes").update({ title: baseline.estudio }).eq("key", "estudio");
   await page.reload();
   // El botón del editor de la escena (el de la barra superior es el primero)
   await page.getByRole("button", { name: "Publicar", exact: true }).last().click();
-  await toast(page, "Publicado");
+  await published(page);
   await waitFor(async () => !(await publicText(request)).includes(title));
   // Tras publicar, las páginas que se regeneran siguen funcionando (p. ej. el detalle de proyecto)
   const { data: project } = await db.from("projects").select("slug").eq("status", "publicado").limit(1).maybeSingle();
@@ -167,6 +176,48 @@ test("admin: edita, publica, la web lo muestra; restaura y vuelve a publicar", a
   const missing = await request.get("/proyectos/no-existe");
   expect(missing.status()).toBe(404);
   expect(await missing.text()).toMatch(/<meta name="robots" content="noindex/);
+});
+
+test("lista de lanzamiento: pendientes en el inicio y aviso accesible antes de publicar", async ({ page }) => {
+  await login(page, "admin");
+  const list = page.locator("[data-launch-list]");
+  await expect(list.getByRole("heading", { name: "Lista de lanzamiento" })).toBeVisible();
+  // El aviso antiguo de proyectos de ejemplo ya no está: va dentro de la lista
+  await expect(page.getByText(/proyectos? de ejemplo del diseño publicados?\. Sustitúyelos/)).toHaveCount(0);
+  const blocking = list.locator('[data-launch-group="Bloqueantes"] a');
+  const pending = await list.locator("li a").count();
+  if (!pending) {
+    await expect(list.getByText("Todo listo para lanzar")).toBeVisible();
+    return;
+  }
+  // Cada pendiente lleva a una pantalla del panel
+  for (const href of await list.locator("li a").evaluateAll((as) => as.map((a) => a.getAttribute("href")))) expect(href).toMatch(/^\/admin\//);
+  await expect(list).toContainText(`${pending} pendiente`);
+  const blockers = await blocking.count();
+  test.skip(blockers === 0, "Sin bloqueantes en la base real: no hay aviso que probar");
+
+  // Guardar y publicar una escena sin cambios: aparece el aviso y «Revisar» no publica
+  const { data: before } = await db.from("releases").select("version").order("version", { ascending: false }).limit(1).maybeSingle();
+  await page.goto("/admin/textos?escena=estudio");
+  await expect(page.locator("#sc-title")).toBeVisible();
+  // El botón del editor de la escena (el de la barra superior es el primero)
+  await page.getByRole("button", { name: "Publicar", exact: true }).last().click();
+  const dialog = page.getByRole("alertdialog");
+  await expect(dialog).toHaveAttribute("aria-modal", "true");
+  await expect(dialog.getByRole("button", { name: "Revisar" })).toBeFocused();
+  await expect(dialog.locator("li")).toHaveCount(blockers);
+  // Foco atrapado: desde el último, Tab vuelve al primero; y Mayús+Tab al revés
+  await dialog.getByRole("button", { name: "Publicar igualmente" }).focus();
+  await page.keyboard.press("Tab");
+  await expect(dialog.locator("a").first()).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(dialog.getByRole("button", { name: "Publicar igualmente" })).toBeFocused();
+  // Esc cierra sin publicar
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await toast(page, "Sin publicar");
+  const { data: after } = await db.from("releases").select("version").order("version", { ascending: false }).limit(1).maybeSingle();
+  expect(after?.version ?? 0).toBe(before?.version ?? 0);
 });
 
 test("páginas: añade, edita, reordena y quita secciones de /web (borrador)", async ({ page }) => {

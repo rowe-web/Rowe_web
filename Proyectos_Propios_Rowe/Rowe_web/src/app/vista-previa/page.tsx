@@ -3,9 +3,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { requirePageUser } from "@/admin/auth";
+import { loadDraftSnapshot } from "@/admin/data";
 import { SiteShell } from "@/components/chrome/SiteShell";
-import type { SiteSnapshot } from "@/lib/content/types";
-import { createSupabaseServer } from "@/lib/supabase/server";
 import { PageMotion } from "@/motion/PageMotion";
 import { HomeScenes } from "@/scenes/HomeScenes";
 
@@ -23,10 +22,7 @@ export default function PreviewPage() {
 async function Preview() {
   const user = await requirePageUser();
   if (!user.role) redirect("/admin");
-  const supabase = await createSupabaseServer();
-  const { data, error } = await supabase.rpc("build_snapshot");
-  if (error || !data) throw new Error(`No se pudo preparar la vista previa: ${error?.message ?? "sin datos"}`);
-  const site = { ...(data as Omit<SiteSnapshot, "version" | "published_at">), version: 0, published_at: new Date().toISOString() } as SiteSnapshot;
+  const site = await loadDraftSnapshot();
 
   return (
     <SiteShell site={site} banner={<PreviewBar />}>

@@ -1,6 +1,34 @@
 import "server-only";
+import { launchIssues } from "@/admin/launch-check";
 import type { MediaRow } from "@/admin/media/upload";
+import type { SiteSnapshot } from "@/lib/content/types";
 import { createSupabaseServer } from "@/lib/supabase/server";
+
+/**
+ * El BORRADOR en la forma de la versión publicada (public.build_snapshot(), lo que se verá al publicar),
+ * con la marca de los proyectos de ejemplo, que la versión publicada no lleva.
+ */
+export async function loadDraftSnapshot(): Promise<SiteSnapshot> {
+  const supabase = await createSupabaseServer();
+  const [{ data, error }, samples] = await Promise.all([
+    supabase.rpc("build_snapshot"),
+    supabase.from("projects").select("id").eq("is_placeholder", true).eq("status", "publicado"),
+  ]);
+  if (error || !data) throw new Error(`No se pudo preparar el borrador: ${error?.message ?? "sin datos"}`);
+  const draft = data as Omit<SiteSnapshot, "version" | "published_at">;
+  const sampleIds = new Set((samples.data ?? []).map((p) => p.id as string));
+  return {
+    ...draft,
+    projects: draft.projects.map((p) => (sampleIds.has(p.id) ? { ...p, is_placeholder: true } : p)),
+    version: 0,
+    published_at: new Date().toISOString(),
+  };
+}
+
+/** Lista de lanzamiento del borrador actual. */
+export async function loadLaunchIssues() {
+  return launchIssues(await loadDraftSnapshot());
+}
 
 /** Biblioteca de medios (para los selectores de los editores). */
 export async function loadMedia(): Promise<MediaRow[]> {

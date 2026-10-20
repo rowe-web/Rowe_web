@@ -6,6 +6,7 @@ import { savePricing, type PricingInput } from "@/admin/actions/prices";
 import { publishSite } from "@/admin/actions/publish";
 import { clearBackup, readBackup, useUndoable } from "@/admin/editor";
 import { useFeedback } from "@/admin/ui/feedback";
+import { useLaunchGuard } from "@/admin/ui/LaunchGuard";
 import { AButton, Card, Field, PageTitle, Segmented, Switch, TextArea, TextInput } from "@/admin/ui/kit";
 import { Select } from "@/admin/ui/Select";
 import { mono } from "@/admin/ui/styles";
@@ -47,6 +48,7 @@ export function PricesScreen({ sections, options, engine }: { sections: SectionR
   const ed = useUndoable<State>(initial, KEY);
   const st = ed.state;
   const { toast, confirm } = useFeedback();
+  const launchGuard = useLaunchGuard();
   const [busy, start] = useTransition();
   const [open, setOpen] = useState<string | null>(null); // clave de la opción con detalles abiertos
   const [openSection, setOpenSection] = useState<string | null>(null);
@@ -167,6 +169,7 @@ export function PricesScreen({ sections, options, engine }: { sections: SectionR
       clearBackup(KEY);
       ed.commit({ sections: res.data!.sections, options: res.data!.options, deletedSections: [], deletedOptions: [] });
       if (!publish) return toast("Precios guardados en el borrador");
+      if ((await launchGuard()) === "review") return toast("Guardado en el borrador. Sin publicar: revisa la lista de lanzamiento.");
       const pub = await publishSite("Precios del configurador");
       toast(pub.ok ? "Publicado. El configurador ya usa los nuevos precios." : pub.error, pub.ok ? "ok" : "error");
     });
