@@ -10,6 +10,7 @@ import type { AdminUser, Role } from "@/admin/auth";
 import { EditorProvider, useEditor } from "@/admin/editor";
 import { ICONS, navFor, sectionFor } from "@/admin/nav";
 import { useFeedback } from "@/admin/ui/feedback";
+import { LaunchGuardProvider, useLaunchGuard } from "@/admin/ui/LaunchGuard";
 import { LiveFeed } from "./LiveFeed";
 import { AButton, mono } from "@/admin/ui/kit";
 
@@ -33,7 +34,9 @@ interface Props {
 export function AdminShell(props: Props) {
   return (
     <EditorProvider>
-      <Shell {...props} />
+      <LaunchGuardProvider>
+        <Shell {...props} />
+      </LaunchGuardProvider>
     </EditorProvider>
   );
 }
@@ -51,6 +54,7 @@ function Shell({ user, status, newLeads, children }: Props) {
   const router = useRouter();
   const { undo, unsaved } = useEditor();
   const { toast, confirm } = useFeedback();
+  const launchGuard = useLaunchGuard();
   // El cajón móvil queda ligado a la ruta en la que se abrió: al navegar, se cierra solo
   const [drawerAt, setDrawerAt] = useState<string | null>(null);
   const drawer = drawerAt === pathname;
@@ -76,12 +80,17 @@ function Shell({ user, status, newLeads, children }: Props) {
   const publish = async () => {
     if (unsaved) return toast("Guarda primero los cambios de esta pantalla.", "error");
     if (!status.dirty) return toast("No hay cambios pendientes de publicar.");
-    const ok = await confirm({
-      title: "¿Publicar los cambios?",
-      body: "La web se actualizará al momento. Si algo no te convence, podrás restaurar la versión anterior desde el historial.",
-      cta: "Publicar",
-    });
-    if (!ok) return;
+    // Con bloqueantes, su aviso sustituye a la confirmación de siempre
+    const decision = await launchGuard();
+    if (decision === "review") return;
+    if (decision === "clear") {
+      const ok = await confirm({
+        title: "¿Publicar los cambios?",
+        body: "La web se actualizará al momento. Si algo no te convence, podrás restaurar la versión anterior desde el historial.",
+        cta: "Publicar",
+      });
+      if (!ok) return;
+    }
     startPublish(async () => {
       const res = await publishSite();
       if (res.ok) toast(`Publicado (versión ${res.data?.version}). La web ya muestra los cambios.`);

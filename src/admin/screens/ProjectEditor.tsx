@@ -9,6 +9,7 @@ import { clearBackup, readBackup, useUndoable } from "@/admin/editor";
 import { slugify } from "@/admin/format";
 import { MediaPicker, MediaPickerModal, MediaThumb, useLibrary } from "@/admin/media/library";
 import { useFeedback } from "@/admin/ui/feedback";
+import { useLaunchGuard } from "@/admin/ui/LaunchGuard";
 import { AButton, Card, Field, Segmented, Switch, TextArea, TextInput } from "@/admin/ui/kit";
 import { mono } from "@/admin/ui/styles";
 
@@ -22,6 +23,7 @@ export function ProjectEditor({ id, initial, isAdmin, isPlaceholder }: { id: str
   const p = ed.state;
   const router = useRouter();
   const { toast, confirm } = useFeedback();
+  const launchGuard = useLaunchGuard();
   const [busy, start] = useTransition();
   const [backup, setBackup] = useState<ProjectInput | null>(null);
   // En un proyecto nuevo la dirección sigue al título hasta que se toca a mano
@@ -43,7 +45,8 @@ export function ProjectEditor({ id, initial, isAdmin, isPlaceholder }: { id: str
       if (!res.ok) return toast(res.error, "error");
       ed.commit({ ...value, metrics: p.metrics });
       clearBackup(key);
-      if (publish) {
+      if (publish && (await launchGuard()) === "review") toast("Guardado en el borrador. Sin publicar la web: revisa la lista de lanzamiento.");
+      else if (publish) {
         const pub = await publishSite(`Proyecto «${value.title}»`);
         toast(pub.ok ? "Publicado. Ya aparece en la web." : pub.error, pub.ok ? "ok" : "error");
       } else toast(id ? "Borrador guardado" : "Proyecto creado como borrador");

@@ -7,6 +7,7 @@ import { publishSite } from "@/admin/actions/publish";
 import { clearBackup, readBackup, useEditor, useUndoable } from "@/admin/editor";
 import { MediaPicker } from "@/admin/media/library";
 import { useFeedback } from "@/admin/ui/feedback";
+import { useLaunchGuard } from "@/admin/ui/LaunchGuard";
 import { JsonFields, type Json } from "@/admin/ui/JsonFields";
 import { AButton, Card, Field, PageTitle, Segmented, Switch, TextArea, TextInput } from "@/admin/ui/kit";
 import { mono, visibleLength } from "@/admin/ui/styles";
@@ -138,6 +139,7 @@ function SceneEditor({ scene, index, isAdmin, onSaved }: { scene: SceneRow; inde
   const ed = useUndoable<SceneInput>(editable(scene), key);
   const v = ed.state;
   const { toast } = useFeedback();
+  const launchGuard = useLaunchGuard();
   const [pv, setPv] = useState<"desk" | "mob">("desk");
   const [saving, startSave] = useTransition();
   const [backup, setBackup] = useState<SceneInput | null>(null);
@@ -160,6 +162,7 @@ function SceneEditor({ scene, index, isAdmin, onSaved }: { scene: SceneRow; inde
       onSaved(v);
       clearBackup(key);
       if (!thenPublish) return toast("Borrador guardado");
+      if ((await launchGuard()) === "review") return toast("Guardado en el borrador. Sin publicar: revisa la lista de lanzamiento.");
       const pub = await publishSite(`Escena «${v.name}»`);
       toast(pub.ok ? "Publicado. La web ya muestra los cambios." : pub.error, pub.ok ? "ok" : "error");
     });

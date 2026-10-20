@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { requirePageUser } from "@/admin/auth";
+import { loadLaunchIssues } from "@/admin/data";
+import type { LaunchIssue } from "@/admin/launch-check";
 import { delta, LEAD_STATUS, longToday, num, percent, when } from "@/admin/format";
 import { Card, StatusDot } from "@/admin/ui/kit";
 import { mono } from "@/admin/ui/styles";
@@ -12,13 +14,13 @@ type Stats = Record<string, number> & { funnel: Record<string, number> };
 export default async function Dashboard() {
   const user = await requirePageUser();
   const supabase = await createSupabaseServer();
-  const [status, stats, leads, recent, history, samples, failedMails] = await Promise.all([
+  const [status, stats, leads, recent, history, launch, failedMails] = await Promise.all([
     supabase.rpc("draft_status"),
     supabase.rpc("admin_stats", { p_days: 7 }),
     supabase.from("leads").select("id", { count: "exact", head: true }).eq("status", "nuevo"),
     supabase.from("leads").select("id, name, company, need, budget_label, status, created_at").order("created_at", { ascending: false }).limit(3),
     supabase.from("audit_log").select("id, created_at, actor_name, summary").order("id", { ascending: false }).limit(4),
-    supabase.from("projects").select("id", { count: "exact", head: true }).eq("is_placeholder", true).eq("status", "publicado"),
+    loadLaunchIssues(),
     user.role === "admin" ? supabase.from("email_outbox").select("id", { count: "exact", head: true }).in("status", ["failed", "dead"]) : Promise.resolve({ count: 0 }),
   ]);
 
@@ -56,19 +58,12 @@ export default async function Dashboard() {
         </a>
       </Card>
 
-      {((samples.count ?? 0) > 0 || (failedMails.count ?? 0) > 0) && (
-        <div className="flex flex-col gap-2">
-          {(samples.count ?? 0) > 0 && (
-            <Link href="/admin/proyectos" className="rounded-lg border border-[rgb(255_59_31/0.45)] px-5 py-3.5 text-[14px] hover:border-rec">
-              <span className="text-rec">●</span> Hay {samples.count} proyecto{samples.count === 1 ? "" : "s"} de ejemplo del diseño publicado{samples.count === 1 ? "" : "s"}. Sustitúyelos por trabajos reales antes del lanzamiento →
-            </Link>
-          )}
-          {(failedMails.count ?? 0) > 0 && (
-            <Link href="/admin/mensajes" className="rounded-lg border border-[rgb(255_59_31/0.45)] px-5 py-3.5 text-[14px] hover:border-rec">
-              <span className="text-rec">●</span> {failedMails.count} aviso{failedMails.count === 1 ? "" : "s"} por email no se ha{failedMails.count === 1 ? "" : "n"} podido enviar. Los mensajes están guardados; revisa la configuración del email →
-            </Link>
-          )}
-        </div>
+      <LaunchList issues={launch} />
+
+      {(failedMails.count ?? 0) > 0 && (
+        <Link href="/admin/mensajes" className="rounded-lg border border-[rgb(255_59_31/0.45)] px-5 py-3.5 text-[14px] hover:border-rec">
+          <span className="text-rec">●</span> {failedMails.count} aviso{failedMails.count === 1 ? "" : "s"} por email no se ha{failedMails.count === 1 ? "" : "n"} podido enviar. Los mensajes están guardados; revisa la configuración del email →
+        </Link>
       )}
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
@@ -144,5 +139,56 @@ export default async function Dashboard() {
         </div>
       </div>
     </div>
+  );
+}
+
+/** Lista de lanzamiento: contenido provisional del borrador, agrupado y enlazado a donde se arregla. */
+function LaunchList({ issues }: { issues: LaunchIssue[] }) {
+  const groups = [
+    { label: "Bloqueantes", hint: "Se verían en la web pública", items: issues.filter((i) => i.severity === "bloqueante"), dot: "bg-rec" },
+    { label: "Avisos", hint: "Conviene revisarlos", items: issues.filter((i) => i.severity === "aviso"), dot: "bg-muted" },
+  ].filter((g) => g.items.length);
+  return (
+    <Card padded={false}>
+      <section aria-labelledby="launch-list" data-launch-list>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line-soft px-5 py-4">
+          <h2 id="launch-list" className="text-[15px] font-normal">
+            Lista de lanzamiento
+          </h2>
+          <span className={`${mono} ${issues.length ? "text-bone" : "text-muted"}`}>{issues.length ? `${issues.length} pendiente${issues.length === 1 ? "" : "s"}` : "Sin pendientes"}</span>
+        </div>
+        {!issues.length && (
+          <p className="flex items-center gap-2.5 px-5 py-5 text-[14px]">
+            <span className="h-2 w-2 rounded-full bg-bone" aria-hidden="true" /> Todo listo para lanzar
+          </p>
+        )}
+        {groups.map((g) => (
+          <div key={g.label} data-launch-group={g.label}>
+            <h3 className={`${mono} flex items-baseline gap-2 border-b border-line-faint px-5 pb-2 pt-4 font-normal text-muted`}>
+              <span className="text-bone">
+                {g.label} · {g.items.length}
+              </span>
+              <span className="normal-case tracking-normal">{g.hint}</span>
+            </h3>
+            <ul>
+              {g.items.map((i) => (
+                <li key={i.id}>
+                  <Link href={i.href} className="flex items-start gap-3.5 border-b border-line-faint px-5 py-3 hover:bg-surface-3">
+                    <span className={`mt-[7px] h-1.5 w-1.5 flex-none rounded-full ${g.dot}`} aria-hidden="true" />
+                    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span className="text-[14px] leading-snug">{i.title}</span>
+                      <span className="truncate text-[12px] text-muted">{i.detail}</span>
+                    </span>
+                    <span className="text-muted" aria-hidden="true">
+                      →
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </section>
+    </Card>
   );
 }

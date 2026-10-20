@@ -2,6 +2,7 @@
 
 import { refresh, updateTag } from "next/cache";
 import { action, check, requireRole } from "@/admin/auth";
+import { loadLaunchIssues } from "@/admin/data";
 import { removeOrphanFiles } from "@/admin/storage-cleanup";
 import { SITE_CACHE_TAG } from "@/lib/content/published";
 import { createSupabaseServer } from "@/lib/supabase/server";
@@ -16,6 +17,14 @@ export async function publishSite(note = "") {
     await removeOrphanFiles(supabase, version).catch((e) => console.error("[admin] limpieza", e));
     refresh();
     return { version };
+  });
+}
+
+/** Avisos bloqueantes de la lista de lanzamiento, para avisar antes de publicar (no impide publicar). */
+export async function launchBlockers() {
+  return action(async () => {
+    await requireRole("admin");
+    return (await loadLaunchIssues()).filter((i) => i.severity === "bloqueante");
   });
 }
 

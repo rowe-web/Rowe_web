@@ -8,6 +8,7 @@ import { clearBackup, readBackup, useEditor, useUndoable } from "@/admin/editor"
 import { when } from "@/admin/format";
 import { MediaPicker } from "@/admin/media/library";
 import { useFeedback } from "@/admin/ui/feedback";
+import { useLaunchGuard } from "@/admin/ui/LaunchGuard";
 import { JsonFields, type Json } from "@/admin/ui/JsonFields";
 import { AButton, Card, Field, PageTitle, Segmented, Switch, TextArea, TextInput } from "@/admin/ui/kit";
 import { mono } from "@/admin/ui/styles";
@@ -91,6 +92,7 @@ export function SettingsScreen({ settings, pages, isAdmin, host, initialTab }: {
 
 function useSaver(isAdmin: boolean) {
   const { toast } = useFeedback();
+  const launchGuard = useLaunchGuard();
   const [busy, start] = useTransition();
   const run = (save: () => Promise<{ ok: boolean; error?: string }>, onSaved: () => void, opts: { publish: boolean; note: string; live?: boolean }) =>
     start(async () => {
@@ -98,6 +100,7 @@ function useSaver(isAdmin: boolean) {
       if (!res.ok) return toast((res as { error: string }).error, "error");
       onSaved();
       if (!opts.publish) return toast(opts.live ? "Guardado. Ya está en uso." : "Borrador guardado");
+      if ((await launchGuard()) === "review") return toast("Guardado en el borrador. Sin publicar: revisa la lista de lanzamiento.");
       const pub = await publishSite(opts.note);
       toast(pub.ok ? "Publicado. La web ya muestra los cambios." : pub.error, pub.ok ? "ok" : "error");
     });

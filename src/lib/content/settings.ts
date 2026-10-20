@@ -102,6 +102,11 @@ export const emptyBrand: BrandSettings = {
   not_found_body: "",
 };
 
+/** Un dato entre corchetes es provisional y hay que sustituirlo antes del lanzamiento («[+34 600 000 000]»). */
+export function isPlaceholderValue(value: unknown): value is string {
+  return typeof value === "string" && /\[.*\]/.test(value);
+}
+
 /** Enlace de WhatsApp a partir del número escrito en el panel (ignora espacios y corchetes). */
 export function whatsappHref(phone: string): string {
   const digits = phone.replace(/\D/g, "");

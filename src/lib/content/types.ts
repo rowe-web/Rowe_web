@@ -80,6 +80,8 @@ export interface Project {
   featured: boolean;
   position: number;
   gallery: string[];
+  /** Proyecto de ejemplo del diseño. Solo en el borrador del panel: la versión publicada no lo lleva. */
+  is_placeholder?: boolean;
 }
 
 export interface ConfigSection {

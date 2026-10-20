@@ -79,6 +79,7 @@ export function buildFallbackSnapshot(): SiteSnapshot {
       featured: p.featured,
       position: i * 10,
       gallery: [],
+      is_placeholder: true,
     }));
 
   const sections: ConfigSection[] = data.configSections.map((s, i) => ({
