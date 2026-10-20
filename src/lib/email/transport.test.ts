@@ -52,6 +52,13 @@ describe("mensaje SMTP (lo que ven los filtros de spam)", () => {
     expect(id(await raw(mail))).not.toBe(id(await raw(mail)));
   });
 
+  it("un Message-ID fijo (confirmación de una solicitud) sale tal cual y es el mismo en cada reintento", async () => {
+    const mail = { ...(await reply()), messageId: "<rowe-solicitud-3f2a9c1e-7b4d-4e8a-9f10-2b3c4d5e6f70@gmail.com>" };
+    const id = (m: string) => m.match(/^Message-ID: (.+)$/m)?.[1];
+    expect(id(await raw(mail))).toBe(mail.messageId);
+    expect(id(await raw(mail))).toBe(mail.messageId);
+  });
+
   it("sin versión de texto no sale", () => {
     expect(() => smtpMessage({ to: ["a@example.com"], subject: "x", html: "<p>x</p>", text: "  " }, ACCOUNT)).toThrow(/texto plano/);
   });

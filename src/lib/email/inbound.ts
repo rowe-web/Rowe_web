@@ -9,6 +9,19 @@ export function normalizeMessageId(id: string | null | undefined): string | null
   return v ? `<${v}>` : null;
 }
 
+/**
+ * Message-ID del email de confirmación de una solicitud: fijo y con el id del lead, para que una
+ * respuesta del cliente (In-Reply-To / References) se asocie a su mensaje sin consultar nada más.
+ */
+export function confirmationMessageId(leadId: string, account: string): string {
+  return `<rowe-solicitud-${leadId.toLowerCase()}@${account.split("@")[1] || "localhost"}>`;
+}
+
+/** Id del lead de un Message-ID de confirmación, o null si no lo es. */
+export function leadIdFromConfirmationId(id: string): string | null {
+  return normalizeMessageId(id)?.match(/^<rowe-solicitud-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})@[^>]+>$/)?.[1] ?? null;
+}
+
 /** Todos los Message-ID de las cabeceras In-Reply-To y References de un email. */
 export function threadIds(inReplyTo: string | null | undefined, references: string | string[] | null | undefined): string[] {
   const refs = Array.isArray(references) ? references.join(" ") : (references ?? "");
@@ -81,7 +94,9 @@ export type InboundMatch = { leadId: string; by: "thread" | "sender" } | null;
 
 /**
  * A qué mensaje (lead) pertenece un email recibido:
- *  1. «thread»: contesta (In-Reply-To / References) a una respuesta que ROWE envió desde el panel.
+ *  1. «thread»: contesta (In-Reply-To / References) a una respuesta que ROWE envió desde el panel
+ *     o al email de confirmación de la solicitud (su Message-ID lleva el id del lead; solo si ese
+ *     lead existe: `existingLeadIds`).
  *  2. «sender»: lo envía la dirección de un cliente que ya escribió → su mensaje más reciente.
  * Cualquier otro email del buzón (avisos internos, publicidad…) se ignora: null.
  */
@@ -89,10 +104,12 @@ export function matchInbound(
   email: { from: string; threadIds: string[] },
   sentReplies: { message_id: string | null; lead_id: string }[],
   leadsByEmail: LeadCandidate[],
+  existingLeadIds: string[] = [],
 ): InboundMatch {
   const byId = new Map(sentReplies.filter((r) => r.message_id).map((r) => [normalizeMessageId(r.message_id)!, r.lead_id]));
   for (const id of email.threadIds) {
-    const lead = byId.get(id);
+    const confirmed = leadIdFromConfirmationId(id);
+    const lead = byId.get(id) ?? (confirmed && existingLeadIds.includes(confirmed) ? confirmed : null);
     if (lead) return { leadId: lead, by: "thread" };
   }
   const from = email.from.trim().toLowerCase();

@@ -50,10 +50,11 @@ const LABELS: Record<string, string> = {
   q: "Pregunta", a: "Respuesta", cta: "Botón principal", secondary: "Botón secundario", image_media_id: "Imagen 2.39:1",
   video_media_id: "Vídeo 2.39:1 (opcional, usa la imagen como póster)", channels_label: "Rótulo de los canales", form_label: "Rótulo del formulario",
   service_area_web: "Webs (dónde)", service_area_video: "Rodajes (dónde)", service_area_cities: "Ciudades de rodaje", service_area_note: "Nota sobre el desplazamiento",
+  subject: "Asunto", intro: "Texto de entrada", outro: "Texto de cierre", reason: "Por qué lo recibe (línea final)",
   owner: "Titular (nombre y apellidos o razón social)", nif: "NIF / CIF", hosting: "Proveedor de alojamiento web", updated: "Última actualización",
 };
 
-const LONG = new Set(["a", "body", "claim", "text", "lead", "description", "note", "message_placeholder", "success_body", "send_body", "not_found_body", "overlay_lead", "disclaimer", "includes", "includes_content", "summary"]);
+const LONG = new Set(["a", "body", "claim", "intro", "outro", "text", "lead", "description", "note", "message_placeholder", "success_body", "send_body", "not_found_body", "overlay_lead", "disclaimer", "includes", "includes_content", "summary"]);
 
 export function humanize(key: string) {
   return LABELS[key] ?? key.replace(/_media_id$/, "").replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());

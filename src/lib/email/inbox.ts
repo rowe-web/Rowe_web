@@ -3,7 +3,7 @@ import { ImapFlow } from "imapflow";
 import { simpleParser } from "mailparser";
 import { serverEnv } from "@/lib/env.server";
 import { adminClient } from "@/lib/supabase/admin";
-import { matchInbound, normalizeMessageId, stripQuoted, threadIds } from "./inbound";
+import { leadIdFromConfirmationId, matchInbound, normalizeMessageId, stripQuoted, threadIds } from "./inbound";
 
 /** Primera lectura (o si Gmail renumera el buzón): se revisan los emails de los últimos días. */
 const FIRST_RUN_DAYS = 30;
@@ -80,7 +80,10 @@ export async function syncInbox({ minInterval = 20 }: { minInterval?: number } =
         const ids = threadIds(mail.inReplyTo, mail.references);
 
         const { data: leads } = await db.from("leads").select("id, email, created_at").ilike("email", from);
-        const match = matchInbound({ from, threadIds: ids }, sent ?? [], leads ?? []);
+        // Respuestas al email de confirmación: el lead va en el Message-ID (si sigue existiendo)
+        const confirmed = ids.map(leadIdFromConfirmationId).filter((v): v is string => !!v);
+        const { data: existing } = confirmed.length ? await db.from("leads").select("id").in("id", confirmed) : { data: [] };
+        const match = matchInbound({ from, threadIds: ids }, sent ?? [], leads ?? [], (existing ?? []).map((l) => l.id as string));
         if (!match) continue;
 
         const full = (mail.text || "").trim().slice(0, 60_000);

@@ -1,7 +1,8 @@
 import "server-only";
 import { adminClient } from "@/lib/supabase/admin";
+import { buildConfirmationMail, type ConfirmationJob } from "./confirmation";
 import { newLeadEmail, type NewLeadPayload } from "./templates";
-import { EmailNotConfiguredError, sendMail } from "./transport";
+import { EmailNotConfiguredError, sendMail, type Mail } from "./transport";
 
 /** Esperas entre reintentos: 1 min, 5 min, 30 min, 2 h, 12 h. Después: «dead». */
 const BACKOFF_MIN = [1, 5, 30, 120, 720];
@@ -11,8 +12,15 @@ interface OutboxRow {
   id: number;
   template: string;
   to_addresses: string[];
-  payload: NewLeadPayload;
+  payload: NewLeadPayload | ConfirmationJob;
   attempts: number;
+}
+
+/** Plantillas de la cola: «new-lead» (aviso al equipo) y «lead-confirmation» (confirmación al cliente). */
+async function buildMail(row: OutboxRow): Promise<Mail | null> {
+  if (row.template === "new-lead") return newLeadEmail(row.payload as NewLeadPayload, row.to_addresses);
+  if (row.template === "lead-confirmation") return buildConfirmationMail(row.payload as ConfirmationJob);
+  return null;
 }
 
 /** Guarda el aviso en la cola. El lead ya está guardado antes de llamar a esto. */
@@ -27,6 +35,25 @@ export async function enqueueNewLead(payload: NewLeadPayload, to: string[]): Pro
     return null;
   }
   return data.id as number;
+}
+
+/**
+ * Encola la confirmación al cliente (después del aviso al equipo). Nunca lanza: si falla, el
+ * formulario responde igual y el error queda en el registro.
+ */
+export async function enqueueConfirmation(job: ConfirmationJob): Promise<number | null> {
+  try {
+    const { data, error } = await adminClient()
+      .from("email_outbox")
+      .insert({ lead_id: job.leadId, template: "lead-confirmation", to_addresses: [job.email], payload: job })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return data.id as number;
+  } catch (err) {
+    console.error("[email] No se pudo encolar la confirmación del lead", job.leadId, err instanceof Error ? err.message : err);
+    return null;
+  }
 }
 
 /**
@@ -60,7 +87,7 @@ export async function processOutbox(opts: { ids?: number[]; limit?: number } = {
     const attempts = row.attempts + 1;
     try {
       if (!row.to_addresses.length) throw new Error("Sin destinatarios (ajuste «notifications»)");
-      const mail = row.template === "new-lead" ? await newLeadEmail(row.payload, row.to_addresses) : null;
+      const mail = await buildMail(row);
       if (!mail) throw new Error(`Plantilla desconocida: ${row.template}`);
       await sendMail(mail);
       await db.from("email_outbox").update({ status: "sent", attempts, sent_at: new Date().toISOString(), last_error: null }).eq("id", row.id);

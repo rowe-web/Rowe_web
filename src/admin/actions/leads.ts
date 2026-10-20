@@ -112,7 +112,8 @@ export async function retryLeadEmail(leadId: string) {
   return action(async () => {
     await requireRole("staff");
     const db = adminClient();
-    const { data } = await db.from("email_outbox").select("id, status").eq("lead_id", id.parse(leadId)).order("id", { ascending: false }).limit(1).maybeSingle();
+    // Solo el aviso al equipo (la confirmación al cliente tiene sus propios reintentos)
+    const { data } = await db.from("email_outbox").select("id, status").eq("lead_id", id.parse(leadId)).eq("template", "new-lead").order("id", { ascending: false }).limit(1).maybeSingle();
     if (!data) throw new ActionError("Este mensaje no tiene aviso en la cola.");
     if (data.status === "sent") throw new ActionError("El aviso ya se envió.");
     // Un aviso «agotado» vuelve a la cola para un intento más

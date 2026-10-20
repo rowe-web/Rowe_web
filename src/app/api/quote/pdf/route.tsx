@@ -1,11 +1,7 @@
-import { renderToBuffer } from "@react-pdf/renderer";
-import { QuoteDocument } from "@/features/configurator/pdf/QuoteDocument";
+import { renderQuotePdf } from "@/features/configurator/pdf/renderQuotePdf";
 import { saveQuote, serverQuote } from "@/features/configurator/server";
-import { getConfiguratorSettings } from "@/features/configurator/settings";
-import { emptyContact, getSetting, hasRealValue, type ContactSettings } from "@/lib/content/settings";
 import { loadSite } from "@/lib/content/site";
 import { clientIp, hashIp, json, sameOrigin } from "@/lib/server/request";
-import { siteHost } from "@/lib/site";
 import { adminClient } from "@/lib/supabase/admin";
 
 /**
@@ -36,17 +32,12 @@ export async function POST(req: Request) {
     console.error("[pdf]", err instanceof Error ? err.message : err);
   }
 
-  const settings = getConfiguratorSettings(site);
-  const contact = getSetting<ContactSettings>(site, "contact", emptyContact);
-  const date = new Date().toLocaleDateString("es-ES", { timeZone: "Europe/Madrid", day: "2-digit", month: "2-digit", year: "numeric" }).replace(/\//g, ".");
-  const pdf = await renderToBuffer(
-    <QuoteDocument quote={quote} number={number} date={date} settings={settings} footer={[contact.email_contact, siteHost, contact.phone].filter(hasRealValue)} />,
-  );
+  const pdf = await renderQuotePdf(site, quote, number);
 
-  return new Response(new Uint8Array(pdf), {
+  return new Response(new Uint8Array(pdf.content), {
     headers: {
       "content-type": "application/pdf",
-      "content-disposition": `attachment; filename="${settings.pdf.file_name.replace(/"/g, "")}"`,
+      "content-disposition": `attachment; filename="${pdf.filename}"`,
       "cache-control": "no-store",
       "x-quote-number": number,
     },

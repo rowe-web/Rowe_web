@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { matchInbound, normalizeMessageId, stripQuoted, threadIds } from "./inbound";
+import { confirmationMessageId, leadIdFromConfirmationId, matchInbound, normalizeMessageId, stripQuoted, threadIds } from "./inbound";
 
 describe("respuestas de clientes · texto nuevo", () => {
   it("corta la cita de Gmail en español (también partida en dos líneas)", () => {
@@ -58,5 +58,32 @@ describe("respuestas de clientes · a qué mensaje pertenecen", () => {
 
   it("ignora los emails que no son de ningún cliente", () => {
     expect(matchInbound({ from: "publicidad@tienda.com", threadIds: ["<otro@x>"] }, replies, leads)).toBeNull();
+  });
+});
+
+describe("respuestas al email de confirmación de la solicitud", () => {
+  const LEAD = "3f2a9c1e-7b4d-4e8a-9f10-2b3c4d5e6f70";
+  const leads = [{ id: "lead-viejo", email: "lucia@clinica.es", created_at: "2026-10-01T00:00:00Z" }];
+  const confirmation = confirmationMessageId(LEAD, "rowe.web.contacto@gmail.com");
+
+  it("su Message-ID lleva el id del lead y el dominio de la cuenta que envía", () => {
+    expect(confirmation).toBe(`<rowe-solicitud-${LEAD}@gmail.com>`);
+    expect(leadIdFromConfirmationId(confirmation)).toBe(LEAD);
+    // Como lo devuelven los clientes de correo: en mayúsculas o sin «< >»
+    expect(leadIdFromConfirmationId(confirmation.toUpperCase().replace(/[<>]/g, ""))).toBe(LEAD);
+    expect(leadIdFromConfirmationId("<rowe-solicitud-no-es-un-id@gmail.com>")).toBeNull();
+    expect(leadIdFromConfirmationId("<abc@gmail.com>")).toBeNull();
+  });
+
+  it("una respuesta (In-Reply-To / References) va a su solicitud por el hilo, aunque escriba desde otra dirección", () => {
+    const ids = threadIds(confirmation, [confirmation]);
+    expect(matchInbound({ from: "otra@gmail.com", threadIds: ids }, [], leads, [LEAD])).toEqual({ leadId: LEAD, by: "thread" });
+    // También con la cabecera References encadenada (Gmail añade los anteriores)
+    expect(matchInbound({ from: "lucia@clinica.es", threadIds: threadIds("<x@mail.gmail.com>", `${confirmation} <x@mail.gmail.com>`) }, [], leads, [LEAD])).toEqual({ leadId: LEAD, by: "thread" });
+  });
+
+  it("si esa solicitud ya no existe, se asocia por el remitente como siempre", () => {
+    expect(matchInbound({ from: "lucia@clinica.es", threadIds: [confirmation] }, [], leads, [])).toEqual({ leadId: "lead-viejo", by: "sender" });
+    expect(matchInbound({ from: "otra@gmail.com", threadIds: [confirmation] }, [], leads, [])).toBeNull();
   });
 });

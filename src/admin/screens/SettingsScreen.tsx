@@ -47,6 +47,7 @@ const TABS = [
   { id: "navegacion", label: "Menú y pie", setting: "navigation" },
   { id: "configurador", label: "Configurador", setting: "configurator" },
   { id: "formulario", label: "Formulario «Hablemos»", setting: "hablemos" },
+  { id: "confirmacion", label: "Email de confirmación", setting: "confirmation_email" },
   { id: "avisos", label: "Avisos por email", setting: "notifications" },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
@@ -59,6 +60,8 @@ const HINTS: Partial<Record<string, string>> = {
   hablemos: "Pasos, opciones, textos y mensajes de error del formulario.",
   legal: "Titular de la web para el aviso legal y la privacidad. En los textos legales, {titular}, {nif}, {domicilio}, {email}, {alojamiento} y {actualizado} se sustituyen por estos datos, y {web} y {dominio} por la dirección real de la web. Lo que va entre corchetes es provisional.",
   notifications: "A quién se envía el aviso de cada mensaje nuevo. No se publica: se aplica al guardar.",
+  confirmation_email:
+    "Email automático al cliente nada más enviar «Hablemos»: resumen de su solicitud y, si viene del configurador, el PDF del presupuesto. {nombre} = nombre del cliente; *texto* = cursiva. No se publica: se aplica al guardar.",
 };
 
 /** Ajustes → Contacto: «Dónde trabajamos» se edita en su propio bloque (vacío si aún no existe). */
